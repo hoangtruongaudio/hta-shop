@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Quản trị - HOÀNG TRƯỜNG AUDIO</title>
+<style>
+:root{--pink:#fe2c55;--dark:#042e3c}
+*{box-sizing:border-box}
+body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:20px}
+.container{max-width:600px;margin:0 auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+h1,h2{color:var(--dark);margin-top:0}
+input,button,textarea{font:inherit;width:100%;margin-top:6px;margin-bottom:12px;padding:10px;border:1px solid #ddd;border-radius:6px}
+button{background:var(--pink);color:#fff;border:0;font-weight:bold;cursor:pointer}
+button:hover{opacity:0.9}
+.card{border:1px solid #eee;padding:12px;border-radius:6px;margin-bottom:12px;background:#fafafa}
+.login-box{max-width:360px;margin:80px auto;background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.hidden{display:none}
+.pimg-preview{width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid #ddd;display:block;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<div id="loginSection" class="login-box">
+ <h2>Đăng nhập Admin</h2>
+ <label>Mật khẩu quản trị</label>
+ <input type="password" id="passInput" placeholder="Nhập mật khẩu...">
+ <button onclick="login()">ĐĂNG NHẬP</button>
+</div>
+
+<div id="adminSection" class="container hidden">
+ <h1>⚙ QUẢN LÝ CỬA HÀNG</h1>
+ 
+ <div class="card">
+  <h2>Cấu hình Shop</h2>
+  <label>Tên Shop</label>
+  <input id="shopNameInput">
+  <label>Số lượng đã bán tổng</label>
+  <input id="soldShopInput">
+  <label>Logo Shop</label>
+  <input type="file" accept="image/*" onchange="uploadLogo(event)">
+  <button onclick="saveShopInfo()">Lưu thông tin Shop</button>
+ </div>
+
+ <h2>Danh sách sản phẩm</h2>
+ <div id="productListAdmin"></div>
+
+ <button onclick="saveAllProducts()" style="background:#0a9c96;margin-top:10px">LƯU TẤT CẢ SẢN PHẨM</button>
+ <button onclick="logout()" style="background:#777;margin-top:5px">Đăng xuất</button>
+</div>
+
+<script>
+const ADMIN_PASS = "123456"; // Mật khẩu quản trị
+
+const defaultProducts=[
+ {name:'Tai nghe Bluetooth AP2 không dây HIFI cảm ứng thông minh',price:'89.000₫',old:'149.000₫',sold:'1.2K',deal:'Giảm 40%',img:''},
+ {name:'Tai nghe Bluetooth AP3 ENC Pin 8H Bluetooth 5.3 HIFI',price:'129.000₫',old:'199.000₫',sold:'2.3K',deal:'Giảm 35%',img:''},
+ {name:'Tai nghe Bluetooth AP4 ANC xuyên âm khử ồn',price:'189.000₫',old:'299.000₫',sold:'908',deal:'Giảm 37%',img:''},
+ {name:'Tai nghe Bluetooth Pro 2 ANC khử ồn cảm ứng',price:'229.000₫',old:'359.000₫',sold:'810',deal:'Giảm 36%',img:''}
+];
+
+let products = JSON.parse(localStorage.getItem('hta_products')||'null')||defaultProducts;
+
+function login(){
+ const p = document.getElementById('passInput').value;
+ if(p === ADMIN_PASS){
+  document.getElementById('loginSection').classList.add('hidden');
+  document.getElementById('adminSection').classList.remove('hidden');
+  loadAdminData();
+ }else{
+  alert("Mật khẩu không chính xác!");
+ }
+}
+
+function logout(){
+ location.reload();
+}
+
+function loadAdminData(){
+ document.getElementById('shopNameInput').value = localStorage.getItem('hta_shop')||'HOÀNG TRƯỜNG AUDIO';
+ document.getElementById('soldShopInput').value = localStorage.getItem('hta_sold')||'10.4K đã bán';
+ renderAdminProducts();
+}
+
+function saveShopInfo(){
+ localStorage.setItem('hta_shop', document.getElementById('shopNameInput').value.trim());
+ localStorage.setItem('hta_sold', document.getElementById('soldShopInput').value.trim());
+ alert("Đã lưu thông tin Shop thành công!");
+}
+
+function uploadLogo(e){
+ const f = e.target.files[0];
+ if(!f) return;
+ const r = new FileReader();
+ r.onload = () => {
+  localStorage.setItem('hta_logo', r.result);
+  alert("Đã cập nhật Logo Shop!");
+ };
+ r.readAsDataURL(f);
+}
+
+function renderAdminProducts(){
+ const box = document.getElementById('productListAdmin');
+ box.innerHTML = '';
+ products.forEach((p, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+   <h3>Sản phẩm #${i+1}</h3>
+   ${p.img ? `<img src="${p.img}" class="pimg-preview">` : ''}
+   <label>Ảnh sản phẩm</label>
+   <input type="file" accept="image/*" onchange="uploadProductImg(event, ${i})">
+   <label>Tên sản phẩm</label>
+   <input id="pname_${i}" value="${p.name}">
+   <label>Giá bán hiện tại</label>
+   <input id="pprice_${i}" value="${p.price}">
+   <label>Giá cũ (gạch đi)</label>
+   <input id="pold_${i}" value="${p.old}">
+   <label>Số lượng đã bán</label>
+   <input id="psold_${i}" value="${p.sold}">
+  `;
+  box.appendChild(card);
+ });
+}
+
+function uploadProductImg(e, index){
+ const f = e.target.files[0];
+ if(!f) return;
+ const r = new FileReader();
+ r.onload = () => {
+  products[index].img = r.result;
+  renderAdminProducts();
+ };
+ r.readAsDataURL(f);
+}
+
+function saveAllProducts(){
+ products.forEach((p, i) => {
+  p.name = document.getElementById(`pname_${i}`).value.trim();
+  p.price = document.getElementById(`pprice_${i}`).value.trim();
+  p.old = document.getElementById(`pold_${i}`).value.trim();
+  p.sold = document.getElementById(`psold_${i}`).value.trim();
+ });
+ localStorage.setItem('hta_products', JSON.stringify(products));
+ alert("Đã lưu tất cả thay đổi sản phẩm!");
+}
+</script>
+</body>
+</html>
