@@ -235,7 +235,7 @@ tr:hover { background: #2f2f2f; }
     </div>
 
     <div class="form-group">
-      <label>Quản lý Ảnh sản phẩm (Bộ nhớ tự nén nhẹ)</label>
+      <label>Quản lý Ảnh sản phẩm (Tự nén dung lượng nhẹ)</label>
       <input type="file" id="imageInput" multiple accept="image/*" style="display:none" onchange="handleImageUpload(event)">
       <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imageInput').click()">+ Tải ảnh lên</button>
       <div class="media-grid" id="imageGrid"></div>
@@ -266,20 +266,20 @@ tr:hover { background: #2f2f2f; }
   </div>
 </div>
 
-<!-- Modal tùy chỉnh Chèn ảnh vào Mô tả -->
+<!-- Modal Chèn ảnh vào Mô tả -->
 <div id="insertImgModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000;">
   <div style="background:var(--bg-card); width:450px; border-radius:10px; padding:20px; border:1px solid var(--border);">
     <h4 style="margin-bottom:15px; color:#fff;">Chèn ảnh vào bài viết</h4>
     
     <div class="form-group">
-      <label>Cách 1: Chọn ảnh từ máy tính (Tự nén dung lượng)</label>
+      <label>Cách 1: Chọn ảnh từ máy tính</label>
       <input type="file" id="editorFileInput" accept="image/*" class="form-control" style="font-size:12px;">
     </div>
 
     <div style="text-align:center; color:var(--text-muted); margin: 10px 0;">— HOẶC —</div>
 
     <div class="form-group">
-      <label>Cách 2: Dán đường dẫn URL ảnh</label>
+      <label>Cách 2: Dán URL đường dẫn ảnh</label>
       <input type="text" id="editorUrlInput" class="form-control" placeholder="https://example.com/anh.jpg">
     </div>
 
@@ -301,6 +301,7 @@ let reviews = JSON.parse(localStorage.getItem('hta_reviews')) || [
 
 let tempImages = [];
 let tempVideo = '';
+let savedRange = null; // Biến lưu vị trí con trỏ chuột trong Trình soạn thảo
 
 function checkLogin() {
   const p = document.getElementById('loginPass').value;
@@ -438,7 +439,7 @@ function saveProductsToStorage() {
     renderProducts();
     renderStats();
   } catch (e) {
-    alert("Bộ nhớ trình duyệt đã đầy. Vui lòng giảm bớt hình ảnh!");
+    alert("Bộ nhớ trình duyệt đã đầy!");
   }
 }
 
@@ -602,7 +603,7 @@ async function saveProduct() {
     alert('Đã lưu sản phẩm thành công!');
   } catch (e) {
     products = originalProducts;
-    alert('Lỗi dung lượng! Hãy dùng URL ảnh/video online thay vì upload trực tiếp.');
+    alert('Lỗi dung lượng bộ nhớ!');
   }
 }
 
@@ -611,8 +612,14 @@ function insertTable() {
   document.execCommand('insertHTML', false, '<table border="1" style="border-collapse:collapse;width:100%"><tr><td>Tiêu đề 1</td><td>Tiêu đề 2</td></tr><tr><td>Nội dung 1</td><td>Nội dung 2</td></tr></table>');
 }
 
-/* Xử lý Chèn ảnh vào Trình soạn thảo bằng Modal riêng */
+/* --- XỬ LÝ CHÈN ẢNH CHUẨN XÁC VÀO TRÌNH SOẠN THẢO --- */
 function openInsertImageModal() {
+  // Lưu con trỏ chuột hiện tại
+  const sel = window.getSelection();
+  if (sel.getRangeAt && sel.rangeCount) {
+    savedRange = sel.getRangeAt(0);
+  }
+  
   document.getElementById('editorFileInput').value = '';
   document.getElementById('editorUrlInput').value = '';
   document.getElementById('insertImgModal').style.display = 'flex';
@@ -620,6 +627,16 @@ function openInsertImageModal() {
 
 function closeInsertImageModal() {
   document.getElementById('insertImgModal').style.display = 'none';
+}
+
+function restoreSelection() {
+  const editor = document.getElementById('editorContent');
+  editor.focus();
+  if (savedRange) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedRange);
+  }
 }
 
 async function confirmInsertImage() {
@@ -631,15 +648,17 @@ async function confirmInsertImage() {
     const reader = new FileReader();
     reader.onload = async function(evt) {
       const compressedImg = await compressImage(evt.target.result, 500, 0.6);
+      restoreSelection();
       document.execCommand('insertImage', false, compressedImg);
       closeInsertImageModal();
     };
     reader.readAsDataURL(file);
   } else if (urlInput) {
+    restoreSelection();
     document.execCommand('insertImage', false, urlInput);
     closeInsertImageModal();
   } else {
-    alert('Vui lòng chọn file ảnh hoặc dán URL đường dẫn ảnh!');
+    alert('Vui lòng chọn file ảnh hoặc dán link URL!');
   }
 }
 
