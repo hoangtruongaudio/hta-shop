@@ -3,7 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TikTok Shop Seller Center Center - Quản lý cửa hàng</title>
+<title>TikTok Shop Seller Center - Quản lý cửa hàng</title>
+<!-- Tích hợp Firebase Web SDK v9 (Compat version) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
 <style>
 :root {
   --primary: #fe2c55;
@@ -291,26 +295,58 @@ tr:hover { background: #2f2f2f; }
 </div>
 
 <script>
-let products = JSON.parse(localStorage.getItem('hta_products')) || [
-  { id: 'p1', name: 'Tai nghe Bluetooth AP4 ANC khử ồn', price: '189.000₫', old: '299.000₫', sold: 908, status: true, images: [], video: '', variants: ['AP4 ANC', 'Pro 2'], desc: 'Tai nghe chất lượng cao chống ồn chủ động.' }
-];
-let orders = JSON.parse(localStorage.getItem('hta_orders')) || [];
-let reviews = JSON.parse(localStorage.getItem('hta_reviews')) || [
-  { id: 'r1', name: 'Nguyễn Văn A', rating: 5, content: 'Sản phẩm dùng rất mượt, giao hàng siêu nhanh!', time: '10/10/2026' }
-];
+// --- CẤU HÌNH FIREBASE REALTIME DATABASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDummyKeyForInitialSetup123456789",
+  authDomain: "hoangtruongaudio.firebaseapp.com",
+  databaseURL: "https://hoangtruongaudio-default-rtdb.firebaseio.com",
+  projectId: "hoangtruongaudio",
+  storageBucket: "hoangtruongaudio.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef123456"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
+let products = [];
+let orders = [];
+let reviews = [];
 
 let tempImages = [];
 let tempVideo = '';
-let savedRange = null; // Biến lưu vị trí con trỏ chuột trong Trình soạn thảo
+let savedRange = null;
 
 function checkLogin() {
   const p = document.getElementById('loginPass').value;
-  if(p === '123456' || p === (localStorage.getItem('hta_admin_pass') || '123456')) {
+  if(p === '123456') {
     document.getElementById('loginModal').style.display = 'none';
-    refreshAllData();
+    listenAllFirebaseData();
   } else {
     alert('Mật khẩu chưa chính xác!');
   }
+}
+
+function listenAllFirebaseData() {
+  db.ref('hta_products').on('value', (snapshot) => {
+    products = snapshot.val() || [];
+    renderProducts();
+    renderStats();
+  });
+
+  db.ref('hta_orders').on('value', (snapshot) => {
+    const val = snapshot.val();
+    orders = val ? Object.keys(val).map(k => ({ firebaseKey: k, ...val[k] })) : [];
+    renderOrders();
+    renderStats();
+  });
+
+  db.ref('hta_reviews').on('value', (snapshot) => {
+    reviews = snapshot.val() || [];
+    renderReviews();
+  });
 }
 
 function showPage(pageId) {
@@ -320,18 +356,6 @@ function showPage(pageId) {
   
   const titles = { dashboard: 'Tổng quan cửa hàng', orders: 'Quản lý đơn hàng', products: 'Quản lý sản phẩm', reviews: 'Quản lý đánh giá' };
   document.getElementById('headerTitle').textContent = titles[pageId];
-  
-  refreshAllData();
-}
-
-function refreshAllData() {
-  orders = JSON.parse(localStorage.getItem('hta_orders')) || [];
-  products = JSON.parse(localStorage.getItem('hta_products')) || products;
-  reviews = JSON.parse(localStorage.getItem('hta_reviews')) || reviews;
-  renderStats();
-  renderOrders();
-  renderProducts();
-  renderReviews();
 }
 
 function renderStats() {
@@ -358,7 +382,7 @@ function renderOrders() {
     const matchSearch = (o.name||'').toLowerCase().includes(search) || (o.phone||'').includes(search);
     const matchStatus = filterStatus === 'ALL' || o.status === filterStatus;
     return matchSearch && matchStatus;
-  }).forEach((o, index) => {
+  }).forEach((o) => {
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td><b>${o.name}</b> - <small style="color:var(--text-muted)">${o.phone}</small><br><small style="color:#aaa">${o.address || 'Không có địa chỉ'}</small></td>
@@ -366,7 +390,7 @@ function renderOrders() {
       <td style="color:var(--primary); font-weight:bold">${o.price}</td>
       <td><span class="badge ${getStatusBadge(o.status)}">${o.status}</span></td>
       <td>
-        <select onchange="changeOrderStatus(${index}, this.value)" style="background:var(--bg-input); color:#fff; border:1px solid var(--border); padding:4px; border-radius:4px;">
+        <select onchange="changeOrderStatus('${o.firebaseKey}', this.value)" style="background:var(--bg-input); color:#fff; border:1px solid var(--border); padding:4px; border-radius:4px;">
           <option value="Mới" ${o.status==='Mới'?'selected':''}>Mới</option>
           <option value="Đã xác nhận" ${o.status==='Đã xác nhận'?'selected':''}>Đã xác nhận</option>
           <option value="Đang giao" ${o.status==='Đang giao'?'selected':''}>Đang giao</option>
@@ -390,11 +414,9 @@ function getStatusBadge(status) {
   }
 }
 
-function changeOrderStatus(index, newStatus) {
-  orders[index].status = newStatus;
-  localStorage.setItem('hta_orders', JSON.stringify(orders));
-  renderStats();
-  renderOrders();
+function changeOrderStatus(key, newStatus) {
+  if(!key) return;
+  db.ref('hta_orders/' + key + '/status').set(newStatus);
 }
 
 function renderProducts() {
@@ -422,7 +444,7 @@ function renderProducts() {
 
 function toggleProductStatus(idx) {
   products[idx].status = !products[idx].status;
-  saveProductsToStorage();
+  syncProductsToFirebase();
 }
 
 function copyProduct(idx) {
@@ -430,17 +452,13 @@ function copyProduct(idx) {
   p.id = 'p_' + Date.now();
   p.name = p.name + ' (Bản sao)';
   products.push(p);
-  saveProductsToStorage();
+  syncProductsToFirebase();
 }
 
-function saveProductsToStorage() {
-  try {
-    localStorage.setItem('hta_products', JSON.stringify(products));
-    renderProducts();
-    renderStats();
-  } catch (e) {
-    alert("Bộ nhớ trình duyệt đã đầy!");
-  }
+function syncProductsToFirebase() {
+  db.ref('hta_products').set(products).then(() => {
+    alert("Đã đồng bộ lên Đám Mây thành công! Tất cả máy khác sẽ thấy ngay.");
+  });
 }
 
 function handleImageUpload(e) {
@@ -587,24 +605,14 @@ async function saveProduct() {
     sold: editIdx !== '' ? products[editIdx].sold : 0
   };
 
-  const originalProducts = [...products];
-
   if(editIdx !== '') {
     products[editIdx] = pData;
   } else {
     products.push(pData);
   }
 
-  try {
-    localStorage.setItem('hta_products', JSON.stringify(products));
-    renderProducts();
-    renderStats();
-    closeProductModal();
-    alert('Đã lưu sản phẩm thành công!');
-  } catch (e) {
-    products = originalProducts;
-    alert('Lỗi dung lượng bộ nhớ!');
-  }
+  syncProductsToFirebase();
+  closeProductModal();
 }
 
 function execCmd(cmd) { document.execCommand(cmd, false, null); }
@@ -612,14 +620,11 @@ function insertTable() {
   document.execCommand('insertHTML', false, '<table border="1" style="border-collapse:collapse;width:100%"><tr><td>Tiêu đề 1</td><td>Tiêu đề 2</td></tr><tr><td>Nội dung 1</td><td>Nội dung 2</td></tr></table>');
 }
 
-/* --- XỬ LÝ CHÈN ẢNH CHUẨN XÁC VÀO TRÌNH SOẠN THẢO --- */
 function openInsertImageModal() {
-  // Lưu con trỏ chuột hiện tại
   const sel = window.getSelection();
   if (sel.getRangeAt && sel.rangeCount) {
     savedRange = sel.getRangeAt(0);
   }
-  
   document.getElementById('editorFileInput').value = '';
   document.getElementById('editorUrlInput').value = '';
   document.getElementById('insertImgModal').style.display = 'flex';
@@ -683,15 +688,13 @@ function addDummyReview() {
   const content = prompt('Nội dung đánh giá:');
   if(name && content) {
     reviews.unshift({ id: 'r_' + Date.now(), name, rating: 5, content, time: new Date().toLocaleDateString('vi-VN') });
-    localStorage.setItem('hta_reviews', JSON.stringify(reviews));
-    renderReviews();
+    db.ref('hta_reviews').set(reviews);
   }
 }
 
 function deleteReview(idx) {
   reviews.splice(idx, 1);
-  localStorage.setItem('hta_reviews', JSON.stringify(reviews));
-  renderReviews();
+  db.ref('hta_reviews').set(reviews);
 }
 </script>
 </body>
