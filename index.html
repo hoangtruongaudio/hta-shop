@@ -213,6 +213,156 @@ function submitOrder() {
 }
 
 renderHomeProducts();
+<script>
+// Dữ liệu sản phẩm mẫu mặc định nếu chưa có
+const defaultProducts = [
+  {
+    id: 'p1',
+    name: 'Tai nghe Bluetooth AP4 ANC Chống ồn cao cấp',
+    price: '189.000₫',
+    old: '299.000₫',
+    status: true,
+    variants: ['AP4 ANC', 'Pro 2', 'AP3'],
+    images: ['https://picsum.photos/600/600?random=1', 'https://picsum.photos/600/600?random=2'],
+    video: '',
+    desc: 'Tai nghe không dây âm thanh sống động, mượt mà, thời lượng pin trâu.'
+  },
+  {
+    id: 'p2',
+    name: 'Tai nghe Chụp tai Wireless Bass Cực Mạnh',
+    price: '350.000₫',
+    old: '500.000₫',
+    status: true,
+    variants: ['Đen', 'Trắng'],
+    images: ['https://picsum.photos/600/600?random=3'],
+    video: '',
+    desc: 'Đệm tai êm ái, chống ồn tốt, phù hợp chơi game và nghe nhạc.'
+  }
+];
+
+// Lấy danh sách sản phẩm từ localStorage hoặc dùng sản phẩm mẫu
+let products = JSON.parse(localStorage.getItem('hta_products'));
+if (!products || products.length === 0) {
+  products = defaultProducts;
+  localStorage.setItem('hta_products', JSON.stringify(products));
+}
+
+let currentProd = null;
+let selectedVariant = '';
+
+function renderHomeProducts() {
+  const list = document.getElementById('productList');
+  if (!list) return;
+  list.innerHTML = '';
+  
+  const activeProducts = products.filter(p => p.status);
+  if (activeProducts.length === 0) {
+    list.innerHTML = '<div style="text-align:center; padding:30px; color:#888;">Chưa có sản phẩm nào.</div>';
+    return;
+  }
+
+  activeProducts.forEach(p => {
+    const coverMedia = (p.images && p.images.length > 0) 
+      ? `<img src="${p.images[0]}">` 
+      : (p.video ? `<video src="${p.video}"></video>` : '<div style="background:#ddd;width:100%;height:100%"></div>');
+    
+    const div = document.createElement('div');
+    div.className = 'product';
+    div.onclick = () => openDetail(p.id);
+    div.innerHTML = `
+      <div class="pimg">${coverMedia}</div>
+      <div class="pbody">
+        <div class="pname">${p.name}</div>
+        <div class="price">${p.price}</div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function openDetail(id) {
+  currentProd = products.find(p => p.id === id);
+  if(!currentProd) return;
+
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('detail').classList.add('show');
+  document.getElementById('stickyNav').style.display = 'flex';
+
+  document.getElementById('detailTitle').textContent = currentProd.name;
+  document.getElementById('detailPrice').textContent = currentProd.price;
+  document.getElementById('detailDesc').innerHTML = currentProd.desc || 'Chưa có mô tả.';
+
+  const carousel = document.getElementById('detailCarousel');
+  carousel.innerHTML = '';
+  if(currentProd.video) {
+    carousel.innerHTML += `<div class="carousel-item"><video src="${currentProd.video}" controls autoplay loop muted></video></div>`;
+  }
+  (currentProd.images || []).forEach(img => {
+    carousel.innerHTML += `<div class="carousel-item"><img src="${img}"></div>`;
+  });
+
+  const vContainer = document.getElementById('detailVariants');
+  vContainer.innerHTML = '';
+  selectedVariant = (currentProd.variants && currentProd.variants.length > 0) ? currentProd.variants[0] : '';
+  (currentProd.variants || []).forEach((v, idx) => {
+    const btn = document.createElement('button');
+    btn.className = `variant-btn ${idx===0?'active':''}`;
+    btn.textContent = v;
+    btn.onclick = () => {
+      document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedVariant = v;
+    };
+    vContainer.appendChild(btn);
+  });
+}
+
+function backHome() {
+  document.getElementById('detail').classList.remove('show');
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('stickyNav').style.display = 'none';
+}
+
+function openCheckout() {
+  if(!currentProd) return;
+  document.getElementById('orderSummary').textContent = `${currentProd.name} (${selectedVariant || 'Mặc định'}) - ${currentProd.price}`;
+  document.getElementById('sheetbg').style.display = 'flex';
+}
+
+function closeCheckout() {
+  document.getElementById('sheetbg').style.display = 'none';
+}
+
+function submitOrder() {
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const addr = document.getElementById('custAddr').value.trim();
+
+  if(!name || !phone || !addr) {
+    alert('Vui lòng điền đầy đủ thông tin giao hàng!');
+    return;
+  }
+
+  const orders = JSON.parse(localStorage.getItem('hta_orders')) || [];
+  orders.unshift({
+    id: 'ORD_' + Date.now(),
+    name: name,
+    phone: phone,
+    address: addr,
+    prodName: currentProd.name,
+    variant: selectedVariant,
+    price: currentProd.price,
+    status: 'Mới',
+    time: new Date().toLocaleString('vi-VN')
+  });
+
+  localStorage.setItem('hta_orders', JSON.stringify(orders));
+  alert('Đặt hàng thành công! Shop sẽ liên hệ xác nhận sớm nhất.');
+  closeCheckout();
+  backHome();
+}
+
+renderHomeProducts();
 </script>
 </body>
 </html>
