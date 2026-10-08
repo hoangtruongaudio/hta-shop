@@ -5,204 +5,315 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>HOÀNG TRƯỜNG AUDIO</title>
 <style>
-:root{ --pink:#fe2c55;--dark:#042e3c;--text:#161823;--muted:#777;--line:#ececec; }
-*{box-sizing:border-box} html,body{margin:0;background:#f5f5f5;color:var(--text);font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
-body{max-width:720px;margin:auto;padding-bottom:72px;position:relative}
+:root { --pink: #fe2c55; --dark: #0f222d; --bg: #f5f5f5; --text: #161823; }
+* { box-sizing: border-box; margin: 0; padding: 0
 
-/* Clearance for Phone Status Bar */
-.status{height:24px;background:var(--dark)}
+; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+body { background: var(--bg); color: var(--text); max-width: 480px; margin: 0 auto; min-height: 100vh; padding-bottom: 70px; position: relative; }
 
-.nav{height:56px;background:var(--dark);color:#fff;display:flex;align-items:center;padding:0 15px;gap:15px;position:sticky;top:0;z-index:100}
-.nav .back{font-size:26px;background:none;border:0;color:#fff;cursor:pointer}
-.nav .search{flex:1;background:#ffffff22;border-radius:20px;height:36px;display:flex;align-items:center;padding:0 12px;font-size:13px;color:#eee}
+/* Status Bar & Header Nav */
+.top-nav { background: var(--dark); color: #fff; padding: 8px 12px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; gap: 10px; }
+.back-btn { font-size: 20px; color: #fff; background: none; border: none; cursor: pointer; }
+.search-box { flex: 1; background: rgba(255,255,255,0.15); border-radius: 18px; padding: 6px 12px; display: flex; align-items: center; gap: 6px; font-size: 13px; color: #ccc; }
+.cart-icon { position: relative; font-size: 20px; cursor: pointer; }
+.cart-badge { position: absolute; top: -5px; right: -8px; background: var(--pink); color: #fff; font-size: 10px; font-weight: bold; padding: 2px 5px; border-radius: 10px; }
 
-.list{background:#fff}
-.product{display:flex;gap:12px;padding:12px;border-bottom:1px solid #eee;cursor:pointer}
-.pimg{width:110px;height:110px;background:#eee;border-radius:6px;overflow:hidden;flex:none}
-.pimg img, .pimg video{width:100%;height:100%;object-fit:cover}
-.pbody{flex:1;display:flex;flex-direction:column;justify-content:space-between}
-.pname{font-size:15px;line-height:1.3;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.price{font-size:18px;color:var(--pink);font-weight:800}
+/* Banner Mall Top */
+.mall-bar { background: #3d1c06; color: #f2ba7f; font-size: 11px; padding: 5px 12px; display: flex; justify-content: space-between; align-items: center; }
 
-/* Detail Page & Carousel Slider */
-.detail{display:none;background:#fff;min-height:100vh}
-.detail.show{display:block}
-.carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;aspect-ratio:1;background:#000}
-.carousel-item{flex:0 0 100%;scroll-snap-align:start;position:relative}
-.carousel-item img, .carousel-item video{width:100%;height:100%;object-fit:cover}
+/* Shop Profile Header */
+.shop-header { background: #fff; padding: 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #eee; }
+.shop-info { display: flex; align-items: center; gap: 10px; }
+.shop-logo { width: 50px; height: 50px; border-radius: 50%; border: 1px solid #eee; object-fit: cover; }
+.shop-name { font-size: 15px; font-weight: bold; display: flex; align-items: center; gap: 4px; }
+.shop-meta { font-size: 11px; color: #666; margin-top: 2px; }
+.btn-follow { background: var(--pink); color: #fff; border: none; padding: 6px 16px; border-radius: 16px; font-size: 13px; font-weight: 600; cursor: pointer; }
 
-.dinfo{padding:15px}
-.dprice{font-size:24px;color:var(--pink);font-weight:800}
-.variants{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.variant-btn{padding:8px 14px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:13px}
-.variant-btn.active{border-color:var(--pink);color:var(--pink);background:#fff0f3}
+/* Vouchers Section */
+.vouchers { display: flex; gap: 8px; padding: 8px 12px; background: #fff; overflow-x: auto; }
+.voucher-card { background: #fff0f3; border: 1px dashed var(--pink); border-radius: 6px; padding: 6px 10px; font-size: 11px; flex: none; display: flex; align-items: center; gap: 8px; }
+.voucher-btn { background: #17c9b0; color: #fff; border: none; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; }
 
-.sticky{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);background:#fff;border-top:1px solid #ddd;padding:8px;display:flex;gap:8px;z-index:90}
-.sticky .buy{flex:1;background:var(--pink);color:#fff;border:0;border-radius:6px;font-weight:bold;padding:12px}
+/* Navigation Tabs */
+.tabs { display: flex; background: #fff; border-bottom: 1px solid #eee; margin-top: 8px; }
+.tab-item { flex: 1; text-align: center; padding: 12px 0; font-size: 14px; font-weight: 600; color: #666; cursor: pointer; border-bottom: 2px solid transparent; }
+.tab-item.active { color: #000; border-bottom: 2px solid #000; }
 
-/* Modal Checkout */
-.sheetbg{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:none;align-items:flex-end}
-.sheet{width:min(720px,100%);margin:auto;background:#fff;border-radius:12px 12px 0 0;padding:18px}
-.sheet input, .sheet textarea{width:100%;padding:10px;margin-top:8px;border:1px solid #ddd;border-radius:6px;outline:none}
-.sheet .btn-confirm{width:100%;padding:12px;background:var(--pink);color:#fff;border:none;border-radius:6px;font-weight:bold;margin-top:12px;cursor:pointer}
+/* Banner Hero */
+.hero-banner { background: linear-gradient(135deg, #ff416c, #ff4b2b); color: #fff; padding: 20px 15px; text-align: center; margin: 8px 0; border-radius: 8px; }
+.hero-banner h2 { font-size: 20px; font-weight: 800; letter-spacing: 0.5px; }
+.hero-banner p { font-size: 12px; opacity: 0.9; margin-top: 4px; }
+
+/* Section Title */
+.sec-title { font-size: 14px; font-weight: bold; padding: 10px 12px 5px; display: flex; align-items: center; gap: 5px; }
+
+/* Product List Feed */
+.prod-list { padding: 0 12px; }
+.prod-card { background: #fff; border-radius: 8px; margin-bottom: 12px; padding: 10px; display: flex; gap: 10px; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+.prod-img { width: 110px; height: 110px; border-radius: 6px; overflow: hidden; background: #f0f0f0; flex: none; }
+.prod-img img, .prod-img video { width: 100%; height: 100%; object-fit: cover; }
+.prod-details { flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+.prod-title { font-size: 13px; font-weight: 500; line-height: 1.3; color: #222; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.badges { display: flex; gap: 4px; margin-top: 4px; }
+.badge { font-size: 9px; padding: 2px 4px; border-radius: 2px; }
+.badge-free { background: #e6f7f5; color: #00a896; border: 1px solid #b2ece6; }
+.badge-off { background: #ffebeb; color: var(--pink); }
+.prod-stats { font-size: 11px; color: #888; margin-top: 4px; }
+.prod-price-row { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 6px; }
+.price-main { color: var(--pink); font-size: 16px; font-weight: bold; }
+.price-old { font-size: 11px; color: #aaa; text-decoration: line-through; margin-left: 4px; }
+.action-btns { display: flex; gap: 6px; }
+.btn-cart { background: #fff0f3; color: var(--pink); border: 1px solid #ffccd5; width: 32px; height: 32px; border-radius: 4px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.btn-buy-sm { background: var(--pink); color: #fff; border: none; padding: 0 14px; height: 32px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+/* Sticky Bottom Bar */
+.bottom-bar { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(480px, 100%); background: #fff; border-top: 1px solid #eee; display: flex; height: 54px; z-index: 99; }
+.bar-item { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 10px; color: #555; text-decoration: none; cursor: pointer; }
+.bar-item span { font-size: 16px; margin-bottom: 2px; }
+.btn-cart-lg { flex: 2; background: #ffebeb; color: var(--pink); border: none; font-size: 12px; font-weight: bold; cursor: pointer; }
+.btn-buy-lg { flex: 2; background: var(--pink); color: #fff; border: none; font-size: 12px; font-weight: bold; cursor: pointer; }
+
+/* Product Detail View */
+.detail-view { display: none; background: #fff; min-height: 100vh; padding-bottom: 60px; }
+.carousel { width: 100%; aspect-ratio: 1; background: #000; overflow-x: auto; display: flex; scroll-snap-type: x mandatory; }
+.carousel-slide { flex: 0 0 100%; scroll-snap-align: start; }
+.carousel-slide img, .carousel-slide video { width: 100%; height: 100%; object-fit: cover; }
+
+/* Checkout Sheet Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; display: none; align-items: flex-end; }
+.sheet-content { background: #fff; width: 100%; border-radius: 12px 12px 0 0; padding: 16px; max-height: 80vh; overflow-y: auto; }
+.form-input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; margin-top: 8px; font-size: 13px; outline: none; }
+.btn-submit { width: 100%; background: var(--pink); color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; margin-top: 15px; cursor: pointer; }
 </style>
 </head>
 <body>
 
-<div class="status"></div>
-<div class="nav">
-  <button class="back" onclick="backHome()">‹</button>
-  <div class="search">⌕&nbsp; Tìm kiếm trên shop...</div>
-</div>
-
-<!-- Home Page -->
-<div id="home">
-  <div style="padding:15px; background:linear-gradient(135deg, #fe2c55, #ff758c); color:#fff; border-radius:0 0 12px 12px;">
-    <h2>HOÀNG TRƯỜNG AUDIO</h2>
-    <p style="font-size:13px;">Chuyên phụ kiện âm thanh cao cấp</p>
+<!-- Header Top Navigation -->
+<div class="top-nav">
+  <button class="back-btn" onclick="goHome()">‹</button>
+  <div class="search-box">⌕ Search for products</div>
+  <div class="cart-icon" onclick="alert('Giỏ hàng của bạn đang có sản phẩm')">
+    🛒<span class="cart-badge" id="cartBadge">0</span>
   </div>
-  <div class="list" id="productList"></div>
 </div>
 
-<!-- Detail Page -->
-<div id="detail" class="detail">
+<!-- Banner Mall -->
+<div class="mall-bar">
+  <span>🎓 Mall</span>
+  <span>100% Authentic Products · Free Shipping ›</span>
+</div>
+
+<!-- Shop Info Section -->
+<div class="shop-header">
+  <div class="shop-info">
+    <img class="shop-logo" src="https://via.placeholder.com/100/000000/FFFFFF?text=HTA" alt="Logo">
+    <div>
+      <div class="shop-name">HOANG TRUONG AUDIO ›</div>
+      <div class="shop-meta">★ 4.9 &nbsp;|&nbsp; 103.6K sold</div>
+    </div>
+  </div>
+  <button class="btn-follow">Monitor</button>
+</div>
+
+<!-- Vouchers -->
+<div class="vouchers">
+  <div class="voucher-card">
+    <div><b>18x shipping voucher</b><br>for orders over 1 VND</div>
+    <button class="voucher-btn">Receive</button>
+  </div>
+  <div class="voucher-card">
+    <div><b>Get a 10,000 VND discount</b><br>on orders over 96,000 VND.</div>
+  </div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <div class="tab-item active" onclick="switchTab(this)">Homepage</div>
+  <div class="tab-item" onclick="switchTab(this)">Product</div>
+  <div class="tab-item" onclick="switchTab(this)">Category</div>
+</div>
+
+<!-- MAIN HOMEPAGE VIEW -->
+<div id="homePage">
+  <div class="hero-banner">
+    <h2>HOANG TRUONG AUDIO</h2>
+    <p>Premium Sound Quality - Great Price</p>
+  </div>
+
+  <div class="sec-title">🔥 Featured Product</div>
+  <div class="prod-list" id="productList"></div>
+</div>
+
+<!-- DETAIL PAGE VIEW -->
+<div id="detailPage" class="detail-view">
   <div class="carousel" id="detailCarousel"></div>
-  <div class="dinfo">
-    <div class="dprice" id="detailPrice"></div>
-    <h2 id="detailTitle" style="font-size:18px; margin-top:5px;"></h2>
-    
-    <div style="margin-top:15px;">
-      <label style="font-size:13px; font-weight:bold;">Chọn phân loại:</label>
-      <div class="variants" id="detailVariants"></div>
+  <div style="padding: 12px;">
+    <div style="font-size: 22px; color: var(--pink); font-weight: bold;" id="detailPrice"></div>
+    <h1 style="font-size: 16px; margin-top: 6px; font-weight: 600;" id="detailTitle"></h1>
+    <div style="margin-top: 15px;">
+      <div style="font-size: 12px; color: #666; font-weight: bold;">Phân loại sản phẩm:</div>
+      <div id="detailVariants" style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px;"></div>
     </div>
-
-    <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
-      <h3 style="font-size:15px;">Mô tả sản phẩm</h3>
-      <div id="detailDesc" style="font-size:14px; color:#444; line-height:1.6; margin-top:8px;"></div>
+    <div style="margin-top:20px; border-top:1px solid #eee; padding-top:12px;">
+      <div style="font-size:14px; font-weight:bold;">Mô tả sản phẩm</div>
+      <div id="detailDesc" style="font-size:13px; color:#444; margin-top:6px; line-height:1.5;"></div>
     </div>
   </div>
 </div>
 
-<div class="sticky" id="stickyNav" style="display:none;">
-  <button class="buy" onclick="openCheckout()">MUA NGAY KHUYẾN MÃI</button>
+<!-- STICKY BOTTOM NAVIGATION BAR -->
+<div class="bottom-bar">
+  <div class="bar-item" onclick="alert('Mở cửa sổ Chat')">
+    <span>💬</span>Chat
+  </div>
+  <div class="bar-item" onclick="alert('Mở giỏ hàng')">
+    <span>🧺</span>Basket
+  </div>
+  <button class="btn-cart-lg" onclick="openOrderModal('cart')">Add to cart</button>
+  <button class="btn-buy-lg" id="btnMainBuy" onclick="openOrderModal('buy')">Buy now</button>
 </div>
 
-<!-- Modal Đặt Hàng -->
-<div class="sheetbg" id="sheetbg">
-  <div class="sheet">
+<!-- CHECKOUT MODAL -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="sheet-content">
     <div style="display:flex; justify-content:space-between; align-items:center;">
-      <h3>Xác nhận đơn hàng</h3>
-      <button onclick="closeCheckout()" style="border:none; background:none; font-size:20px;">×</button>
+      <h3 style="font-size:16px;">Xác nhận đặt hàng</h3>
+      <span onclick="closeOrderModal()" style="font-size:22px; cursor:pointer;">×</span>
     </div>
-    <p id="orderSummary" style="font-size:13px; color:var(--pink); font-weight:bold; margin-top:8px;"></p>
+    <div id="orderSummary" style="color:var(--pink); font-weight:bold; font-size:13px; margin:10px 0;"></div>
     
-    <input type="text" id="custName" placeholder="Họ và tên người nhận *">
-    <input type="tel" id="custPhone" placeholder="Số điện thoại *">
-    <textarea id="custAddr" rows="3" placeholder="Địa chỉ chi tiết (Số nhà, đường, phường/xã) *"></textarea>
+    <input type="text" id="custName" class="form-input" placeholder="Họ và tên người nhận *">
+    <input type="tel" id="custPhone" class="form-input" placeholder="Số điện thoại liên hệ *">
+    <textarea id="custAddr" class="form-input" rows="3" placeholder="Địa chỉ nhận hàng chi tiết *"></textarea>
     
-    <button class="btn-confirm" onclick="submitOrder()">HOÀN TẤT ĐẶT HÀNG</button>
+    <button class="btn-submit" onclick="submitOrder()">ĐẶT HÀNG NGAY</button>
   </div>
 </div>
 
 <script>
-let currentProd = null;
+let currentProduct = null;
 let selectedVariant = '';
 
-// Tải sản phẩm từ LocalStorage do Admin lưu
-function getProductsFromAdmin() {
+function getProducts() {
   const data = localStorage.getItem('hta_products');
   return data ? JSON.parse(data) : [];
 }
 
-function renderHomeProducts() {
-  const list = document.getElementById('productList');
-  if (!list) return;
-  list.innerHTML = '';
-  
-  const products = getProductsFromAdmin();
-  // Chỉ hiển thị sản phẩm có trạng thái status = true
-  const activeProducts = products.filter(p => p.status);
+function renderProducts() {
+  const container = document.getElementById('productList');
+  if (!container) return;
+  container.innerHTML = '';
 
-  if (activeProducts.length === 0) {
-    list.innerHTML = '<div style="text-align:center; padding:40px; color:#888;">Chưa có sản phẩm nào được bật hiển thị.</div>';
+  const list = getProducts().filter(p => p.status);
+
+  if (list.length === 0) {
+    container.innerHTML = '<div style="text-align:center; padding:30px; color:#999; font-size:13px;">Chưa có sản phẩm nào được bật hiển thị từ Admin.</div>';
     return;
   }
 
-  activeProducts.forEach(p => {
-    // Ưu tiên hiển thị ảnh 1 (Ảnh đại diện)
-    const coverMedia = (p.images && p.images.length > 0) 
-      ? `<img src="${p.images[0]}">` 
-      : (p.video ? `<video src="${p.video}"></video>` : '<div style="background:#eee;width:100%;height:100%"></div>');
-    
-    const div = document.createElement('div');
-    div.className = 'product';
-    div.onclick = () => openDetail(p.id);
-    div.innerHTML = `
-      <div class="pimg">${coverMedia}</div>
-      <div class="pbody">
-        <div class="pname">${p.name}</div>
-        <div class="price">${p.price}</div>
+  list.forEach(p => {
+    const media = (p.images && p.images.length > 0)
+      ? `<img src="${p.images[0]}" alt="${p.name}">`
+      : (p.video ? `<video src="${p.video}"></video>` : `<div style="width:100%;height:100%;background:#eee;"></div>`);
+
+    const card = document.createElement('div');
+    card.className = 'prod-card';
+    card.onclick = () => showDetail(p.id);
+    card.innerHTML = `
+      <div class="prod-img">${media}</div>
+      <div class="prod-details">
+        <div class="prod-title">${p.name}</div>
+        <div>
+          <div class="badges">
+            <span class="badge badge-free">Free shipping</span>
+            <span class="badge badge-off">35% off</span>
+          </div>
+          <div class="prod-stats">★★★★★ 4.8 | 1.2K Sold</div>
+        </div>
+        <div class="prod-price-row">
+          <div>
+            <span class="price-main">${p.price}</span>
+          </div>
+          <div class="action-btns" onclick="event.stopPropagation()">
+            <button class="btn-cart" onclick="showDetail('${p.id}')">🛒</button>
+            <button class="btn-buy-sm" onclick="showDetail('${p.id}')">Buy</button>
+          </div>
+        </div>
       </div>
     `;
-    list.appendChild(div);
+    container.appendChild(card);
   });
 }
 
-function openDetail(id) {
-  const products = getProductsFromAdmin();
-  currentProd = products.find(p => p.id === id);
-  if (!currentProd) return;
+function showDetail(id) {
+  const list = getProducts();
+  currentProduct = list.find(p => p.id === id);
+  if (!currentProduct) return;
 
-  document.getElementById('home').style.display = 'none';
-  document.getElementById('detail').classList.add('show');
-  document.getElementById('stickyNav').style.display = 'flex';
+  document.getElementById('homePage').style.display = 'none';
+  document.getElementById('detailPage').style.display = 'block';
 
-  document.getElementById('detailTitle').textContent = currentProd.name;
-  document.getElementById('detailPrice').textContent = currentProd.price;
-  document.getElementById('detailDesc').innerHTML = currentProd.desc || 'Chưa có mô tả.';
+  document.getElementById('detailTitle').textContent = currentProduct.name;
+  document.getElementById('detailPrice').textContent = currentProduct.price;
+  document.getElementById('detailDesc').innerHTML = currentProduct.desc || 'Chưa có mô tả chi tiết cho sản phẩm này.';
 
-  // Carousel ảnh + video
+  // Render Slides
   const carousel = document.getElementById('detailCarousel');
   carousel.innerHTML = '';
-  if (currentProd.video) {
-    carousel.innerHTML += `<div class="carousel-item"><video src="${currentProd.video}" controls autoplay loop muted></video></div>`;
+  if (currentProduct.video) {
+    carousel.innerHTML += `<div class="carousel-slide"><video src="${currentProduct.video}" controls autoplay loop muted></video></div>`;
   }
-  (currentProd.images || []).forEach(img => {
-    carousel.innerHTML += `<div class="carousel-item"><img src="${img}"></div>`;
+  (currentProduct.images || []).forEach(img => {
+    carousel.innerHTML += `<div class="carousel-slide"><img src="${img}"></div>`;
   });
 
-  // Phân loại / Biến thể
+  // Render Variants
   const vContainer = document.getElementById('detailVariants');
   vContainer.innerHTML = '';
-  selectedVariant = (currentProd.variants && currentProd.variants.length > 0) ? currentProd.variants[0] : '';
-  (currentProd.variants || []).forEach((v, idx) => {
+  selectedVariant = (currentProduct.variants && currentProduct.variants.length > 0) ? currentProduct.variants[0] : '';
+  
+  (currentProduct.variants || []).forEach((v, i) => {
     const btn = document.createElement('button');
-    btn.className = `variant-btn ${idx === 0 ? 'active' : ''}`;
+    btn.style.cssText = `padding:6px 12px; border:1px solid ${i===0?'var(--pink)':'#ccc'}; background:${i===0?'#ffebeb':'#fff'}; color:${i===0?'var(--pink)':'#333'}; border-radius:4px; font-size:12px; cursor:pointer;`;
     btn.textContent = v;
-    btn.onclick = () => {
-      document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    btn.onclick = (e) => {
+      document.querySelectorAll('#detailVariants button').forEach(b => {
+        b.style.borderColor = '#ccc'; b.style.background = '#fff'; b.style.color = '#333';
+      });
+      btn.style.borderColor = 'var(--pink)';
+      btn.style.background = '#ffebeb';
+      btn.style.color = 'var(--pink)';
       selectedVariant = v;
     };
     vContainer.appendChild(btn);
   });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function backHome() {
-  document.getElementById('detail').classList.remove('show');
-  document.getElementById('home').style.display = 'block';
-  document.getElementById('stickyNav').style.display = 'none';
-  renderHomeProducts();
+function goHome() {
+  document.getElementById('detailPage').style.display = 'none';
+  document.getElementById('homePage').style.display = 'block';
+  renderProducts();
 }
 
-function openCheckout() {
-  if (!currentProd) return;
-  document.getElementById('orderSummary').textContent = `${currentProd.name} (${selectedVariant || 'Mặc định'}) - ${currentProd.price}`;
-  document.getElementById('sheetbg').style.display = 'flex';
+function switchTab(el) {
+  document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
 }
 
-function closeCheckout() {
-  document.getElementById('sheetbg').style.display = 'none';
+function openOrderModal(type) {
+  if (!currentProduct) {
+    const list = getProducts().filter(p => p.status);
+    if (list.length > 0) currentProduct = list[0];
+    else { alert('Chưa có sản phẩm để đặt hàng!'); return; }
+  }
+  document.getElementById('orderSummary').textContent = `${currentProduct.name} (${selectedVariant || 'Default'}) - ${currentProduct.price}`;
+  document.getElementById('checkoutModal').style.display = 'flex';
+}
+
+function closeOrderModal() {
+  document.getElementById('checkoutModal').style.display = 'none';
 }
 
 function submitOrder() {
@@ -211,38 +322,32 @@ function submitOrder() {
   const addr = document.getElementById('custAddr').value.trim();
 
   if (!name || !phone || !addr) {
-    alert('Vui lòng điền đầy đủ thông tin giao hàng!');
+    alert('Vui lòng nhập đầy đủ Tên, Số điện thoại và Địa chỉ!');
     return;
   }
 
   const orders = JSON.parse(localStorage.getItem('hta_orders')) || [];
   orders.unshift({
     id: 'ORD_' + Date.now(),
-    name: name,
-    phone: phone,
-    address: addr,
-    prodName: currentProd.name,
+    name, phone, address: addr,
+    prodName: currentProduct.name,
     variant: selectedVariant,
-    price: currentProd.price,
+    price: currentProduct.price,
     status: 'Mới',
     time: new Date().toLocaleString('vi-VN')
   });
 
   localStorage.setItem('hta_orders', JSON.stringify(orders));
-  alert('Đặt hàng thành công! Shop sẽ liên hệ xác nhận sớm nhất.');
-  closeCheckout();
-  backHome();
+  alert('Đặt hàng thành công! Shop sẽ liên hệ xác nhận.');
+  closeOrderModal();
+  goHome();
 }
 
-// Tự động lắng nghe thay đổi dữ liệu từ Admin tab bên cạnh
 window.addEventListener('storage', (e) => {
-  if (e.key === 'hta_products') {
-    renderHomeProducts();
-  }
+  if (e.key === 'hta_products') renderProducts();
 });
 
-// Chạy hiển thị ngay khi mở trang
-renderHomeProducts();
+renderProducts();
 </script>
 </body>
 </html>
