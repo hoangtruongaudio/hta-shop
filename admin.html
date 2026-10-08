@@ -1,148 +1,610 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Quản trị - HOÀNG TRƯỜNG AUDIO</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok Shop Seller Center Center - Quản lý cửa hàng</title>
 <style>
-:root{--pink:#fe2c55;--dark:#042e3c}
-*{box-sizing:border-box}
-body{font-family:Arial,sans-serif;background:#f4f6f8;margin:0;padding:20px}
-.container{max-width:600px;margin:0 auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,0.1)}
-h1,h2{color:var(--dark);margin-top:0}
-input,button,textarea{font:inherit;width:100%;margin-top:6px;margin-bottom:12px;padding:10px;border:1px solid #ddd;border-radius:6px}
-button{background:var(--pink);color:#fff;border:0;font-weight:bold;cursor:pointer}
-button:hover{opacity:0.9}
-.card{border:1px solid #eee;padding:12px;border-radius:6px;margin-bottom:12px;background:#fafafa}
-.login-box{max-width:360px;margin:80px auto;background:#fff;padding:24px;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
-.hidden{display:none}
-.pimg-preview{width:80px;height:80px;object-fit:cover;border-radius:4px;border:1px solid #ddd;display:block;margin-bottom:8px}
+:root {
+  --primary: #fe2c55;
+  --primary-hover: #e02648;
+  --bg-dark: #121212;
+  --bg-sidebar: #1e1e1e;
+  --bg-card: #282828;
+  --bg-input: #333333;
+  --text-main: #ffffff;
+  --text-muted: #aaaaaa;
+  --border: #383838;
+  --success: #00b894;
+  --warning: #fdcb6e;
+  --info: #0984e3;
+  --danger: #d63031;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }
+body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
+
+/* Login Modal */
+#loginModal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.login-card { background: var(--bg-card); padding: 30px; border-radius: 12px; width: 360px; border: 1px solid var(--border); text-align: center; }
+.login-card h2 { color: var(--primary); margin-bottom: 20px; font-size: 22px; }
+.login-card input { width: 100%; padding: 12px; margin-bottom: 15px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: #fff; outline: none; }
+.login-card button { width: 100%; padding: 12px; background: var(--primary); border: none; color: #fff; font-weight: bold; border-radius: 6px; cursor: pointer; }
+
+/* Sidebar */
+.sidebar { width: 240px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+.brand { padding: 20px; font-size: 18px; font-weight: bold; color: var(--primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); }
+.menu { list-style: none; padding: 15px 0; }
+.menu-item { padding: 12px 20px; display: flex; align-items: center; gap: 12px; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-size: 14px; }
+.menu-item:hover, .menu-item.active { background: #2a2a2a; color: var(--primary); border-left: 4px solid var(--primary); }
+
+/* Main Content */
+.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.header { height: 60px; background: var(--bg-sidebar); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 25px; }
+.content { flex: 1; padding: 25px; overflow-y: auto; }
+
+.page { display: none; }
+.page.active { display: block; }
+
+/* Cards & Stats */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 25px; }
+.stat-card { background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border); }
+.stat-card .title { font-size: 13px; color: var(--text-muted); margin-bottom: 8px; }
+.stat-card .value { font-size: 24px; font-weight: bold; color: #fff; }
+
+/* Tables */
+.table-container { background: var(--bg-card); border-radius: 8px; border: 1px solid var(--border); overflow: hidden; }
+.table-header { padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); gap: 15px; }
+.search-box { background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; color: #fff; outline: none; width: 250px; }
+table { width: 100%; border-collapse: collapse; text-align: left; font-size: 14px; }
+th, td { padding: 12px 18px; border-bottom: 1px solid var(--border); }
+th { background: #222; color: var(--text-muted); font-weight: 600; }
+tr:hover { background: #2f2f2f; }
+
+/* Buttons & Badges */
+.btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-secondary { background: #444; color: #fff; }
+.btn-sm { padding: 4px 8px; font-size: 12px; }
+.badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+.badge-new { background: rgba(9, 132, 227, 0.2); color: var(--info); }
+.badge-confirmed { background: rgba(253, 203, 110, 0.2); color: var(--warning); }
+.badge-shipping { background: rgba(162, 155, 254, 0.2); color: #a29bfe; }
+.badge-completed { background: rgba(0, 184, 148, 0.2); color: var(--success); }
+.badge-canceled { background: rgba(214, 48, 49, 0.2); color: var(--danger); }
+
+/* Form Components */
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
+.form-control { width: 100%; padding: 10px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px; color: #fff; outline: none; }
+
+/* Media Uploader & Drag-Drop Grid */
+.media-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 10px; }
+.media-box { aspect-ratio: 1; background: var(--bg-input); border: 2px dashed var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; overflow: hidden; }
+.media-box.cover { border-color: var(--primary); }
+.media-box.cover::after { content: "Ảnh chính"; position: absolute; top: 4px; left: 4px; background: var(--primary); color: #fff; font-size: 9px; padding: 2px 4px; border-radius: 3px; }
+.media-box img, .media-box video { width: 100%; height: 100%; object-fit: cover; }
+.media-box .remove-btn { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+/* Editor Toolbar */
+.editor-toolbar { background: #222; border: 1px solid var(--border); border-bottom: none; border-radius: 6px 6px 0 0; padding: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+.editor-toolbar button { background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.editor-content { background: var(--bg-input); border: 1px solid var(--border); border-radius: 0 0 6px 6px; min-height: 150px; padding: 12px; color: #fff; outline: none; }
 </style>
 </head>
 <body>
 
-<div id="loginSection" class="login-box">
- <h2>Đăng nhập Admin</h2>
- <label>Mật khẩu quản trị</label>
- <input type="password" id="passInput" placeholder="Nhập mật khẩu...">
- <button onclick="login()">ĐĂNG NHẬP</button>
+<!-- Login Modal -->
+<div id="loginModal">
+  <div class="login-card">
+    <h2>TikTok Shop Seller</h2>
+    <p style="color:var(--text-muted);font-size:13px;margin-bottom:15px">Đăng nhập quyền Quản trị viên</p>
+    <input type="password" id="loginPass" placeholder="Nhập mật khẩu (Mặc định: 123456)">
+    <button onclick="checkLogin()">ĐĂNG NHẬP</button>
+  </div>
 </div>
 
-<div id="adminSection" class="container hidden">
- <h1>⚙ QUẢN LÝ CỬA HÀNG</h1>
- 
- <div class="card">
-  <h2>Cấu hình Shop</h2>
-  <label>Tên Shop</label>
-  <input id="shopNameInput">
-  <label>Số lượng đã bán tổng</label>
-  <input id="soldShopInput">
-  <label>Logo Shop</label>
-  <input type="file" accept="image/*" onchange="uploadLogo(event)">
-  <button onclick="saveShopInfo()">Lưu thông tin Shop</button>
- </div>
+<!-- Sidebar -->
+<div class="sidebar">
+  <div class="brand">🎵 Seller Center</div>
+  <ul class="menu">
+    <li class="menu-item active" onclick="showPage('dashboard')">📊 Tổng quan</li>
+    <li class="menu-item" onclick="showPage('orders')">📦 Đơn hàng</li>
+    <li class="menu-item" onclick="showPage('products')">🛍️ Sản phẩm</li>
+    <li class="menu-item" onclick="showPage('reviews')">⭐ Đánh giá</li>
+  </ul>
+</div>
 
- <h2>Danh sách sản phẩm</h2>
- <div id="productListAdmin"></div>
+<!-- Main Area -->
+<div class="main">
+  <div class="header">
+    <div id="headerTitle" style="font-weight: bold;">Tổng quan cửa hàng</div>
+    <div style="font-size: 13px; color: var(--text-muted);">Tài khoản: <b>hoangtruongaudio</b></div>
+  </div>
 
- <button onclick="saveAllProducts()" style="background:#0a9c96;margin-top:10px">LƯU TẤT CẢ SẢN PHẨM</button>
- <button onclick="logout()" style="background:#777;margin-top:5px">Đăng xuất</button>
+  <div class="content">
+    
+    <!-- PAGE: DASHBOARD -->
+    <div id="page-dashboard" class="page active">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="title">Doanh thu tổng</div>
+          <div class="value" id="statRevenue">0 ₫</div>
+        </div>
+        <div class="stat-card">
+          <div class="title">Tổng đơn hàng</div>
+          <div class="value" id="statOrders">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="title">Đơn mới chờ xử lý</div>
+          <div class="value" id="statPendingOrders" style="color: var(--warning);">0</div>
+        </div>
+        <div class="stat-card">
+          <div class="title">Sản phẩm đang bán</div>
+          <div class="value" id="statActiveProducts">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PAGE: ORDERS -->
+    <div id="page-orders" class="page">
+      <div class="table-container">
+        <div class="table-header">
+          <input type="text" class="search-box" id="searchOrderInput" oninput="renderOrders()" placeholder="Tìm theo tên KH, SĐT...">
+          <select class="search-box" id="filterOrderStatus" onchange="renderOrders()" style="width: auto;">
+            <option value="ALL">Tất cả trạng thái</option>
+            <option value="Mới">Mới</option>
+            <option value="Đã xác nhận">Đã xác nhận</option>
+            <option value="Đang giao">Đang giao</option>
+            <option value="Hoàn thành">Hoàn thành</option>
+            <option value="Đã hủy">Đã hủy</option>
+          </select>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Mã / Khách hàng</th>
+              <th>Sản phẩm / Phân loại</th>
+              <th>Tổng tiền</th>
+              <th>Trạng thái</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody id="orderTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: PRODUCTS -->
+    <div id="page-products" class="page">
+      <div style="margin-bottom: 15px; display: flex; justify-content: space-between;">
+        <input type="text" class="search-box" id="searchProductInput" oninput="renderProducts()" placeholder="Tìm kiếm sản phẩm...">
+        <button class="btn btn-primary" onclick="openProductModal()">+ Thêm sản phẩm mới</button>
+      </div>
+
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Hình ảnh</th>
+              <th>Tên sản phẩm</th>
+              <th>Giá niêm yết</th>
+              <th>Đã bán</th>
+              <th>Trạng thái</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="productTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAGE: REVIEWS -->
+    <div id="page-reviews" class="page">
+      <div class="table-container">
+        <div class="table-header">
+          <button class="btn btn-primary" onclick="addDummyReview()">+ Thêm đánh giá mẫu</button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Khách hàng</th>
+              <th>Đánh giá</th>
+              <th>Nội dung</th>
+              <th>Thời gian</th>
+              <th>Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="reviewTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal Thêm/Sửa Sản Phẩm -->
+<div id="productModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:1000;">
+  <div style="background:var(--bg-card); width:800px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:25px; border:1px solid var(--border);">
+    <h3 id="modalProductTitle" style="margin-bottom:20px;">Thêm sản phẩm mới</h3>
+    
+    <input type="hidden" id="prodEditId">
+    
+    <div class="form-group">
+      <label>Tên sản phẩm *</label>
+      <input type="text" id="prodName" class="form-control" placeholder="Nhập tên sản phẩm">
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+      <div class="form-group">
+        <label>Giá bán (₫) *</label>
+        <input type="text" id="prodPrice" class="form-control" placeholder="Ví dụ: 189.000₫">
+      </div>
+      <div class="form-group">
+        <label>Giá gốc (₫)</label>
+        <input type="text" id="prodOldPrice" class="form-control" placeholder="Ví dụ: 299.000₫">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Biến thể / Phân loại (Phân cách bằng dấu phẩy)</label>
+      <input type="text" id="prodVariants" class="form-control" placeholder="AP2, AP3, AP4 ANC, Pro 2 (Màu Trắng, Đen)">
+    </div>
+
+    <!-- Upload 9 Ảnh & Kéo thả chọn ảnh chính -->
+    <div class="form-group">
+      <label>Quản lý 9 Ảnh sản phẩm (Nhấp chọn/kéo thả, ảnh 1 là Ảnh Đại Diện chính)</label>
+      <input type="file" id="imageInput" multiple accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imageInput').click()">+ Tải ảnh lên</button>
+      
+      <div class="media-grid" id="imageGrid"></div>
+    </div>
+
+    <!-- Upload Video -->
+    <div class="form-group">
+      <label>Video sản phẩm (Xem trước ngay trong Admin)</label>
+      <input type="file" id="videoInput" accept="video/*" style="display:none" onchange="handleVideoUpload(event)">
+      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('videoInput').click()">+ Tải video lên</button>
+      <div id="videoPreviewContainer" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Editor Mô tả -->
+    <div class="form-group">
+      <label>Mô tả chi tiết sản phẩm</label>
+      <div class="editor-toolbar">
+        <button onclick="execCmd('bold')"><b>B</b></button>
+        <button onclick="execCmd('italic')"><i>I</i></button>
+        <button onclick="execCmd('insertUnorderedList')">• List</button>
+        <button onclick="insertTable()">+ Bảng</button>
+        <button onclick="insertImageEditor()">+ Chèn ảnh</button>
+      </div>
+      <div id="editorContent" class="editor-content" contenteditable="true"></div>
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+      <button class="btn btn-secondary" onclick="closeProductModal()">Hủy</button>
+      <button class="btn btn-primary" onclick="saveProduct()">Lưu sản phẩm</button>
+    </div>
+  </div>
 </div>
 
 <script>
-const ADMIN_PASS = "123456"; // Mật khẩu quản trị
-
-const defaultProducts=[
- {name:'Tai nghe Bluetooth AP2 không dây HIFI cảm ứng thông minh',price:'89.000₫',old:'149.000₫',sold:'1.2K',deal:'Giảm 40%',img:''},
- {name:'Tai nghe Bluetooth AP3 ENC Pin 8H Bluetooth 5.3 HIFI',price:'129.000₫',old:'199.000₫',sold:'2.3K',deal:'Giảm 35%',img:''},
- {name:'Tai nghe Bluetooth AP4 ANC xuyên âm khử ồn',price:'189.000₫',old:'299.000₫',sold:'908',deal:'Giảm 37%',img:''},
- {name:'Tai nghe Bluetooth Pro 2 ANC khử ồn cảm ứng',price:'229.000₫',old:'359.000₫',sold:'810',deal:'Giảm 36%',img:''}
+// Khởi tạo Dữ liệu
+let products = JSON.parse(localStorage.getItem('hta_products')) || [
+  { id: 'p1', name: 'Tai nghe Bluetooth AP4 ANC khử ồn', price: '189.000₫', old: '299.000₫', sold: 908, status: true, images: [], video: '', variants: ['AP4 ANC', 'Pro 2'], desc: 'Tai nghe chất lượng cao chống ồn chủ động.' }
+];
+let orders = JSON.parse(localStorage.getItem('hta_orders')) || [];
+let reviews = JSON.parse(localStorage.getItem('hta_reviews')) || [
+  { id: 'r1', name: 'Nguyễn Văn A', rating: 5, content: 'Sản phẩm dùng rất mượt, giao hàng siêu nhanh!', time: '10/10/2026' }
 ];
 
-let products = JSON.parse(localStorage.getItem('hta_products')||'null')||defaultProducts;
+let tempImages = [];
+let tempVideo = '';
 
-function login(){
- const p = document.getElementById('passInput').value;
- if(p === ADMIN_PASS){
-  document.getElementById('loginSection').classList.add('hidden');
-  document.getElementById('adminSection').classList.remove('hidden');
-  loadAdminData();
- }else{
-  alert("Mật khẩu không chính xác!");
- }
+function checkLogin() {
+  const p = document.getElementById('loginPass').value;
+  if(p === '123456' || p === (localStorage.getItem('hta_admin_pass') || '123456')) {
+    document.getElementById('loginModal').style.display = 'none';
+    refreshAllData();
+  } else {
+    alert('Mật khẩu chưa chính xác!');
+  }
 }
 
-function logout(){
- location.reload();
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
+  document.getElementById(`page-${pageId}`).classList.add('active');
+  
+  const titles = { dashboard: 'Tổng quan cửa hàng', orders: 'Quản lý đơn hàng', products: 'Quản lý sản phẩm', reviews: 'Quản lý đánh giá' };
+  document.getElementById('headerTitle').textContent = titles[pageId];
+  
+  refreshAllData();
 }
 
-function loadAdminData(){
- document.getElementById('shopNameInput').value = localStorage.getItem('hta_shop')||'HOÀNG TRƯỜNG AUDIO';
- document.getElementById('soldShopInput').value = localStorage.getItem('hta_sold')||'10.4K đã bán';
- renderAdminProducts();
+function refreshAllData() {
+  renderStats();
+  renderOrders();
+  renderProducts();
+  renderReviews();
 }
 
-function saveShopInfo(){
- localStorage.setItem('hta_shop', document.getElementById('shopNameInput').value.trim());
- localStorage.setItem('hta_sold', document.getElementById('soldShopInput').value.trim());
- alert("Đã lưu thông tin Shop thành công!");
+// DASHBOARD
+function renderStats() {
+  let totalRev = 0;
+  orders.forEach(o => {
+    if(o.status === 'Hoàn thành') {
+      let num = parseInt(o.price.replace(/\D/g,'')) || 0;
+      totalRev += num;
+    }
+  });
+  document.getElementById('statRevenue').textContent = totalRev.toLocaleString('vi-VN') + ' ₫';
+  document.getElementById('statOrders').textContent = orders.length;
+  document.getElementById('statPendingOrders').textContent = orders.filter(o => o.status === 'Mới').length;
+  document.getElementById('statActiveProducts').textContent = products.filter(p => p.status).length;
 }
 
-function uploadLogo(e){
- const f = e.target.files[0];
- if(!f) return;
- const r = new FileReader();
- r.onload = () => {
-  localStorage.setItem('hta_logo', r.result);
-  alert("Đã cập nhật Logo Shop!");
- };
- r.readAsDataURL(f);
+// ORDERS MANAGEMENT
+function renderOrders() {
+  const tbody = document.getElementById('orderTableBody');
+  const search = document.getElementById('searchOrderInput').value.toLowerCase();
+  const filterStatus = document.getElementById('filterOrderStatus').value;
+  
+  tbody.innerHTML = '';
+  
+  orders.filter(o => {
+    const matchSearch = o.name.toLowerCase().includes(search) || o.phone.includes(search);
+    const matchStatus = filterStatus === 'ALL' || o.status === filterStatus;
+    return matchSearch && matchStatus;
+  }).forEach((o, index) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${o.name}</b><br><small style="color:var(--text-muted)">${o.phone}</small></td>
+      <td>${o.prodName}<br><small style="color:var(--primary)">Phân loại: ${o.variant || 'Mặc định'}</small></td>
+      <td style="color:var(--primary); font-weight:bold">${o.price}</td>
+      <td><span class="badge ${getStatusBadge(o.status)}">${o.status}</span></td>
+      <td>
+        <select onchange="changeOrderStatus(${index}, this.value)" style="background:var(--bg-input); color:#fff; border:1px solid var(--border); padding:4px; border-radius:4px;">
+          <option value="Mới" ${o.status==='Mới'?'selected':''}>Mới</option>
+          <option value="Đã xác nhận" ${o.status==='Đã xác nhận'?'selected':''}>Đã xác nhận</option>
+          <option value="Đang giao" ${o.status==='Đang giao'?'selected':''}>Đang giao</option>
+          <option value="Hoàn thành" ${o.status==='Hoàn thành'?'selected':''}>Hoàn thành</option>
+          <option value="Đã hủy" ${o.status==='Đã hủy'?'selected':''}>Đã hủy</option>
+        </select>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
-function renderAdminProducts(){
- const box = document.getElementById('productListAdmin');
- box.innerHTML = '';
- products.forEach((p, i) => {
-  const card = document.createElement('div');
-  card.className = 'card';
-  card.innerHTML = `
-   <h3>Sản phẩm #${i+1}</h3>
-   ${p.img ? `<img src="${p.img}" class="pimg-preview">` : ''}
-   <label>Ảnh sản phẩm</label>
-   <input type="file" accept="image/*" onchange="uploadProductImg(event, ${i})">
-   <label>Tên sản phẩm</label>
-   <input id="pname_${i}" value="${p.name}">
-   <label>Giá bán hiện tại</label>
-   <input id="pprice_${i}" value="${p.price}">
-   <label>Giá cũ (gạch đi)</label>
-   <input id="pold_${i}" value="${p.old}">
-   <label>Số lượng đã bán</label>
-   <input id="psold_${i}" value="${p.sold}">
-  `;
-  box.appendChild(card);
- });
+function getStatusBadge(status) {
+  switch(status) {
+    case 'Mới': return 'badge-new';
+    case 'Đã xác nhận': return 'badge-confirmed';
+    case 'Đang giao': return 'badge-shipping';
+    case 'Hoàn thành': return 'badge-completed';
+    case 'Đã hủy': return 'badge-canceled';
+    default: return '';
+  }
 }
 
-function uploadProductImg(e, index){
- const f = e.target.files[0];
- if(!f) return;
- const r = new FileReader();
- r.onload = () => {
-  products[index].img = r.result;
-  renderAdminProducts();
- };
- r.readAsDataURL(f);
+function changeOrderStatus(index, newStatus) {
+  orders[index].status = newStatus;
+  localStorage.setItem('hta_orders', JSON.stringify(orders));
+  renderStats();
+  renderOrders();
 }
 
-function saveAllProducts(){
- products.forEach((p, i) => {
-  p.name = document.getElementById(`pname_${i}`).value.trim();
-  p.price = document.getElementById(`pprice_${i}`).value.trim();
-  p.old = document.getElementById(`pold_${i}`).value.trim();
-  p.sold = document.getElementById(`psold_${i}`).value.trim();
- });
- localStorage.setItem('hta_products', JSON.stringify(products));
- alert("Đã lưu tất cả thay đổi sản phẩm!");
+// PRODUCTS MANAGEMENT
+function renderProducts() {
+  const tbody = document.getElementById('productTableBody');
+  const search = document.getElementById('searchProductInput').value.toLowerCase();
+  tbody.innerHTML = '';
+
+  products.filter(p => p.name.toLowerCase().includes(search)).forEach((p, idx) => {
+    const imgUrl = (p.images && p.images.length > 0) ? p.images[0] : '';
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><div style="width:45px; height:45px; background:#444; border-radius:6px; overflow:hidden">${imgUrl ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover">` : ''}</div></td>
+      <td><b>${p.name}</b></td>
+      <td><b style="color:var(--primary)">${p.price}</b></td>
+      <td>${p.sold || 0}</td>
+      <td><button class="btn btn-sm ${p.status?'btn-primary':'btn-secondary'}" onclick="toggleProductStatus(${idx})">${p.status?'Hiển thị':'Đã ẩn'}</button></td>
+      <td>
+        <button class="btn btn-sm btn-secondary" onclick="editProduct(${idx})">Sửa</button>
+        <button class="btn btn-sm btn-secondary" onclick="copyProduct(${idx})">Sao chép</button>
+      </td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleProductStatus(idx) {
+  products[idx].status = !products[idx].status;
+  saveProductsToStorage();
+}
+
+function copyProduct(idx) {
+  let p = JSON.parse(JSON.stringify(products[idx]));
+  p.id = 'p_' + Date.now();
+  p.name = p.name + ' (Bản sao)';
+  products.push(p);
+  saveProductsToStorage();
+}
+
+function saveProductsToStorage() {
+  localStorage.setItem('hta_products', JSON.stringify(products));
+  renderProducts();
+  renderStats();
+}
+
+// MEDIA UPLOAD & DRAG DROP
+function handleImageUpload(e) {
+  const files = Array.from(e.target.files);
+  files.forEach(file => {
+    if(tempImages.length >= 9) return;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      tempImages.push(evt.target.result);
+      renderMediaGrid();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function handleVideoUpload(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    tempVideo = evt.target.result;
+    renderVideoPreview();
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderMediaGrid() {
+  const grid = document.getElementById('imageGrid');
+  grid.innerHTML = '';
+  tempImages.slice(0, 9).forEach((img, i) => {
+    const box = document.createElement('div');
+    box.className = `media-box ${i===0?'cover':''}`;
+    box.draggable = true;
+    box.innerHTML = `<img src="${img}"><button class="remove-btn" onclick="removeImg(${i})">×</button>`;
+    
+    // Drag Drop Events
+    box.ondragstart = (e) => e.dataTransfer.setData('text/plain', i);
+    box.ondragover = (e) => e.preventDefault();
+    box.ondrop = (e) => {
+      e.preventDefault();
+      const fromIdx = parseInt(e.dataTransfer.getData('text/plain'));
+      const item = tempImages.splice(fromIdx, 1)[0];
+      tempImages.splice(i, 0, item);
+      renderMediaGrid();
+    };
+
+    grid.appendChild(box);
+  });
+}
+
+function renderVideoPreview() {
+  const container = document.getElementById('videoPreviewContainer');
+  if(tempVideo) {
+    container.innerHTML = `<video src="${tempVideo}" controls style="max-width:200px; border-radius:6px;"></video><br><button class="btn btn-sm btn-secondary" onclick="tempVideo='';renderVideoPreview();">Xóa video</button>`;
+  } else {
+    container.innerHTML = '';
+  }
+}
+
+function removeImg(idx) {
+  tempImages.splice(idx, 1);
+  renderMediaGrid();
+}
+
+// MODAL PRODUCT
+function openProductModal() {
+  document.getElementById('prodEditId').value = '';
+  document.getElementById('prodName').value = '';
+  document.getElementById('prodPrice').value = '';
+  document.getElementById('prodOldPrice').value = '';
+  document.getElementById('prodVariants').value = '';
+  document.getElementById('editorContent').innerHTML = '';
+  tempImages = [];
+  tempVideo = '';
+  renderMediaGrid();
+  renderVideoPreview();
+  document.getElementById('productModal').style.display = 'flex';
+}
+
+function closeProductModal() {
+  document.getElementById('productModal').style.display = 'none';
+}
+
+function editProduct(idx) {
+  const p = products[idx];
+  document.getElementById('prodEditId').value = idx;
+  document.getElementById('prodName').value = p.name;
+  document.getElementById('prodPrice').value = p.price;
+  document.getElementById('prodOldPrice').value = p.old || '';
+  document.getElementById('prodVariants').value = (p.variants || []).join(', ');
+  document.getElementById('editorContent').innerHTML = p.desc || '';
+  tempImages = [...(p.images || [])];
+  tempVideo = p.video || '';
+  renderMediaGrid();
+  renderVideoPreview();
+  document.getElementById('productModal').style.display = 'flex';
+}
+
+function saveProduct() {
+  const editIdx = document.getElementById('prodEditId').value;
+  const name = document.getElementById('prodName').value.trim();
+  const price = document.getElementById('prodPrice').value.trim();
+  if(!name || !price) { alert('Vui lòng nhập tên và giá sản phẩm'); return; }
+
+  const pData = {
+    id: editIdx !== '' ? products[editIdx].id : 'p_' + Date.now(),
+    name: name,
+    price: price,
+    old: document.getElementById('prodOldPrice').value.trim(),
+    variants: document.getElementById('prodVariants').value.split(',').map(s => s.trim()).filter(Boolean),
+    desc: document.getElementById('editorContent').innerHTML,
+    images: tempImages,
+    video: tempVideo,
+    status: true,
+    sold: editIdx !== '' ? products[editIdx].sold : 0
+  };
+
+  if(editIdx !== '') {
+    products[editIdx] = pData;
+  } else {
+    products.push(pData);
+  }
+
+  saveProductsToStorage();
+  closeProductModal();
+}
+
+// EDITOR COMMANDS
+function execCmd(cmd) { document.execCommand(cmd, false, null); }
+function insertTable() {
+  document.execCommand('insertHTML', false, '<table border="1" style="border-collapse:collapse;width:100%"><tr><td>Tiêu đề 1</td><td>Tiêu đề 2</td></tr><tr><td>Nội dung 1</td><td>Nội dung 2</td></tr></table>');
+}
+function insertImageEditor() {
+  const url = prompt('Nhập URL hình ảnh:');
+  if(url) document.execCommand('insertImage', false, url);
+}
+
+// REVIEWS MANAGEMENT
+function renderReviews() {
+  const tbody = document.getElementById('reviewTableBody');
+  tbody.innerHTML = '';
+  reviews.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><b>${r.name}</b></td>
+      <td style="color:#ffb400">★ ${r.rating}</td>
+      <td>${r.content}</td>
+      <td><small style="color:var(--text-muted)">${r.time}</small></td>
+      <td><button class="btn btn-sm btn-secondary" onclick="deleteReview(${i})">Xóa</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function addDummyReview() {
+  const name = prompt('Tên khách hàng:');
+  const content = prompt('Nội dung đánh giá:');
+  if(name && content) {
+    reviews.unshift({ id: 'r_' + Date.now(), name, rating: 5, content, time: new Date().toLocaleDateString('vi-VN') });
+    localStorage.setItem('hta_reviews', JSON.stringify(reviews));
+    renderReviews();
+  }
+}
+
+function deleteReview(idx) {
+  reviews.splice(idx, 1);
+  localStorage.setItem('hta_reviews', JSON.stringify(reviews));
+  renderReviews();
 }
 </script>
 </body>
