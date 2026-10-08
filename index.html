@@ -71,9 +71,17 @@ button{cursor:pointer}
 .detail{display:none;background:#f5f5f5;min-height:500px}
 .detail.show{display:block}
 .home.hide{display:none}
-.gallery{background:#fff;position:relative;aspect-ratio:1/1}
-.gallery img, .gallery video{width:100%;height:100%;object-fit:cover}
-.gallery .counter{position:absolute;bottom:12px;right:12px;background:#0009;color:#fff;padding:4px 8px;border-radius:12px;font-size:11px}
+
+/* Cải tiến Media Slider trong Trang Chi Tiết */
+.gallery-container{background:#000;position:relative;width:100%}
+.main-media{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:#000;position:relative}
+.main-media img, .main-media video{width:100%;height:100%;object-fit:contain}
+.thumb-slider{display:flex;gap:8px;padding:10px;background:#fff;overflow-x:auto;border-bottom:1px solid #eee}
+.thumb-item{width:60px;height:60px;border-radius:6px;border:2px solid #ddd;overflow:hidden;flex:none;cursor:pointer;position:relative;background:#f0f0f0}
+.thumb-item.active{border-color:var(--pink)}
+.thumb-item img, .thumb-item video{width:100%;height:100%;object-fit:cover}
+.thumb-item .v-badge{position:absolute;inset:0;background:rgba(0,0,0,0.4);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold}
+
 .dinfo{background:#fff;padding:13px 14px}
 .dtitle{font-size:18px;line-height:1.4}
 .dprice{font-size:27px;color:var(--pink);font-weight:800;margin-top:8px}
@@ -164,7 +172,10 @@ button{cursor:pointer}
 </div>
 
 <div class="detail" id="detail">
- <div class="gallery" id="detailGallery"></div>
+ <div class="gallery-container">
+   <div class="main-media" id="mainMediaView"></div>
+   <div class="thumb-slider" id="thumbSlider"></div>
+ </div>
  <div class="dinfo">
   <div class="dtitle" id="detailTitle"></div>
   <div class="stars">★★★★★ <span style="color:#777">4.9 | Đã bán 1.2K</span></div>
@@ -276,9 +287,15 @@ function renderList(listData, targetId){
  }
 
  listData.forEach((p)=>{
-  const imgTag = (p.images && p.images.length > 0) 
-    ? `<img src="${p.images[0]}" alt="${p.name}">` 
-    : (p.img ? `<img src="${p.img}">` : (p.video ? `<video src="${p.video}"></video>` : '<div style="padding:10px;font-size:11px;color:#aaa;text-align:center">Chưa có ảnh</div>'));
+  // Hiển thị ảnh bìa danh sách
+  let imgTag = '<div style="padding:10px;font-size:11px;color:#aaa;text-align:center">Chưa có ảnh</div>';
+  if (p.images && p.images.length > 0) {
+    imgTag = `<img src="${p.images[0]}" alt="${p.name}">`;
+  } else if (p.img) {
+    imgTag = `<img src="${p.img}">`;
+  } else if (p.video) {
+    imgTag = `<video src="${p.video}" muted></video>`;
+  }
 
   const el = document.createElement('div');
   el.className = 'product';
@@ -343,14 +360,8 @@ function showDetail(itemOrId) {
   document.getElementById('stickyPrice').textContent = item.price;
   document.getElementById('detailDesc').innerHTML = item.desc || 'Chưa có mô tả chi tiết.';
 
-  const gallery = document.getElementById('detailGallery');
-  if(item.images && item.images.length > 0) {
-    gallery.innerHTML = `<img src="${item.images[0]}"><div class="counter">1/${item.images.length}</div>`;
-  } else if(item.video) {
-    gallery.innerHTML = `<video src="${item.video}" controls autoplay loop muted></video>`;
-  } else {
-    gallery.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#888;">Không có hình ảnh</div>`;
-  }
+  // Xử lý Render Video & Slide Ảnh chi tiết
+  renderDetailMedia(item);
 
   const varBox = document.getElementById('variants');
   varBox.innerHTML = '';
@@ -372,6 +383,69 @@ function showDetail(itemOrId) {
 
   renderReviewsList();
   window.scrollTo(0,0);
+}
+
+function renderDetailMedia(item) {
+  const mainView = document.getElementById('mainMediaView');
+  const thumbSlider = document.getElementById('thumbSlider');
+  
+  mainView.innerHTML = '';
+  thumbSlider.innerHTML = '';
+
+  let mediaList = [];
+
+  // Thêm Video nếu có
+  if (item.video) {
+    mediaList.push({ type: 'video', src: item.video });
+  }
+
+  // Thêm danh sách ảnh
+  if (item.images && item.images.length > 0) {
+    item.images.forEach(img => {
+      mediaList.push({ type: 'image', src: img });
+    });
+  } else if (item.img) {
+    mediaList.push({ type: 'image', src: item.img });
+  }
+
+  if (mediaList.length === 0) {
+    mainView.innerHTML = `<div style="color:#888;">Không có hình ảnh</div>`;
+    thumbSlider.style.display = 'none';
+    return;
+  }
+
+  thumbSlider.style.display = mediaList.length > 1 ? 'flex' : 'none';
+
+  function displayMainMedia(mediaItem) {
+    if (mediaItem.type === 'video') {
+      mainView.innerHTML = `<video src="${mediaItem.src}" controls autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>`;
+    } else {
+      mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
+    }
+  }
+
+  // Hiển thị phần tử media đầu tiên
+  displayMainMedia(mediaList[0]);
+
+  // Tạo Thumbnail cho các ảnh/video
+  mediaList.forEach((media, index) => {
+    const thumb = document.createElement('div');
+    thumb.className = `thumb-item ${index === 0 ? 'active' : ''}`;
+    
+    if (media.type === 'video') {
+      thumb.innerHTML = `<video src="${media.src}"></video><div class="v-badge">▶</div>`;
+    } else {
+      thumb.innerHTML = `<img src="${media.src}">`;
+    }
+
+    thumb.onclick = () => {
+      document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
+      thumb.classList.add('active');
+      displayMainMedia(media);
+    };
+
+    thumbSlider.appendChild(thumb);
+  });
 }
 
 function renderReviewsList() {
@@ -410,6 +484,8 @@ function openOrder() {
   const imgBox = document.getElementById('orderImgContainer');
   if(selectedProduct.images && selectedProduct.images.length > 0) {
     imgBox.innerHTML = `<img src="${selectedProduct.images[0]}" style="width:100%;height:100%;object-fit:cover">`;
+  } else if(selectedProduct.img) {
+    imgBox.innerHTML = `<img src="${selectedProduct.img}" style="width:100%;height:100%;object-fit:cover">`;
   } else {
     imgBox.innerHTML = `<div style="text-align:center;line-height:75px;color:#aaa">HTA</div>`;
   }
