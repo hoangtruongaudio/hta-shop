@@ -391,4 +391,144 @@ function showDetail(itemOrId) {
         btn.classList.add('sel');
         selectedVariant = v;
       };
-      varBox.appendChild(
+      varBox.appendChild(btn);
+    });
+  } else {
+    varBox.innerHTML = '<span>Mặc định</span>';
+  }
+
+  window.scrollTo(0,0);
+}
+
+function renderDetailMedia(item) {
+  const mainView = document.getElementById('mainMediaView');
+  const thumbSlider = document.getElementById('thumbSlider');
+  mainView.innerHTML = '';
+  thumbSlider.innerHTML = '';
+  let mediaList = [];
+
+  if (item.video) mediaList.push({ type: 'video', src: item.video });
+  if (item.images && item.images.length > 0) {
+    item.images.forEach(img => mediaList.push({ type: 'image', src: img }));
+  } else if (item.img) {
+    mediaList.push({ type: 'image', src: item.img });
+  }
+
+  if (mediaList.length === 0) {
+    mainView.innerHTML = `<div style="color:#888;">Không có hình ảnh</div>`;
+    thumbSlider.style.display = 'none';
+    return;
+  }
+
+  thumbSlider.style.display = mediaList.length > 1 ? 'flex' : 'none';
+
+  function displayMainMedia(mediaItem) {
+    if (mediaItem.type === 'video') {
+      mainView.innerHTML = `<video src="${mediaItem.src}" controls autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>`;
+    } else {
+      mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
+    }
+  }
+
+  displayMainMedia(mediaList[0]);
+
+  mediaList.forEach((media, index) => {
+    const thumb = document.createElement('div');
+    thumb.className = `thumb-item ${index === 0 ? 'active' : ''}`;
+    thumb.innerHTML = media.type === 'video' ? `<video src="${media.src}"></video><div class="v-badge">▶</div>` : `<img src="${media.src}">`;
+    thumb.onclick = () => {
+      document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
+      thumb.classList.add('active');
+      displayMainMedia(media);
+    };
+    thumbSlider.appendChild(thumb);
+  });
+}
+
+function renderReviewsList(reviewsData) {
+  const container = document.getElementById('reviewContainer');
+  let reviews = reviewsData || [
+    { name: 'Nguyễn Văn A', rating: 5, content: 'Sản phẩm dùng rất mượt, giao hàng siêu nhanh!' }
+  ];
+  let html = `<div style="font-size:28px;font-weight:800;margin-bottom:10px;">4.9 <span style="font-size:16px;color:#ffb400">★★★★★</span></div>`;
+  reviews.forEach(r => {
+    html += `
+      <div class="review">
+        <span class="avatar">${r.name ? r.name.charAt(0) : 'K'}</span><b>${r.name}</b><br>
+        <span class="stars">${'★'.repeat(r.rating || 5)}</span><br>${r.content}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
+
+function backHome() {
+  if(document.getElementById('detail').classList.contains('show')) {
+    document.getElementById('detail').classList.remove('show');
+    document.getElementById('home').classList.remove('hide');
+  } else {
+    switchTab('home');
+  }
+}
+
+function openOrder() {
+  if(!selectedProduct) return;
+  document.getElementById('orderTitle').textContent = selectedProduct.name;
+  document.getElementById('orderPrice').textContent = selectedProduct.price;
+  document.getElementById('orderVariantLabel').textContent = 'Phân loại: ' + selectedVariant;
+  
+  const imgBox = document.getElementById('orderImgContainer');
+  if(selectedProduct.images && selectedProduct.images.length > 0) {
+    imgBox.innerHTML = `<img src="${selectedProduct.images[0]}" style="width:100%;height:100%;object-fit:cover">`;
+  } else if(selectedProduct.img) {
+    imgBox.innerHTML = `<img src="${selectedProduct.img}" style="width:100%;height:100%;object-fit:cover">`;
+  } else {
+    imgBox.innerHTML = `<div style="text-align:center;line-height:75px;color:#aaa">HTA</div>`;
+  }
+  
+  document.getElementById('sheetbg').style.display = 'flex';
+}
+
+function closeOrder() {
+  document.getElementById('sheetbg').style.display = 'none';
+}
+
+function submitOrder() {
+  const name = document.getElementById('name').value.trim();
+  const phone = document.getElementById('phone').value.trim();
+  const address = document.getElementById('address').value.trim();
+
+  if(!name || !phone || !address) {
+    alert('Vui lòng nhập đầy đủ Họ tên, SĐT và Địa chỉ nhận hàng!');
+    return;
+  }
+
+  const newOrder = {
+    id: 'ORD_' + Date.now(),
+    name: name,
+    phone: phone,
+    address: address,
+    prodName: selectedProduct.name,
+    variant: selectedVariant,
+    price: selectedProduct.price,
+    status: 'Mới',
+    time: new Date().toLocaleString('vi-VN')
+  };
+
+  // Đẩy đơn hàng lên Firebase đồng bộ sang Admin
+  db.ref('hta_orders').push(newOrder).then(() => {
+    alert('Đặt hàng thành công! Hoàng Trường Audio sẽ liên hệ xác nhận đơn hàng.');
+    closeOrder();
+    document.getElementById('name').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('address').value = '';
+  });
+}
+
+window.onload = function() {
+  listenRealtimeData();
+  switchTab('home');
+};
+</script>
+</body>
+</html>
