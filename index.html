@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#042e3c">
 <title>HOÀNG TRƯỜNG AUDIO</title>
+<!-- Tích hợp Firebase Web SDK v9 (Compat version) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+
 <style>
 :root{
  --pink:#fe2c55;--dark:#042e3c;--text:#161823;--muted:#777;
@@ -72,7 +76,6 @@ button{cursor:pointer}
 .detail.show{display:block}
 .home.hide{display:none}
 
-/* Cải tiến Media Slider trong Trang Chi Tiết */
 .gallery-container{background:#000;position:relative;width:100%}
 .main-media{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:#000;position:relative}
 .main-media img, .main-media video{width:100%;height:100%;object-fit:contain}
@@ -218,6 +221,22 @@ button{cursor:pointer}
 </div>
 
 <script>
+// --- CHẤU CẤU HÌNH FIREBASE REALTIME DATABASE ---
+const firebaseConfig = {
+  apiKey: "AIzaSyDummyKeyForInitialSetup123456789",
+  authDomain: "hoangtruongaudio.firebaseapp.com",
+  databaseURL: "https://hoangtruongaudio-default-rtdb.firebaseio.com",
+  projectId: "hoangtruongaudio",
+  storageBucket: "hoangtruongaudio.appspot.com",
+  messagingSenderId: "123456789",
+  appId: "1:123456789:web:abcdef123456"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.database();
+
 const defaultProducts=[
  {id:'p1', name:'Tai nghe Bluetooth AP2 không dây HIFI cảm ứng thông minh', price:'89.000₫', old:'149.000₫', sold:'1.2K', deal:'Giảm 40%', images:[], status:true, variants:['AP2 Standard', 'AP2 Pro'], desc:'Tai nghe AP2 âm thanh đỉnh cao, nhỏ gọn tiện lợi.'},
  {id:'p2', name:'Tai nghe Bluetooth AP3 ENC Pin 8H Bluetooth 5.3 HIFI', price:'129.000₫', old:'199.000₫', sold:'2.3K', deal:'Giảm 35%', images:[], status:true, variants:['AP3 White', 'AP3 Black'], desc:'Pin trâu 8H liên tục, âm thanh HIFI chân thực.'},
@@ -231,26 +250,25 @@ let selectedProduct = null;
 let selectedVariant = '';
 let priceAsc = true;
 
-function loadStorageData() {
-  const localData = localStorage.getItem('hta_products');
-  if (localData) {
-    try {
-      const parsed = JSON.parse(localData);
-      products = parsed.filter(p => p.status !== false);
-    } catch(e) { products = defaultProducts; }
-  } else {
-    products = defaultProducts;
-  }
-  currentProducts = [...products];
-  
-  const savedLogo = localStorage.getItem('hta_logo');
-  if(savedLogo) document.getElementById('logoImg').src = savedLogo;
-  
-  const savedShop = localStorage.getItem('hta_shop');
-  if(savedShop) document.getElementById('shopName').textContent = savedShop + ' ›';
-  
-  const savedSold = localStorage.getItem('hta_sold');
-  if(savedSold) document.getElementById('soldShop').textContent = savedSold + ' đã bán';
+// Lắng nghe dữ liệu realtime từ Firebase cho toàn bộ thiết bị
+function listenRealtimeData() {
+  db.ref('hta_products').on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (val && Array.isArray(val)) {
+      products = val.filter(p => p.status !== false);
+    } else {
+      products = defaultProducts;
+    }
+    currentProducts = [...products];
+    const activeTab = document.querySelector('.tabs button.active').id;
+    if (activeTab === 'tabHomeBtn') renderList(products, 'homeProductList');
+    else if (activeTab === 'tabProductBtn') renderList(currentProducts, 'productList');
+  });
+
+  db.ref('hta_reviews').on('value', (snapshot) => {
+    const val = snapshot.val();
+    if(val) renderReviewsList(val);
+  });
 }
 
 function switchTab(tabName){
@@ -287,7 +305,6 @@ function renderList(listData, targetId){
  }
 
  listData.forEach((p)=>{
-  // Hiển thị ảnh bìa danh sách
   let imgTag = '<div style="padding:10px;font-size:11px;color:#aaa;text-align:center">Chưa có ảnh</div>';
   if (p.images && p.images.length > 0) {
     imgTag = `<img src="${p.images[0]}" alt="${p.name}">`;
@@ -360,7 +377,6 @@ function showDetail(itemOrId) {
   document.getElementById('stickyPrice').textContent = item.price;
   document.getElementById('detailDesc').innerHTML = item.desc || 'Chưa có mô tả chi tiết.';
 
-  // Xử lý Render Video & Slide Ảnh chi tiết
   renderDetailMedia(item);
 
   const varBox = document.getElementById('variants');
@@ -375,165 +391,4 @@ function showDetail(itemOrId) {
         btn.classList.add('sel');
         selectedVariant = v;
       };
-      varBox.appendChild(btn);
-    });
-  } else {
-    varBox.innerHTML = '<span>Mặc định</span>';
-  }
-
-  renderReviewsList();
-  window.scrollTo(0,0);
-}
-
-function renderDetailMedia(item) {
-  const mainView = document.getElementById('mainMediaView');
-  const thumbSlider = document.getElementById('thumbSlider');
-  
-  mainView.innerHTML = '';
-  thumbSlider.innerHTML = '';
-
-  let mediaList = [];
-
-  // Thêm Video nếu có
-  if (item.video) {
-    mediaList.push({ type: 'video', src: item.video });
-  }
-
-  // Thêm danh sách ảnh
-  if (item.images && item.images.length > 0) {
-    item.images.forEach(img => {
-      mediaList.push({ type: 'image', src: img });
-    });
-  } else if (item.img) {
-    mediaList.push({ type: 'image', src: item.img });
-  }
-
-  if (mediaList.length === 0) {
-    mainView.innerHTML = `<div style="color:#888;">Không có hình ảnh</div>`;
-    thumbSlider.style.display = 'none';
-    return;
-  }
-
-  thumbSlider.style.display = mediaList.length > 1 ? 'flex' : 'none';
-
-  function displayMainMedia(mediaItem) {
-    if (mediaItem.type === 'video') {
-      mainView.innerHTML = `<video src="${mediaItem.src}" controls autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>`;
-    } else {
-      mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
-    }
-  }
-
-  // Hiển thị phần tử media đầu tiên
-  displayMainMedia(mediaList[0]);
-
-  // Tạo Thumbnail cho các ảnh/video
-  mediaList.forEach((media, index) => {
-    const thumb = document.createElement('div');
-    thumb.className = `thumb-item ${index === 0 ? 'active' : ''}`;
-    
-    if (media.type === 'video') {
-      thumb.innerHTML = `<video src="${media.src}"></video><div class="v-badge">▶</div>`;
-    } else {
-      thumb.innerHTML = `<img src="${media.src}">`;
-    }
-
-    thumb.onclick = () => {
-      document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
-      thumb.classList.add('active');
-      displayMainMedia(media);
-    };
-
-    thumbSlider.appendChild(thumb);
-  });
-}
-
-function renderReviewsList() {
-  const container = document.getElementById('reviewContainer');
-  let reviews = JSON.parse(localStorage.getItem('hta_reviews')) || [
-    { name: 'Nguyễn Văn A', rating: 5, content: 'Sản phẩm dùng rất mượt, giao hàng siêu nhanh!' }
-  ];
-  
-  let html = `<div style="font-size:28px;font-weight:800;margin-bottom:10px;">4.9 <span style="font-size:16px;color:#ffb400">★★★★★</span></div>`;
-  reviews.forEach(r => {
-    html += `
-      <div class="review">
-        <span class="avatar">${r.name ? r.name.charAt(0) : 'K'}</span><b>${r.name}</b><br>
-        <span class="stars">${'★'.repeat(r.rating || 5)}</span><br>${r.content}
-      </div>
-    `;
-  });
-  container.innerHTML = html;
-}
-
-function backHome() {
-  if(document.getElementById('detail').classList.contains('show')) {
-    document.getElementById('detail').classList.remove('show');
-    document.getElementById('home').classList.remove('hide');
-  } else {
-    switchTab('home');
-  }
-}
-
-function openOrder() {
-  if(!selectedProduct) return;
-  document.getElementById('orderTitle').textContent = selectedProduct.name;
-  document.getElementById('orderPrice').textContent = selectedProduct.price;
-  document.getElementById('orderVariantLabel').textContent = 'Phân loại: ' + selectedVariant;
-  
-  const imgBox = document.getElementById('orderImgContainer');
-  if(selectedProduct.images && selectedProduct.images.length > 0) {
-    imgBox.innerHTML = `<img src="${selectedProduct.images[0]}" style="width:100%;height:100%;object-fit:cover">`;
-  } else if(selectedProduct.img) {
-    imgBox.innerHTML = `<img src="${selectedProduct.img}" style="width:100%;height:100%;object-fit:cover">`;
-  } else {
-    imgBox.innerHTML = `<div style="text-align:center;line-height:75px;color:#aaa">HTA</div>`;
-  }
-  
-  document.getElementById('sheetbg').style.display = 'flex';
-}
-
-function closeOrder() {
-  document.getElementById('sheetbg').style.display = 'none';
-}
-
-function submitOrder() {
-  const name = document.getElementById('name').value.trim();
-  const phone = document.getElementById('phone').value.trim();
-  const address = document.getElementById('address').value.trim();
-
-  if(!name || !phone || !address) {
-    alert('Vui lòng nhập đầy đủ Họ tên, SĐT và Địa chỉ nhận hàng!');
-    return;
-  }
-
-  const newOrder = {
-    id: 'ORD_' + Date.now(),
-    name: name,
-    phone: phone,
-    address: address,
-    prodName: selectedProduct.name,
-    variant: selectedVariant,
-    price: selectedProduct.price,
-    status: 'Mới',
-    time: new Date().toLocaleString('vi-VN')
-  };
-
-  let orders = JSON.parse(localStorage.getItem('hta_orders')) || [];
-  orders.unshift(newOrder);
-  localStorage.setItem('hta_orders', JSON.stringify(orders));
-
-  alert('Đặt hàng thành công! Hoàng Trường Audio sẽ liên hệ xác nhận đơn hàng.');
-  closeOrder();
-  document.getElementById('name').value = '';
-  document.getElementById('phone').value = '';
-  document.getElementById('address').value = '';
-}
-
-window.onload = function() {
-  loadStorageData();
-  switchTab('home');
-};
-</script>
-</body>
-</html>
+      varBox.appendChild(
