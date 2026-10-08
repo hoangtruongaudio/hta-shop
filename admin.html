@@ -81,6 +81,7 @@ tr:hover { background: #2f2f2f; }
 .editor-toolbar { background: #222; border: 1px solid var(--border); border-bottom: none; border-radius: 6px 6px 0 0; padding: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
 .editor-toolbar button { background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 .editor-content { background: var(--bg-input); border: 1px solid var(--border); border-radius: 0 0 6px 6px; min-height: 150px; padding: 12px; color: #fff; outline: none; }
+.editor-content img { max-width: 100%; border-radius: 6px; margin: 8px 0; display: block; }
 </style>
 </head>
 <body>
@@ -205,6 +206,7 @@ tr:hover { background: #2f2f2f; }
   </div>
 </div>
 
+<!-- Modal Sản phẩm -->
 <div id="productModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:1000;">
   <div style="background:var(--bg-card); width:800px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:25px; border:1px solid var(--border);">
     <h3 id="modalProductTitle" style="margin-bottom:20px;">Thêm sản phẩm mới</h3>
@@ -233,15 +235,15 @@ tr:hover { background: #2f2f2f; }
     </div>
 
     <div class="form-group">
-      <label>Quản lý Ảnh sản phẩm (Ảnh sẽ được tự động tối ưu hóa dung lượng)</label>
+      <label>Quản lý Ảnh sản phẩm (Bộ nhớ tự nén nhẹ)</label>
       <input type="file" id="imageInput" multiple accept="image/*" style="display:none" onchange="handleImageUpload(event)">
       <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imageInput').click()">+ Tải ảnh lên</button>
       <div class="media-grid" id="imageGrid"></div>
     </div>
 
     <div class="form-group">
-      <label>URL Video sản phẩm (Khuyên dùng URL online thay vì tải file nặng để tránh đầy bộ nhớ)</label>
-      <input type="text" id="videoUrlInput" class="form-control" placeholder="Dán đường dẫn Video MP4 (VD: https://domain.com/video.mp4)" oninput="handleVideoUrlChange(this.value)">
+      <label>URL Video sản phẩm</label>
+      <input type="text" id="videoUrlInput" class="form-control" placeholder="Dán đường dẫn Video MP4" oninput="handleVideoUrlChange(this.value)">
       <div id="videoPreviewContainer" style="margin-top:10px;"></div>
     </div>
 
@@ -252,7 +254,7 @@ tr:hover { background: #2f2f2f; }
         <button onclick="execCmd('italic')"><i>I</i></button>
         <button onclick="execCmd('insertUnorderedList')">• List</button>
         <button onclick="insertTable()">+ Bảng</button>
-        <button onclick="insertImageEditor()">+ Chèn ảnh</button>
+        <button onclick="openInsertImageModal()">+ Chèn ảnh</button>
       </div>
       <div id="editorContent" class="editor-content" contenteditable="true"></div>
     </div>
@@ -260,6 +262,30 @@ tr:hover { background: #2f2f2f; }
     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
       <button class="btn btn-secondary" onclick="closeProductModal()">Hủy</button>
       <button class="btn btn-primary" onclick="saveProduct()">Lưu sản phẩm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal tùy chỉnh Chèn ảnh vào Mô tả -->
+<div id="insertImgModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000;">
+  <div style="background:var(--bg-card); width:450px; border-radius:10px; padding:20px; border:1px solid var(--border);">
+    <h4 style="margin-bottom:15px; color:#fff;">Chèn ảnh vào bài viết</h4>
+    
+    <div class="form-group">
+      <label>Cách 1: Chọn ảnh từ máy tính (Tự nén dung lượng)</label>
+      <input type="file" id="editorFileInput" accept="image/*" class="form-control" style="font-size:12px;">
+    </div>
+
+    <div style="text-align:center; color:var(--text-muted); margin: 10px 0;">— HOẶC —</div>
+
+    <div class="form-group">
+      <label>Cách 2: Dán đường dẫn URL ảnh</label>
+      <input type="text" id="editorUrlInput" class="form-control" placeholder="https://example.com/anh.jpg">
+    </div>
+
+    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
+      <button class="btn btn-secondary btn-sm" onclick="closeInsertImageModal()">Hủy</button>
+      <button class="btn btn-primary btn-sm" onclick="confirmInsertImage()">Xác nhận chèn</button>
     </div>
   </div>
 </div>
@@ -325,7 +351,6 @@ function renderOrders() {
   const tbody = document.getElementById('orderTableBody');
   const search = document.getElementById('searchOrderInput').value.toLowerCase();
   const filterStatus = document.getElementById('filterOrderStatus').value;
-  
   tbody.innerHTML = '';
   
   orders.filter(o => {
@@ -413,7 +438,7 @@ function saveProductsToStorage() {
     renderProducts();
     renderStats();
   } catch (e) {
-    alert("Không thể lưu sản phẩm do bộ nhớ trình duyệt đã đầy. Hãy xóa bớt ảnh!");
+    alert("Bộ nhớ trình duyệt đã đầy. Vui lòng giảm bớt hình ảnh!");
   }
 }
 
@@ -423,7 +448,6 @@ function handleImageUpload(e) {
     if(tempImages.length >= 9) return;
     const reader = new FileReader();
     reader.onload = async function(evt) {
-      // Nén ảnh trực tiếp khi vừa chọn file
       const compressed = await compressImage(evt.target.result, 400, 0.5);
       tempImages.push(compressed);
       renderMediaGrid();
@@ -509,7 +533,6 @@ function editProduct(idx) {
   document.getElementById('productModal').style.display = 'flex';
 }
 
-// Hàm nén ảnh mạnh hơn (Rộng tối đa 400px, Chất lượng 0.5)
 function compressImage(base64Str, maxWidth = 400, quality = 0.5) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -546,7 +569,6 @@ async function saveProduct() {
     return; 
   }
 
-  // Nén toàn bộ ảnh hiện tại một lần nữa trước khi lưu
   const compressedImages = await Promise.all(
     tempImages.map(img => img.startsWith('data:image') ? compressImage(img, 400, 0.5) : Promise.resolve(img))
   );
@@ -579,9 +601,8 @@ async function saveProduct() {
     closeProductModal();
     alert('Đã lưu sản phẩm thành công!');
   } catch (e) {
-    products = originalProducts; // Khôi phục danh sách cũ nếu lưu thất bại
-    alert('Lỗi: Dung lượng vẫn còn quá lớn! Bạn nên dùng đường dẫn (link) ảnh/video online thay vì upload trực tiếp.');
-    console.error(e);
+    products = originalProducts;
+    alert('Lỗi dung lượng! Hãy dùng URL ảnh/video online thay vì upload trực tiếp.');
   }
 }
 
@@ -589,9 +610,37 @@ function execCmd(cmd) { document.execCommand(cmd, false, null); }
 function insertTable() {
   document.execCommand('insertHTML', false, '<table border="1" style="border-collapse:collapse;width:100%"><tr><td>Tiêu đề 1</td><td>Tiêu đề 2</td></tr><tr><td>Nội dung 1</td><td>Nội dung 2</td></tr></table>');
 }
-function insertImageEditor() {
-  const url = prompt('Nhập URL hình ảnh:');
-  if(url) document.execCommand('insertImage', false, url);
+
+/* Xử lý Chèn ảnh vào Trình soạn thảo bằng Modal riêng */
+function openInsertImageModal() {
+  document.getElementById('editorFileInput').value = '';
+  document.getElementById('editorUrlInput').value = '';
+  document.getElementById('insertImgModal').style.display = 'flex';
+}
+
+function closeInsertImageModal() {
+  document.getElementById('insertImgModal').style.display = 'none';
+}
+
+async function confirmInsertImage() {
+  const fileInput = document.getElementById('editorFileInput');
+  const urlInput = document.getElementById('editorUrlInput').value.trim();
+
+  if (fileInput.files && fileInput.files[0]) {
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = async function(evt) {
+      const compressedImg = await compressImage(evt.target.result, 500, 0.6);
+      document.execCommand('insertImage', false, compressedImg);
+      closeInsertImageModal();
+    };
+    reader.readAsDataURL(file);
+  } else if (urlInput) {
+    document.execCommand('insertImage', false, urlInput);
+    closeInsertImageModal();
+  } else {
+    alert('Vui lòng chọn file ảnh hoặc dán URL đường dẫn ảnh!');
+  }
 }
 
 function renderReviews() {
