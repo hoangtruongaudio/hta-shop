@@ -3,286 +3,216 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#042e3c">
 <title>HOÀNG TRƯỜNG AUDIO</title>
 <style>
-:root{
- --pink:#fe2c55;--dark:#042e3c;--text:#161823;--muted:#777;
- --line:#ececec;--bg:#f5f5f5;--teal:#14b8b5;--mint:#e9fbfa;
-}
-*{box-sizing:border-box}html,body{margin:0;background:#ddd;color:var(--text);
-font-family:Arial,"Helvetica Neue",sans-serif;-webkit-tap-highlight-color:transparent}
-body{max-width:720px;margin:auto;background:#f5f5f5;padding-bottom:72px}
-button,input,textarea{font:inherit}button{cursor:pointer}
-.status{height:42px;background:var(--dark);color:#fff;display:flex;align-items:center;
-justify-content:space-between;padding:0 18px;font-size:15px;font-weight:700}
-.status .right{display:flex;gap:9px;align-items:center}.battery{border:2px solid #fff;border-radius:5px;padding:0 3px;font-size:11px}
-.nav{height:56px;background:var(--dark);color:#fff;display:flex;align-items:center;padding:0 15px;gap:18px}
-.nav .back{font-size:30px;background:none;border:0;color:#fff}.nav .search{flex:1;background:#fff1;border:1px solid #ffffff44;
-border-radius:22px;height:38px;display:flex;align-items:center;padding:0 13px;font-size:13px;color:#eee}
-.nav .share,.nav .cart{font-size:24px}.cart{position:relative}.cart b{position:absolute;right:-8px;top:-8px;
-font-size:10px;background:var(--pink);border-radius:12px;padding:3px 5px}
-.mall{height:42px;margin:0 14px;background:linear-gradient(110deg,#5a3019,#1d1009);
-color:#ffe9d5;border-radius:0 0 10px 10px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:13px}
-.shop{background:#fff;margin:0 0 8px;padding:13px 14px 14px;border-radius:0 0 10px 10px}
-.shopline{display:flex;align-items:center;gap:11px}.logo{width:62px;height:62px;border:1px solid #ddd;border-radius:50%;
-display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;flex:none}
-.logo img{width:100%;height:100%;object-fit:contain}.shopname{font-size:18px;font-weight:500;flex:1}
-.follow{background:var(--pink);color:#fff;border:0;border-radius:20px;padding:10px 22px;font-weight:700}
-.shopsub{margin-left:73px;margin-top:-22px;font-size:12px}.rating{color:#111}.rating .star{color:#12a990;background:#e9fbf7;padding:2px 5px;border-radius:4px}
-.vouchers{display:flex;gap:10px;overflow:auto;margin-top:16px}.voucher{min-width:235px;border:1px solid #d5eeee;background:#eefafa;border-radius:10px;
-padding:10px 12px;font-size:13px}.voucher.pink{background:#fff4f6;border-color:#ffd7df}.voucher button{float:right;background:#18b7b2;color:#fff;border:0;border-radius:6px;padding:7px 17px}
-.tabs{height:61px;background:#fff;display:flex;align-items:end;border-bottom:1px solid #ddd}
-.tabs button{flex:1;height:53px;background:#fff;border:0;color:#777;font-size:17px}
-.tabs button.active{color:#111;font-weight:700;border-bottom:3px solid #111}
-.sort{height:54px;background:#fff;display:flex;align-items:center;gap:0;overflow:hidden;white-space:nowrap;border-bottom:1px solid #eee}
-.sort button{background:#fff;border:0;padding:0 15px;color:#777;font-size:15px}.sort button.active{color:var(--pink);font-weight:700}.sep{color:#ddd}
-.list{background:#fff}.product{display:flex;gap:11px;padding:12px 14px;border-bottom:1px solid #f0f0f0;background:#fff;cursor:pointer}
-.pimg{width:244px;max-width:38%;aspect-ratio:1/1;background:#f4f4f4;border-radius:7px;overflow:hidden;position:relative;flex:none}
-.pimg img{width:100%;height:100%;object-fit:cover}
-.pbody{min-width:0;flex:1;display:flex;flex-direction:column}
-.pname{font-size:16px;line-height:1.28;height:41px;overflow:hidden}.tags{display:flex;gap:5px;margin:5px 0;overflow:hidden}
-.tag{font-size:11px;padding:4px 6px;border-radius:4px;white-space:nowrap}.ship{background:#e7faf8;color:#0a9c96}.deal{background:#fff0f3;color:var(--pink)}
-.stars{font-size:14px}.stars i{font-style:normal;color:#111}.meta{color:#777;font-size:12px;margin-left:5px}
-.priceRow{margin-top:auto;display:flex;align-items:end;justify-content:space-between;gap:5px}.price{font-size:21px;color:var(--pink);font-weight:800}.old{font-size:12px;color:#aaa;text-decoration:line-through}
-.buy{background:var(--pink);color:#fff;border-radius:4px;border:0;font-size:14px;font-weight:700;padding:10px 18px;min-width:96px}
-.cartmini{background:#fff0f3;color:var(--pink);border:0;border-radius:7px 0 0 7px;padding:10px 11px;font-size:18px}
-.miniBuy{display:flex}.miniBuy .buy{border-radius:0 7px 7px 0}
+:root{ --pink:#fe2c55;--dark:#042e3c;--text:#161823;--muted:#777;--line:#ececec; }
+*{box-sizing:border-box} html,body{margin:0;background:#f5f5f5;color:var(--text);font-family:Arial,sans-serif;-webkit-tap-highlight-color:transparent}
+body{max-width:720px;margin:auto;padding-bottom:72px;position:relative}
 
-/* CSS cho Tab Banner & Danh mục */
-.banner{margin:10px 14px;background:linear-gradient(135deg,#fe2c55,#ff758c);color:#fff;padding:20px;border-radius:12px;text-align:center}
-.banner h2{margin:0 0 8px;font-size:20px}.banner p{margin:0;font-size:13px;opacity:0.9}
-.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px}
-.cat-item{background:#fff;border:1px solid #eee;border-radius:10px;padding:16px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.02)}
-.cat-item .icon{font-size:32px;margin-bottom:8px}.cat-item b{display:block;font-size:14px;color:#333}
+/* Clearance for Phone Status Bar */
+.status{height:24px;background:var(--dark)}
 
-.detail{display:none;background:#f5f5f5;min-height:500px}.detail.show{display:block}.home.hide{display:none}
-.gallery{background:#fff;position:relative;aspect-ratio:1/1}.gallery img{width:100%;height:100%;object-fit:cover}.gallery .counter{position:absolute;bottom:12px;right:12px;background:#0009;color:#fff;padding:4px 8px;border-radius:12px;font-size:11px}
-.dinfo{background:#fff;padding:13px 14px}.dtitle{font-size:18px;line-height:1.4}.dprice{font-size:27px;color:var(--pink);font-weight:800;margin-top:8px}.shipping{border-top:1px solid #eee;border-bottom:1px solid #eee;background:#fff;padding:12px 14px;font-size:13px}
-.section{background:#fff;margin-top:8px;padding:14px}.section h3{font-size:16px;margin:0 0 12px}.variant{display:flex;gap:8px;flex-wrap:wrap}.variant button{background:#fff;border:1px solid #ddd;border-radius:4px;padding:9px 13px}.variant button.sel{border-color:var(--pink);color:var(--pink);background:#fff5f7}
-.review{border-top:1px solid #eee;padding:12px 0;font-size:13px}.avatar{display:inline-flex;width:30px;height:30px;border-radius:50%;background:#eee;align-items:center;justify-content:center;margin-right:7px}
-.review .stars{color:#ffb400}.sticky{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);
-background:#fff;border-top:1px solid #ddd;padding:7px 9px calc(7px + env(safe-area-inset-bottom));display:flex;gap:6px;z-index:40}
-.sticky .small{width:45px;background:#fff;border:0;font-size:10px}.sticky .add{width:38%;background:#fff0f3;color:var(--pink);border:0;border-radius:4px;font-weight:700}.sticky .buy{flex:1;border-radius:4px}
-.sheetbg{position:fixed;inset:0;background:#0008;z-index:80;display:none;align-items:flex-end}.sheet{width:min(720px,100%);margin:auto;background:#fff;border-radius:15px 15px 0 0;padding:16px;max-height:90vh;overflow:auto}.sheet h2{font-size:18px;margin:0 0 12px}.close{float:right;border:0;background:#eee;border-radius:50%;width:30px;height:30px}
-.orderitem{display:flex;gap:10px;border-bottom:1px solid #eee;padding-bottom:12px}.othumb{width:75px;height:75px;background:#eee;border-radius:7px}.field{margin-top:12px}.field label{display:block;font-size:12px;color:#666;margin-bottom:5px}.field input,.field textarea{width:100%;border:1px solid #ddd;border-radius:6px;padding:11px;outline:0}.confirm{width:100%;height:46px;background:var(--pink);color:#fff;border:0;border-radius:5px;font-weight:800;margin-top:14px}
-@media(max-width:520px){.pimg{width:36vw}.pname{font-size:15px}.price{font-size:20px}.mall{margin:0 12px}}
+.nav{height:56px;background:var(--dark);color:#fff;display:flex;align-items:center;padding:0 15px;gap:15px;position:sticky;top:0;z-index:100}
+.nav .back{font-size:26px;background:none;border:0;color:#fff;cursor:pointer}
+.nav .search{flex:1;background:#ffffff22;border-radius:20px;height:36px;display:flex;align-items:center;padding:0 12px;font-size:13px;color:#eee}
+
+.list{background:#fff}
+.product{display:flex;gap:12px;padding:12px;border-bottom:1px solid #eee;cursor:pointer}
+.pimg{width:110px;height:110px;background:#eee;border-radius:6px;overflow:hidden;flex:none}
+.pimg img, .pimg video{width:100%;height:100%;object-fit:cover}
+.pbody{flex:1;display:flex;flex-direction:column;justify-content:space-between}
+.pname{font-size:15px;line-height:1.3;font-weight:600;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.price{font-size:18px;color:var(--pink);font-weight:800}
+
+/* Detail Page & Carousel Slider */
+.detail{display:none;background:#fff;min-height:100vh}
+.detail.show{display:block}
+.carousel{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;aspect-ratio:1;background:#000}
+.carousel-item{flex:0 0 100%;scroll-snap-align:start;position:relative}
+.carousel-item img, .carousel-item video{width:100%;height:100%;object-fit:cover}
+
+.dinfo{padding:15px}
+.dprice{font-size:24px;color:var(--pink);font-weight:800}
+.variants{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.variant-btn{padding:8px 14px;border:1px solid #ddd;border-radius:6px;background:#fff;cursor:pointer;font-size:13px}
+.variant-btn.active{border-color:var(--pink);color:var(--pink);background:#fff0f3}
+
+.sticky{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);background:#fff;border-top:1px solid #ddd;padding:8px;display:flex;gap:8px;z-index:90}
+.sticky .buy{flex:1;background:var(--pink);color:#fff;border:0;border-radius:6px;font-weight:bold;padding:12px}
+
+/* Modal Checkout */
+.sheetbg{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200;display:none;align-items:flex-end}
+.sheet{width:min(720px,100%);margin:auto;background:#fff;border-radius:12px 12px 0 0;padding:18px}
+.sheet input, .sheet textarea{width:100%;padding:10px;margin-top:8px;border:1px solid #ddd;border-radius:6px;outline:none}
+.sheet .btn-confirm{width:100%;padding:12px;background:var(--pink);color:#fff;border:none;border-radius:6px;font-weight:bold;margin-top:12px;cursor:pointer}
 </style>
 </head>
 <body>
 
- <div class="status"></div>
+<div class="status"></div>
 <div class="nav">
- <button class="back" onclick="backHome()">‹</button>
- <div class="search">⌕&nbsp; Tìm kiếm sản phẩm</div>
- <div class="share">↗</div>
- <div class="cart">🛒<b>31</b></div>
+  <button class="back" onclick="backHome()">‹</button>
+  <div class="search">⌕&nbsp; Tìm kiếm trên shop...</div>
 </div>
-<div class="mall"><span>♙ Mall</span><span>Hàng thật 100% · Freeship ›</span></div>
 
-<div class="home" id="home">
- <section class="shop">
-  <div class="shopline">
-   <div class="logo"><img id="logoImg" alt="logo"></div>
-   <div class="shopname" id="shopName">HOÀNG TRƯỜNG AUDIO ›</div>
-   <button class="follow">Theo dõi</button>
+<!-- Home Page -->
+<div id="home">
+  <div style="padding:15px; background:linear-gradient(135deg, #fe2c55, #ff758c); color:#fff; border-radius:0 0 12px 12px;">
+    <h2>HOÀNG TRƯỜNG AUDIO</h2>
+    <p style="font-size:13px;">Chuyên phụ kiện âm thanh cao cấp</p>
   </div>
-  <div class="shopsub"><span class="rating">★ 4.9</span> &nbsp; <span id="soldShop">10.4K đã bán</span></div>
-  <div class="vouchers">
-   <div class="voucher"><b>Voucher vận chuyển x18</b><br>cho đơn trên 1đ <button>Nhận</button></div>
-   <div class="voucher pink"><b>Giảm 10K ₫</b><br>cho đơn trên 96K</div>
+  <div class="list" id="productList"></div>
+</div>
+
+<!-- Detail Page -->
+<div id="detail" class="detail">
+  <div class="carousel" id="detailCarousel"></div>
+  <div class="dinfo">
+    <div class="dprice" id="detailPrice"></div>
+    <h2 id="detailTitle" style="font-size:18px; margin-top:5px;"></h2>
+    
+    <div style="margin-top:15px;">
+      <label style="font-size:13px; font-weight:bold;">Chọn phân loại:</label>
+      <div class="variants" id="detailVariants"></div>
+    </div>
+
+    <div style="margin-top:20px; border-top:1px solid #eee; padding-top:15px;">
+      <h3 style="font-size:15px;">Mô tả sản phẩm</h3>
+      <div id="detailDesc" style="font-size:14px; color:#444; line-height:1.6; margin-top:8px;"></div>
+    </div>
   </div>
- </section>
-
- <!-- TAB MAIN NAVIGATION -->
- <div class="tabs">
-  <button id="tabHomeBtn" class="active" onclick="switchTab('home')">Trang chủ</button>
-  <button id="tabProductBtn" onclick="switchTab('product')">Sản phẩm</button>
-  <button id="tabCategoryBtn" onclick="switchTab('category')">Danh mục</button>
- </div>
-
- <!-- NỘI DUNG TAB TRANG CHỦ -->
- <div id="tabHomeContent">
-   <div class="banner">
-     <h2>HOÀNG TRƯỜNG AUDIO</h2>
-     <p>Âm Thanh Đỉnh Cao - Giá Cực Tốt</p>
-   </div>
-   <div style="padding:10px 14px;font-weight:700;font-size:16px">🔥 Sản phẩm nổi bật</div>
-   <div class="list" id="homeProductList"></div>
- </div>
-
- <!-- NỘI DUNG TAB SẢN PHẨM -->
- <div id="tabProductContent" style="display:none">
-   <div class="sort">
-    <button id="sortRecommend" class="active" onclick="sortProducts('recommend')">Đề xuất</button><span class="sep">|</span>
-    <button id="sortBest" onclick="sortProducts('best')">Bán chạy</button><span class="sep">|</span>
-    <button id="sortNew" onclick="sortProducts('new')">Hàng mới ra mắt</button><span class="sep">|</span>
-    <button id="sortPrice" onclick="sortProducts('price')">Giá <span id="priceDir">↕</span></button>
-   </div>
-   <div class="list" id="productList"></div>
- </div>
-
- <!-- NỘI DUNG TAB DANH MỤC -->
- <div id="tabCategoryContent" style="display:none">
-   <div class="category-grid">
-     <div class="cat-item" onclick="switchTab('product')"><div class="icon">🎧</div><b>Tai nghe Bluetooth</b></div>
-     <div class="cat-item" onclick="switchTab('product')"><div class="icon">🔇</div><b>Chống ồn ANC</b></div>
-     <div class="cat-item" onclick="switchTab('product')"><div class="icon">🔊</div><b>Loa & Phụ kiện</b></div>
-     <div class="cat-item" onclick="switchTab('product')"><div class="icon">🏷️</div><b>Voucher & Ưu đãi</b></div>
-   </div>
- </div>
-
 </div>
 
-<div class="detail" id="detail">
- <div class="gallery"><img id="detailImg"><div class="counter">1 / 5</div></div>
- <div class="dinfo">
-  <div class="dtitle" id="detailTitle"></div>
-  <div class="stars">★★★★★ <span style="color:#777">4.9 | Đã bán 1.2K</span></div>
-  <div class="dprice" id="detailPrice"></div>
- </div>
- <div class="shipping">🚚 <b>Miễn phí vận chuyển</b> · Giao sớm nhất trong 3 ngày.</div>
- <div class="section"><h3>Voucher & khuyến mãi</h3><div class="voucher" style="min-width:0">Giảm 10K ₫ cho đơn từ 96K <button>Nhận</button></div></div>
- <div class="section"><h3>Chọn phân loại</h3><div class="variant" id="variants">
-   <button class="sel">AP2</button><button>AP3</button><button>AP4 ANC</button><button>Pro 2</button><button>Pro 2 ANC</button>
- </div></div>
- <div class="section"><h3>Đánh giá của khách hàng (1.8K)</h3>
-   <div style="font-size:30px;font-weight:800">4.9 <span style="font-size:16px;color:#ffb400">★★★★★</span></div>
-   <div class="review"><span class="avatar">KH</span><b>Khách hàng</b><br><span class="stars">★★★★★</span><br>Âm thanh ổn, đóng gói chắc chắn, giao hàng nhanh.</div>
-   <div class="review"><span class="avatar">MN</span><b>Minh N.</b><br><span class="stars">★★★★★</span><br>Tai nghe nhỏ gọn, kết nối nhanh với điện thoại.</div>
- </div>
- <div class="section"><h3>Mô tả sản phẩm</h3><p style="font-size:13px;line-height:1.6">Tai nghe Bluetooth không dây, thiết kế nhỏ gọn, cảm ứng tiện lợi, âm thanh HIFI. Có nhiều phiên bản để lựa chọn. Bảo hành theo chính sách HOÀNG TRƯỜNG AUDIO.</p></div>
+<div class="sticky" id="stickyNav" style="display:none;">
+  <button class="buy" onclick="openCheckout()">MUA NGAY KHUYẾN MÃI</button>
 </div>
 
-<div class="sticky">
- <button class="small">💬<br>Chat</button><button class="small">🛒<br>Giỏ</button>
- <button class="add" onclick="openOrder()">Thêm vào giỏ</button><button class="buy" onclick="openOrder()">Mua ngay<br><small id="stickyPrice">89.000₫</small></button>
-</div>
-
+<!-- Modal Đặt Hàng -->
 <div class="sheetbg" id="sheetbg">
- <div class="sheet">
-  <button class="close" onclick="closeOrder()">×</button>
-  <h2>Đặt hàng</h2>
-  <div class="orderitem"><div class="othumb"><img id="orderImg" style="width:100%;height:100%;object-fit:cover;border-radius:7px"></div>
-   <div><b id="orderTitle">Tai Nghe Bluetooth AP2</b><div style="color:var(--pink);font-size:20px;font-weight:800" id="orderPrice">89.000₫</div></div>
+  <div class="sheet">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3>Xác nhận đơn hàng</h3>
+      <button onclick="closeCheckout()" style="border:none; background:none; font-size:20px;">×</button>
+    </div>
+    <p id="orderSummary" style="font-size:13px; color:var(--pink); font-weight:bold; margin-top:8px;"></p>
+    
+    <input type="text" id="custName" placeholder="Họ và tên người nhận *">
+    <input type="tel" id="custPhone" placeholder="Số điện thoại *">
+    <textarea id="custAddr" rows="3" placeholder="Địa chỉ chi tiết (Số nhà, đường, phường/xã) *"></textarea>
+    
+    <button class="btn-confirm" onclick="submitOrder()">HOÀN TẤT ĐẶT HÀNG</button>
   </div>
-  <div class="field"><label>Họ và tên *</label><input id="name" placeholder="Nhập họ và tên"></div>
-  <div class="field"><label>Số điện thoại *</label><input id="phone" inputmode="tel" placeholder="Nhập số điện thoại"></div>
-  <div class="field"><label>Địa chỉ nhận hàng *</label><textarea id="address" rows="3" placeholder="Số nhà, đường, phường/xã, tỉnh/thành"></textarea></div>
-  <button class="confirm" onclick="submitOrder()">XÁC NHẬN ĐẶT HÀNG</button>
- </div>
 </div>
 
 <script>
-const defaultProducts=[
- {name:'Tai nghe Bluetooth AP2 không dây HIFI cảm ứng thông minh',price:'89.000₫',old:'149.000₫',sold:'1.2K',deal:'Giảm 40%',img:''},
- {name:'Tai nghe Bluetooth AP3 ENC Pin 8H Bluetooth 5.3 HIFI',price:'129.000₫',old:'199.000₫',sold:'2.3K',deal:'Giảm 35%',img:''},
- {name:'Tai nghe Bluetooth AP4 ANC xuyên âm khử ồn',price:'189.000₫',old:'299.000₫',sold:'908',deal:'Giảm 37%',img:''},
- {name:'Tai nghe Bluetooth Pro 2 ANC khử ồn cảm ứng',price:'229.000₫',old:'359.000₫',sold:'810',deal:'Giảm 36%',img:''}
-];
+let products = JSON.parse(localStorage.getItem('hta_products')) || [];
+let currentProd = null;
+let selectedVariant = '';
 
-let products=JSON.parse(localStorage.getItem('hta_products')||'null')||defaultProducts;
-let currentProducts = [...products];
-let priceAsc = true;
-
-// Chuyển đổi giữa các Tab Trang chủ - Sản phẩm - Danh mục
-function switchTab(tabName){
- document.getElementById('tabHomeBtn').classList.remove('active');
- document.getElementById('tabProductBtn').classList.remove('active');
- document.getElementById('tabCategoryBtn').classList.remove('active');
-
- document.getElementById('tabHomeContent').style.display = 'none';
- document.getElementById('tabProductContent').style.display = 'none';
- document.getElementById('tabCategoryContent').style.display = 'none';
-
- if(tabName === 'home'){
-  document.getElementById('tabHomeBtn').classList.add('active');
-  document.getElementById('tabHomeContent').style.display = 'block';
-  renderList(products, 'homeProductList');
- }else if(tabName === 'product'){
-  document.getElementById('tabProductBtn').classList.add('active');
-  document.getElementById('tabProductContent').style.display = 'block';
-  renderList(currentProducts, 'productList');
- }else if(tabName === 'category'){
-  document.getElementById('tabCategoryBtn').classList.add('active');
-  document.getElementById('tabCategoryContent').style.display = 'block';
- }
-}
-
-// Hàm render danh sách sản phẩm
-function renderList(listData, targetId){
- const list=document.getElementById(targetId); list.innerHTML='';
- listData.forEach((p,i)=>{
-  const el=document.createElement('div');el.className='product';
-  el.innerHTML=`<div class="pimg">${p.img?`<img src="${p.img}">`:'<div style="padding:10px;font-size:11px;color:#aaa;text-align:center">Chưa có ảnh</div>'}</div>
-   <div class="pbody"><div class="pname">${p.name}</div><div class="tags"><span class="tag ship">🚚 Freeship</span><span class="tag deal">${p.deal}</span></div>
-   <div><span class="stars">★★★★★</span><span class="meta">4.8 | Đã bán ${p.sold}</span></div>
-   <div class="priceRow"><div><div class="price">${p.price}</div><div class="old">${p.old}</div></div>
-   <div class="miniBuy"><button class="cartmini" onclick="event.stopPropagation();toast('Đã thêm vào giỏ')">🛒</button><button class="buy" onclick="event.stopPropagation();openProductByObj('${p.name}')">Mua</button></div></div></div>`;
-  el.onclick=()=>openProductByObj(p.name);list.appendChild(el)
- })
-}
-
-// Xử lý Lọc & Sắp xếp sản phẩm
-function sortProducts(type){
- document.getElementById('sortRecommend').classList.remove('active');
- document.getElementById('sortBest').classList.remove('active');
- document.getElementById('sortNew').classList.remove('active');
- document.getElementById('sortPrice').classList.remove('active');
-
- if(type === 'recommend'){
-  document.getElementById('sortRecommend').classList.add('active');
-  currentProducts = [...products];
- } else if(type === 'best'){
-  document.getElementById('sortBest').classList.add('active');
-  currentProducts = [...products].sort((a,b) => parseFloat(b.sold) - parseFloat(a.sold));
- } else if(type === 'new'){
-  document.getElementById('sortNew').classList.add('active');
-  currentProducts = [...products].reverse();
- } else if(type === 'price'){
-  document.getElementById('sortPrice').classList.add('active');
-  priceAsc = !priceAsc;
-  document.getElementById('priceDir').textContent = priceAsc ? '↑' : '↓';
-  currentProducts = [...products].sort((a,b) => {
-   let pa = parseInt(a.price.replace(/\D/g,'')) || 0;
-   let pb = parseInt(b.price.replace(/\D/g,'')) || 0;
-   return priceAsc ? pa - pb : pb - pa;
+function renderHomeProducts() {
+  const list = document.getElementById('productList');
+  list.innerHTML = '';
+  products.filter(p => p.status).forEach(p => {
+    const coverMedia = (p.images && p.images.length > 0) ? `<img src="${p.images[0]}">` : (p.video ? `<video src="${p.video}"></video>` : '');
+    const div = document.createElement('div');
+    div.className = 'product';
+    div.onclick = () => openDetail(p.id);
+    div.innerHTML = `
+      <div class="pimg">${coverMedia}</div>
+      <div class="pbody">
+        <div class="pname">${p.name}</div>
+        <div class="price">${p.price}</div>
+      </div>
+    `;
+    list.appendChild(div);
   });
- }
- renderList(currentProducts, 'productList');
 }
 
-function openProductByObj(name){
- const p = products.find(item => item.name === name) || products[0];
- document.getElementById('home').classList.add('hide');document.getElementById('detail').classList.add('show');
- document.getElementById('detailTitle').textContent=p.name;document.getElementById('detailPrice').textContent=p.price;document.getElementById('stickyPrice').textContent=p.price;
- document.getElementById('orderTitle').textContent=p.name;document.getElementById('orderPrice').textContent=p.price;
- document.getElementById('detailImg').src=p.img||'';document.getElementById('orderImg').src=p.img||'';
+function openDetail(id) {
+  currentProd = products.find(p => p.id === id);
+  if(!currentProd) return;
+
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('detail').classList.add('show');
+  document.getElementById('stickyNav').style.display = 'flex';
+
+  document.getElementById('detailTitle').textContent = currentProd.name;
+  document.getElementById('detailPrice').textContent = currentProd.price;
+  document.getElementById('detailDesc').innerHTML = currentProd.desc || 'Chưa có mô tả.';
+
+  // Render Carousel (Video + 9 Ảnh)
+  const carousel = document.getElementById('detailCarousel');
+  carousel.innerHTML = '';
+  if(currentProd.video) {
+    carousel.innerHTML += `<div class="carousel-item"><video src="${currentProd.video}" controls autoplay loop muted></video></div>`;
+  }
+  (currentProd.images || []).forEach(img => {
+    carousel.innerHTML += `<div class="carousel-item"><img src="${img}"></div>`;
+  });
+
+  // Render Biến thể
+  const vContainer = document.getElementById('detailVariants');
+  vContainer.innerHTML = '';
+  selectedVariant = (currentProd.variants && currentProd.variants.length > 0) ? currentProd.variants[0] : '';
+  (currentProd.variants || []).forEach((v, idx) => {
+    const btn = document.createElement('button');
+    btn.className = `variant-btn ${idx===0?'active':''}`;
+    btn.textContent = v;
+    btn.onclick = () => {
+      document.querySelectorAll('.variant-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedVariant = v;
+    };
+    vContainer.appendChild(btn);
+  });
 }
 
-function backHome(){document.getElementById('detail').classList.remove('show');document.getElementById('home').classList.remove('hide')}
-function openOrder(){document.getElementById('sheetbg').style.display='flex'}
-function closeOrder(){document.getElementById('sheetbg').style.display='none'}
-
-function submitOrder(){
- const n=document.getElementById('name').value.trim(),ph=document.getElementById('phone').value.replace(/\s/g,''),a=document.getElementById('address').value.trim();
- if(!n||!ph||!a){toast('Vui lòng nhập đầy đủ thông tin');return}
- if(!/^(0|\+84)\d{8,10}$/.test(ph)){toast('Số điện thoại chưa đúng');return}
- closeOrder();toast('Đặt hàng thành công — shop sẽ liên hệ xác nhận')
+function backHome() {
+  document.getElementById('detail').classList.remove('show');
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('stickyNav').style.display = 'none';
 }
 
-function toast(t){
- const d=document.createElement('div');d.textContent=t;
- Object.assign(d.style,{position:'fixed',left:'50%',bottom:'85px',transform:'translateX(-50%)',background:'#222',color:'#fff',padding:'10px 16px',borderRadius:'20px',zIndex:200,fontSize:'13px'});
- document.body.appendChild(d);setTimeout(()=>d.remove(),1800)
+function openCheckout() {
+  if(!currentProd) return;
+  document.getElementById('orderSummary').textContent = `${currentProd.name} (${selectedVariant || 'Mặc định'}) - ${currentProd.price}`;
+  document.getElementById('sheetbg').style.display = 'flex';
 }
 
-document.getElementById('logoImg').src=localStorage.getItem('hta_logo')||'';
-document.getElementById('shopName').textContent=(localStorage.getItem('hta_shop')||'HOÀNG TRƯỜNG AUDIO')+' ›';
-document.getElementById('soldShop').textContent=localStorage.getItem('hta_sold')||'10.4K đã bán';
+function closeCheckout() {
+  document.getElementById('sheetbg').style.display = 'none';
+}
 
-// Khởi chạy mặc định ở Tab Trang Chủ
-switchTab('home');
+function submitOrder() {
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const addr = document.getElementById('custAddr').value.trim();
+
+  if(!name || !phone || !addr) {
+    alert('Vui lòng điền đầy đủ thông tin giao hàng!');
+    return;
+  }
+
+  const orders = JSON.parse(localStorage.getItem('hta_orders')) || [];
+  orders.unshift({
+    id: 'ORD_' + Date.now(),
+    name: name,
+    phone: phone,
+    address: addr,
+    prodName: currentProd.name,
+    variant: selectedVariant,
+    price: currentProd.price,
+    status: 'Mới',
+    time: new Date().toLocaleString('vi-VN')
+  });
+
+  localStorage.setItem('hta_orders', JSON.stringify(orders));
+  alert('Đặt hàng thành công! Shop sẽ liên hệ xác nhận sớm nhất.');
+  closeCheckout();
+  backHome();
+}
+
+renderHomeProducts();
 </script>
 </body>
 </html>
