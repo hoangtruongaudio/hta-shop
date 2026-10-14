@@ -295,15 +295,16 @@ tr:hover { background: #2f2f2f; }
 </div>
 
 <script>
-// --- CẤU HÌNH FIREBASE REALTIME DATABASE ---
+// --- CHUẨN HÓA FIREBASE CONFIG CỦA BẠN ---
 const firebaseConfig = {
-  apiKey: "AIzaSyDummyKeyForInitialSetup123456789",
-  authDomain: "hoangtruongaudio.firebaseapp.com",
-  databaseURL: "https://hoangtruongaudio-default-rtdb.firebaseio.com",
-  projectId: "hoangtruongaudio",
-  storageBucket: "hoangtruongaudio.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+  apiKey: "AIzaSyCAM8aZvUM5KwzNttrnTNsqo30yhf2IbKI",
+  authDomain: "hoangtruong-c6268.firebaseapp.com",
+  databaseURL: "https://hoangtruong-c6268-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hoangtruong-c6268",
+  storageBucket: "hoangtruong-c6268.firebasestorage.app",
+  messagingSenderId: "858441479645",
+  appId: "1:858441479645:web:bad1af63eadf0633a1f234",
+  measurementId: "G-Q0DMZ4NXBY"
 };
 
 if (!firebase.apps.length) {
@@ -457,7 +458,7 @@ function copyProduct(idx) {
 
 function syncProductsToFirebase() {
   db.ref('hta_products').set(products).then(() => {
-    alert("Đã đồng bộ lên Đám Mây thành công! Tất cả máy khác sẽ thấy ngay.");
+    alert("Đã lưu lên Firebase đám mây thành công!");
   });
 }
 
