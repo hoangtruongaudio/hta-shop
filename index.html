@@ -221,15 +221,16 @@ button{cursor:pointer}
 </div>
 
 <script>
-// --- CHẤU CẤU HÌNH FIREBASE REALTIME DATABASE ---
+// --- CHUẨN HÓA FIREBASE CONFIG CỦA BẠN ---
 const firebaseConfig = {
-  apiKey: "AIzaSyDummyKeyForInitialSetup123456789",
-  authDomain: "hoangtruongaudio.firebaseapp.com",
-  databaseURL: "https://hoangtruongaudio-default-rtdb.firebaseio.com",
-  projectId: "hoangtruongaudio",
-  storageBucket: "hoangtruongaudio.appspot.com",
-  messagingSenderId: "123456789",
-  appId: "1:123456789:web:abcdef123456"
+  apiKey: "AIzaSyCAM8aZvUM5KwzNttrnTNsqo30yhf2IbKI",
+  authDomain: "hoangtruong-c6268.firebaseapp.com",
+  databaseURL: "https://hoangtruong-c6268-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hoangtruong-c6268",
+  storageBucket: "hoangtruong-c6268.firebasestorage.app",
+  messagingSenderId: "858441479645",
+  appId: "1:858441479645:web:bad1af63eadf0633a1f234",
+  measurementId: "G-Q0DMZ4NXBY"
 };
 
 if (!firebase.apps.length) {
@@ -260,7 +261,8 @@ function listenRealtimeData() {
       products = defaultProducts;
     }
     currentProducts = [...products];
-    const activeTab = document.querySelector('.tabs button.active').id;
+    const activeTabBtn = document.querySelector('.tabs button.active');
+    const activeTab = activeTabBtn ? activeTabBtn.id : 'tabHomeBtn';
     if (activeTab === 'tabHomeBtn') renderList(products, 'homeProductList');
     else if (activeTab === 'tabProductBtn') renderList(currentProducts, 'productList');
   });
@@ -515,7 +517,6 @@ function submitOrder() {
     time: new Date().toLocaleString('vi-VN')
   };
 
-  // Đẩy đơn hàng lên Firebase đồng bộ sang Admin
   db.ref('hta_orders').push(newOrder).then(() => {
     alert('Đặt hàng thành công! Hoàng Trường Audio sẽ liên hệ xác nhận đơn hàng.');
     closeOrder();
