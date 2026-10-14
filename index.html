@@ -505,8 +505,15 @@ function submitOrder() {
     return;
   }
 
+  // Định dạng lại số điện thoại chuẩn quốc tế (chuyển 09xx thành 849xx)
+  let formattedPhone = phone.replace(/\D/g, '');
+  if(formattedPhone.startsWith('0')) {
+    formattedPhone = '84' + formattedPhone.slice(1);
+  }
+
+  const orderId = 'ORD_' + Date.now();
   const newOrder = {
-    id: 'ORD_' + Date.now(),
+    id: orderId,
     name: name,
     phone: phone,
     address: address,
@@ -517,12 +524,29 @@ function submitOrder() {
     time: new Date().toLocaleString('vi-VN')
   };
 
+  // Soạn sẵn tin nhắn gửi Zalo cho Khách hàng
+  const msgForCustomer = `Chào ${name}, Hoàng Trường Audio xác nhận đơn hàng:\n` +
+    `📦 Mã đơn: ${orderId}\n` +
+    `🎧 Sản phẩm: ${selectedProduct.name} (${selectedVariant})\n` +
+    `💰 Số tiền: ${selectedProduct.price}\n` +
+    `📍 Địa chỉ: ${address}\n` +
+    `📞 SĐT: ${phone}\n` +
+    `🚚 Thời gian giao hàng dự kiến: 2-3 ngày.\n` +
+    `🔎 Theo dõi đơn hàng tại: https://hoangtruongaudio.github.io/hta-shop/`;
+
+  // 1. Lưu đơn vào Firebase Realtime Database
   db.ref('hta_orders').push(newOrder).then(() => {
-    alert('Đặt hàng thành công! Hoàng Trường Audio sẽ liên hệ xác nhận đơn hàng.');
+    alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận đơn...');
     closeOrder();
+    
+    // Reset ô nhập
     document.getElementById('name').value = '';
     document.getElementById('phone').value = '';
     document.getElementById('address').value = '';
+
+    // 2. Mở Zalo tự động soạn tin nhắn tới SĐT khách hàng
+    const zaloUrl = `https://zalo.me/${formattedPhone}?text=${encodeURIComponent(msgForCustomer)}`;
+    window.open(zaloUrl, '_blank');
   });
 }
 
