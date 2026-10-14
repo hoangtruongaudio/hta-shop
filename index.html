@@ -505,9 +505,9 @@ function submitOrder() {
     return;
   }
 
-  // --- CẤU HÌNH BOT TELEGRAM CỦA BẠN ---
+  // Cấu hình Telegram đã hoàn chỉnh
   const TELEGRAM_BOT_TOKEN = '8869659373:AAFJAU0YcVSISF6hriTRcB-S3PMiRFpJPS4';
-  const TELEGRAM_CHAT_ID = 'ĐIỀN_CHAT_ID_LẤY_TỪ_USERINFOBOT_VÀO_ĐÂY'; // <--- Thay Id của bạn vào đây
+  const TELEGRAM_CHAT_ID = '6961829665';
 
   let formattedPhone = phone.replace(/\D/g, '');
   if(formattedPhone.startsWith('0')) {
@@ -527,7 +527,7 @@ function submitOrder() {
     time: new Date().toLocaleString('vi-VN')
   };
 
-  // 1. Soạn tin nhắn chốt đơn tự động gửi sang Zalo Khách hàng
+  // 1. Soạn tin nhắn gửi Zalo cho Khách hàng
   const msgForCustomer = `Chào ${name}, Hoàng Trường Audio xác nhận đơn hàng:\n` +
     `📦 Mã đơn: ${orderId}\n` +
     `🎧 Sản phẩm: ${selectedProduct.name} (${selectedVariant})\n` +
@@ -537,7 +537,7 @@ function submitOrder() {
     `🚚 Thời gian giao hàng dự kiến: 2-3 ngày.\n` +
     `🔎 Theo dõi đơn hàng tại: https://hoangtruongaudio.github.io/hta-shop/`;
 
-  // 2. Soạn tin nhắn cảnh báo gửi ngầm về Telegram cho Bạn (Admin)
+  // 2. Soạn tin nhắn báo động về Telegram cho Admin
   const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*\n` +
     `📦 *Mã đơn:* \`${orderId}\`\n` +
     `👤 *Khách hàng:* ${name}\n` +
@@ -546,18 +546,16 @@ function submitOrder() {
     `💰 *Tổng tiền:* ${selectedProduct.price}\n` +
     `📍 *Địa chỉ:* ${address}`;
 
-  // 3. Đẩy tin nhắn báo động về Telegram cá nhân
-  if (TELEGRAM_CHAT_ID !== 'ĐIỀN_CHAT_ID_LẤY_TỪ_USERINFOBOT_VÀO_ĐÂY') {
-    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        chat_id: TELEGRAM_CHAT_ID,
-        text: msgForAdmin,
-        parse_mode: 'Markdown'
-      })
-    });
-  }
+  // 3. Gửi thông báo trực tiếp về Telegram cá nhân
+  fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      chat_id: TELEGRAM_CHAT_ID,
+      text: msgForAdmin,
+      parse_mode: 'Markdown'
+    })
+  });
 
   // 4. Lưu đơn lên Firebase & Tự bật Zalo gửi tin nhắn cho khách
   db.ref('hta_orders').push(newOrder).then(() => {
