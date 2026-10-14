@@ -505,7 +505,10 @@ function submitOrder() {
     return;
   }
 
-  // Định dạng lại số điện thoại chuẩn quốc tế (chuyển 09xx thành 849xx)
+  // --- CẤU HÌNH BOT TELEGRAM CỦA BẠN ---
+  const TELEGRAM_BOT_TOKEN = '8869659373:AAFJAU0YcVSISF6hriTRcB-S3PMiRFpJPS4';
+  const TELEGRAM_CHAT_ID = 'ĐIỀN_CHAT_ID_LẤY_TỪ_USERINFOBOT_VÀO_ĐÂY'; // <--- Thay Id của bạn vào đây
+
   let formattedPhone = phone.replace(/\D/g, '');
   if(formattedPhone.startsWith('0')) {
     formattedPhone = '84' + formattedPhone.slice(1);
@@ -524,7 +527,7 @@ function submitOrder() {
     time: new Date().toLocaleString('vi-VN')
   };
 
-  // Soạn sẵn tin nhắn gửi Zalo cho Khách hàng
+  // 1. Soạn tin nhắn chốt đơn tự động gửi sang Zalo Khách hàng
   const msgForCustomer = `Chào ${name}, Hoàng Trường Audio xác nhận đơn hàng:\n` +
     `📦 Mã đơn: ${orderId}\n` +
     `🎧 Sản phẩm: ${selectedProduct.name} (${selectedVariant})\n` +
@@ -534,17 +537,37 @@ function submitOrder() {
     `🚚 Thời gian giao hàng dự kiến: 2-3 ngày.\n` +
     `🔎 Theo dõi đơn hàng tại: https://hoangtruongaudio.github.io/hta-shop/`;
 
-  // 1. Lưu đơn vào Firebase Realtime Database
+  // 2. Soạn tin nhắn cảnh báo gửi ngầm về Telegram cho Bạn (Admin)
+  const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*\n` +
+    `📦 *Mã đơn:* \`${orderId}\`\n` +
+    `👤 *Khách hàng:* ${name}\n` +
+    `📞 *SĐT:* \`${phone}\`\n` +
+    `🎧 *Sản phẩm:* ${selectedProduct.name} (${selectedVariant})\n` +
+    `💰 *Tổng tiền:* ${selectedProduct.price}\n` +
+    `📍 *Địa chỉ:* ${address}`;
+
+  // 3. Đẩy tin nhắn báo động về Telegram cá nhân
+  if (TELEGRAM_CHAT_ID !== 'ĐIỀN_CHAT_ID_LẤY_TỪ_USERINFOBOT_VÀO_ĐÂY') {
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        chat_id: TELEGRAM_CHAT_ID,
+        text: msgForAdmin,
+        parse_mode: 'Markdown'
+      })
+    });
+  }
+
+  // 4. Lưu đơn lên Firebase & Tự bật Zalo gửi tin nhắn cho khách
   db.ref('hta_orders').push(newOrder).then(() => {
-    alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận đơn...');
+    alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận...');
     closeOrder();
     
-    // Reset ô nhập
     document.getElementById('name').value = '';
     document.getElementById('phone').value = '';
     document.getElementById('address').value = '';
 
-    // 2. Mở Zalo tự động soạn tin nhắn tới SĐT khách hàng
     const zaloUrl = `https://zalo.me/${formattedPhone}?text=${encodeURIComponent(msgForCustomer)}`;
     window.open(zaloUrl, '_blank');
   });
