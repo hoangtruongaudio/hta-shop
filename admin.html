@@ -77,9 +77,7 @@ tr:hover { background: #2f2f2f; }
 
 .media-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-top: 10px; }
 .media-box { aspect-ratio: 1; background: var(--bg-input); border: 2px dashed var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; overflow: hidden; }
-.media-box.cover { border-color: var(--primary); }
-.media-box.cover::after { content: "Ảnh chính"; position: absolute; top: 4px; left: 4px; background: var(--primary); color: #fff; font-size: 9px; padding: 2px 4px; border-radius: 3px; }
-.media-box img, .media-box video { width: 100%; height: 100%; object-fit: cover; }
+.media-box img { width: 100%; height: 100%; object-fit: cover; }
 .media-box .remove-btn { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 </style>
 </head>
@@ -100,8 +98,7 @@ tr:hover { background: #2f2f2f; }
     <li class="menu-item active" onclick="showPage('dashboard')">📊 Tổng quan</li>
     <li class="menu-item" onclick="showPage('shopinfo')">⚙️ Cài đặt Cửa hàng</li>
     <li class="menu-item" onclick="showPage('orders')">📦 Đơn hàng</li>
-    <li class="menu-item" onclick="showPage('products')">🛍️ Sản phẩm</li>
-    <li class="menu-item" onclick="showPage('reviews')">⭐ Đánh giá Khách hàng</li>
+    <li class="menu-item" onclick="showPage('products')">🛍️ Sản phẩm & Đánh giá</li>
   </ul>
 </div>
 
@@ -134,35 +131,30 @@ tr:hover { background: #2f2f2f; }
       </div>
     </div>
 
-    <!-- TRANG CÀI ĐẶT THÔNG TIN SHOP (LOGO, TÊN, ĐÃ BÁN) -->
+    <!-- TRANG CÀI ĐẶT THÔNG TIN SHOP -->
     <div id="page-shopinfo" class="page">
       <div style="background:var(--bg-card); padding:25px; border-radius:8px; border:1px solid var(--border); max-width:600px;">
-        <h3 style="margin-bottom:15px; color:var(--primary);">Cài đặt Giao diện & Thông tin Shop</h3>
-        
+        <h3 style="margin-bottom:15px; color:var(--primary);">Cài đặt Giao diện & Logo Shop</h3>
         <div class="form-group">
           <label>Tên Cửa hàng</label>
           <input type="text" id="settingShopName" class="form-control" placeholder="HOÀNG TRƯỜNG AUDIO">
         </div>
-
         <div class="form-group">
-          <label>Điểm đánh giá Shop chung (Ví dụ: 4.9)</label>
+          <label>Điểm đánh giá Shop chung</label>
           <input type="text" id="settingShopRating" class="form-control" placeholder="4.9">
         </div>
-
         <div class="form-group">
-          <label>Tổng số lượng đã bán của Shop (Ví dụ: 219.4K)</label>
+          <label>Tổng số lượng đã bán</label>
           <input type="text" id="settingShopSold" class="form-control" placeholder="219.4K">
         </div>
-
         <div class="form-group">
-          <label>Logo Cửa hàng (Tải ảnh hoặc dán URL)</label>
+          <label>Logo Cửa hàng (Tải ảnh hoặc dán link)</label>
           <input type="file" id="logoFileInput" accept="image/*" class="form-control" style="margin-bottom:8px;" onchange="handleLogoUpload(event)">
-          <input type="text" id="settingLogoUrl" class="form-control" placeholder="Hoặc dán link URL ảnh Logo">
+          <input type="text" id="settingLogoUrl" class="form-control" placeholder="Link URL Logo">
           <div style="margin-top:10px; width:80px; height:80px; border-radius:50%; overflow:hidden; background:#333; border:1px solid var(--border);">
             <img id="logoPreviewImg" src="" style="width:100%;height:100%;object-fit:cover;">
           </div>
         </div>
-
         <button class="btn btn-primary" onclick="saveShopSettings()">Lưu cài đặt Shop</button>
       </div>
     </div>
@@ -219,44 +211,19 @@ tr:hover { background: #2f2f2f; }
         </table>
       </div>
     </div>
-
-    <!-- TRANG QUẢN LÝ ĐÁNH GIÁ (REVIEW) -->
-    <div id="page-reviews" class="page">
-      <div class="table-container">
-        <div class="table-header">
-          <div>
-            <h3 style="color:#fff; font-size:16px;">Đánh giá của khách hàng đã mua</h3>
-            <p style="color:var(--text-muted); font-size:12px;">Bạn có thể tùy ý thêm hoặc xóa đánh giá thực tế cho cửa hàng/sản phẩm.</p>
-          </div>
-          <button class="btn btn-primary" onclick="openReviewModal()">+ Thêm đánh giá mới</button>
-        </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Khách hàng</th>
-              <th>Số sao</th>
-              <th>Nội dung đánh giá</th>
-              <th>Thời gian</th>
-              <th>Thao tác</th>
-            </tr>
-          </thead>
-          <tbody id="reviewTableBody"></tbody>
-        </table>
-      </div>
-    </div>
   </div>
 </div>
 
-<!-- Modal Sản phẩm (Có tùy chỉnh Số bán & Đánh giá) -->
+<!-- Modal Sản phẩm (Có chỉnh số bán, điểm đánh giá và danh sách đánh giá riêng) -->
 <div id="productModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:1000;">
-  <div style="background:var(--bg-card); width:800px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:25px; border:1px solid var(--border);">
-    <h3 id="modalProductTitle" style="margin-bottom:20px;">Cấu hình sản phẩm</h3>
+  <div style="background:var(--bg-card); width:850px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:25px; border:1px solid var(--border);">
+    <h3 id="modalProductTitle" style="margin-bottom:20px;">Cấu hình sản phẩm & Đánh giá riêng</h3>
     
     <input type="hidden" id="prodEditId">
     
     <div class="form-group">
       <label>Tên sản phẩm *</label>
-      <input type="text" id="prodName" class="form-control" placeholder="Nhập tên sản phẩm">
+      <input type="text" id="prodName" class="form-control" placeholder="Tên sản phẩm">
     </div>
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
@@ -272,17 +239,17 @@ tr:hover { background: #2f2f2f; }
 
     <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
       <div class="form-group">
-        <label>Số bán hiển thị (Ví dụ: 127.5K hoặc 2419)</label>
+        <label>Số bán hiển thị (Ví dụ: 127.5K)</label>
         <input type="text" id="prodSold" class="form-control" placeholder="127.5K">
       </div>
       <div class="form-group">
-        <label>Điểm đánh giá sản phẩm (Ví dụ: 4.9)</label>
+        <label>Điểm đánh giá (Ví dụ: 4.9)</label>
         <input type="text" id="prodRating" class="form-control" placeholder="4.9">
       </div>
     </div>
 
     <div class="form-group">
-      <label>Biến thể / Phân loại (Phân cách bằng dấu phẩy)</label>
+      <label>Biến thể / Phân loại (Cách nhau bằng dấu phẩy)</label>
       <input type="text" id="prodVariants" class="form-control" placeholder="AP2 Standard, AP2 Pro">
     </div>
 
@@ -294,41 +261,22 @@ tr:hover { background: #2f2f2f; }
     </div>
 
     <div class="form-group">
-      <label>URL Video sản phẩm</label>
-      <input type="text" id="videoUrlInput" class="form-control" placeholder="Dán đường dẫn Video MP4">
+      <label>Mô tả chi tiết sản phẩm</label>
+      <textarea id="prodDesc" class="form-control" rows="3" placeholder="Mô tả sản phẩm..."></textarea>
     </div>
 
-    <div class="form-group">
-      <label>Mô tả chi tiết sản phẩm</label>
-      <textarea id="prodDesc" class="form-control" rows="4" placeholder="Nhập mô tả sản phẩm..."></textarea>
+    <!-- PHẦN QUẢN LÝ ĐÁNH GIÁ RIÊNG CHO SẢN PHẨM NÀY -->
+    <div style="border-top:1px solid var(--border); padding-top:15px; margin-top:15px;">
+      <div style="display:flex; justify-content:between; align-items:center; margin-bottom:10px;">
+        <label style="font-weight:bold; color:var(--primary); font-size:14px;">⭐ Đánh giá riêng của sản phẩm này</label>
+        <button class="btn btn-sm btn-primary" onclick="addReviewItem()">+ Thêm đánh giá</button>
+      </div>
+      <div id="productReviewsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
     </div>
 
     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
       <button class="btn btn-secondary" onclick="closeProductModal()">Hủy</button>
       <button class="btn btn-primary" onclick="saveProduct()">Lưu sản phẩm</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Thêm/Sửa Đánh Giá -->
-<div id="reviewModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:1000;">
-  <div style="background:var(--bg-card); width:450px; border-radius:12px; padding:25px; border:1px solid var(--border);">
-    <h3 style="margin-bottom:15px; color:#fff;">Thêm đánh giá khách hàng</h3>
-    <div class="form-group">
-      <label>Tên khách hàng</label>
-      <input type="text" id="revName" class="form-control" placeholder="Nguyễn Văn A">
-    </div>
-    <div class="form-group">
-      <label>Số sao (1 - 5)</label>
-      <input type="number" id="revRating" class="form-control" min="1" max="5" value="5">
-    </div>
-    <div class="form-group">
-      <label>Nội dung đánh giá</label>
-      <textarea id="revContent" class="form-control" rows="3" placeholder="Sản phẩm dùng rất tốt..."></textarea>
-    </div>
-    <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:15px;">
-      <button class="btn btn-secondary btn-sm" onclick="closeReviewModal()">Hủy</button>
-      <button class="btn btn-primary btn-sm" onclick="saveReview()">Lưu đánh giá</button>
     </div>
   </div>
 </div>
@@ -341,8 +289,7 @@ const firebaseConfig = {
   projectId: "hoangtruong-c6268",
   storageBucket: "hoangtruong-c6268.firebasestorage.app",
   messagingSenderId: "858441479645",
-  appId: "1:858441479645:web:bad1af63eadf0633a1f234",
-  measurementId: "G-Q0DMZ4NXBY"
+  appId: "1:858441479645:web:bad1af63eadf0633a1f234"
 };
 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
@@ -350,9 +297,9 @@ const db = firebase.database();
 
 let products = [];
 let orders = [];
-let reviews = [];
 let shopSettings = {};
 let tempImages = [];
+let tempReviews = []; // Lưu tạm danh sách đánh giá của sản phẩm đang sửa
 
 function checkLogin() {
   if(document.getElementById('loginPass').value === '123456') {
@@ -375,11 +322,6 @@ function listenAllFirebaseData() {
     renderStats();
   });
 
-  db.ref('hta_reviews').on('value', (snapshot) => {
-    reviews = snapshot.val() || [];
-    renderReviews();
-  });
-
   db.ref('hta_shop').on('value', (snapshot) => {
     shopSettings = snapshot.val() || {};
     document.getElementById('settingShopName').value = shopSettings.name || 'HOÀNG TRƯỜNG AUDIO';
@@ -394,7 +336,7 @@ function showPage(pageId) {
   document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.menu-item').forEach(el => el.classList.remove('active'));
   document.getElementById(`page-${pageId}`).classList.add('active');
-  const titles = { dashboard: 'Tổng quan cửa hàng', shopinfo: 'Cài đặt Cửa hàng', orders: 'Quản lý đơn hàng', products: 'Quản lý sản phẩm', reviews: 'Quản lý đánh giá' };
+  const titles = { dashboard: 'Tổng quan cửa hàng', shopinfo: 'Cài đặt Cửa hàng', orders: 'Quản lý đơn hàng', products: 'Quản lý sản phẩm' };
   document.getElementById('headerTitle').textContent = titles[pageId];
 }
 
@@ -412,7 +354,6 @@ function renderStats() {
   document.getElementById('statActiveProducts').textContent = products.filter(p => p.status !== false).length;
 }
 
-// Cài đặt Shop & Logo
 function handleLogoUpload(e) {
   const file = e.target.files[0];
   if(file) {
@@ -432,9 +373,7 @@ function saveShopSettings() {
     sold: document.getElementById('settingShopSold').value.trim(),
     logo: document.getElementById('settingLogoUrl').value.trim()
   };
-  db.ref('hta_shop').set(sData).then(() => {
-    alert('Đã cập nhật thông tin Cửa hàng và Logo thành công!');
-  });
+  db.ref('hta_shop').set(sData).then(() => { alert('Đã lưu cài đặt Shop!'); });
 }
 
 function renderOrders() {
@@ -448,35 +387,24 @@ function renderOrders() {
     const matchStatus = filterStatus === 'ALL' || o.status === filterStatus;
     return matchSearch && matchStatus;
   }).forEach((o) => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><b>${o.name}</b> - <small style="color:var(--text-muted)">${o.phone}</small><br><small style="color:#aaa">${o.address || ''}</small></td>
-      <td>${o.prodName}<br><small style="color:var(--primary)">Phân loại: ${o.variant || 'Mặc định'}</small></td>
-      <td style="color:var(--primary); font-weight:bold">${o.price}</td>
-      <td><span class="badge ${getStatusBadge(o.status)}">${o.status}</span></td>
-      <td>
-        <select onchange="changeOrderStatus('${o.firebaseKey}', this.value)" style="background:var(--bg-input); color:#fff; border:1px solid var(--border); padding:4px; border-radius:4px;">
-          <option value="Mới" ${o.status==='Mới'?'selected':''}>Mới</option>
-          <option value="Đã xác nhận" ${o.status==='Đã xác nhận'?'selected':''}>Đã xác nhận</option>
-          <option value="Đang giao" ${o.status==='Đang giao'?'selected':''}>Đang giao</option>
-          <option value="Hoàn thành" ${o.status==='Hoàn thành'?'selected':''}>Hoàn thành</option>
-          <option value="Đã hủy" ${o.status==='Đã hủy'?'selected':''}>Đã hủy</option>
-        </select>
-      </td>
+    tbody.innerHTML += `
+      <tr>
+        <td><b>${o.name}</b> - <small>${o.phone}</small><br><small style="color:#aaa">${o.address || ''}</small></td>
+        <td>${o.prodName}<br><small style="color:var(--primary)">Phân loại: ${o.variant || 'Mặc định'}</small></td>
+        <td style="color:var(--primary); font-weight:bold">${o.price}</td>
+        <td><span class="badge badge-new">${o.status}</span></td>
+        <td>
+          <select onchange="changeOrderStatus('${o.firebaseKey}', this.value)" style="background:var(--bg-input); color:#fff; border:1px solid var(--border); padding:4px; border-radius:4px;">
+            <option value="Mới" ${o.status==='Mới'?'selected':''}>Mới</option>
+            <option value="Đã xác nhận" ${o.status==='Đã xác nhận'?'selected':''}>Đã xác nhận</option>
+            <option value="Đang giao" ${o.status==='Đang giao'?'selected':''}>Đang giao</option>
+            <option value="Hoàn thành" ${o.status==='Hoàn thành'?'selected':''}>Hoàn thành</option>
+            <option value="Đã hủy" ${o.status==='Đã hủy'?'selected':''}>Đã hủy</option>
+          </select>
+        </td>
+      </tr>
     `;
-    tbody.appendChild(tr);
   });
-}
-
-function getStatusBadge(status) {
-  switch(status) {
-    case 'Mới': return 'badge-new';
-    case 'Đã xác nhận': return 'badge-confirmed';
-    case 'Đang giao': return 'badge-shipping';
-    case 'Hoàn thành': return 'badge-completed';
-    case 'Đã hủy': return 'badge-canceled';
-    default: return '';
-  }
 }
 
 function changeOrderStatus(key, newStatus) {
@@ -491,19 +419,19 @@ function renderProducts() {
 
   products.filter(p => p.name.toLowerCase().includes(search)).forEach((p, idx) => {
     const imgUrl = (p.images && p.images.length > 0) ? p.images[0] : (p.img || '');
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td><div style="width:45px; height:45px; background:#444; border-radius:6px; overflow:hidden">${imgUrl ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover">` : ''}</div></td>
-      <td><b>${p.name}</b></td>
-      <td><b style="color:var(--primary)">${p.price}</b></td>
-      <td>Đã bán: <b>${p.sold || '1.2K'}</b> | ★ ${p.rating || '4.9'}</td>
-      <td><button class="btn btn-sm ${p.status!==false?'btn-primary':'btn-secondary'}" onclick="toggleProductStatus(${idx})">${p.status!==false?'Hiển thị':'Đã ẩn'}</button></td>
-      <td>
-        <button class="btn btn-sm btn-secondary" onclick="editProduct(${idx})">Sửa</button>
-        <button class="btn btn-sm btn-secondary" onclick="copyProduct(${idx})">Sao chép</button>
-      </td>
+    tbody.innerHTML += `
+      <tr>
+        <td><div style="width:45px; height:45px; background:#444; border-radius:6px; overflow:hidden">${imgUrl ? `<img src="${imgUrl}" style="width:100%;height:100%;object-fit:cover">` : ''}</div></td>
+        <td><b>${p.name}</b></td>
+        <td><b style="color:var(--primary)">${p.price}</b></td>
+        <td>Đã bán: <b>${p.sold || '1.2K'}</b> | ★ ${p.rating || '4.9'}</td>
+        <td><button class="btn btn-sm ${p.status!==false?'btn-primary':'btn-secondary'}" onclick="toggleProductStatus(${idx})">${p.status!==false?'Hiển thị':'Đã ẩn'}</button></td>
+        <td>
+          <button class="btn btn-sm btn-secondary" onclick="editProduct(${idx})">Sửa</button>
+          <button class="btn btn-sm btn-secondary" onclick="copyProduct(${idx})">Sao chép</button>
+        </td>
+      </tr>
     `;
-    tbody.appendChild(tr);
   });
 }
 
@@ -522,17 +450,14 @@ function copyProduct(idx) {
 
 function syncProductsToFirebase() {
   db.ref('hta_products').set(products).then(() => {
-    alert("Đã đồng bộ lên Firebase thành công!");
+    alert("Đã đồng bộ thành công!");
   });
 }
 
 function handleImageUpload(e) {
   Array.from(e.target.files).forEach(file => {
     const reader = new FileReader();
-    reader.onload = (evt) => {
-      tempImages.push(evt.target.result);
-      renderMediaGrid();
-    };
+    reader.onload = (evt) => { tempImages.push(evt.target.result); renderMediaGrid(); };
     reader.readAsDataURL(file);
   });
 }
@@ -545,6 +470,37 @@ function renderMediaGrid() {
   });
 }
 
+// Xử lý danh sách đánh giá riêng của sản phẩm trong Modal
+function renderProductReviewsList() {
+  const container = document.getElementById('productReviewsContainer');
+  container.innerHTML = '';
+  if(tempReviews.length === 0) {
+    container.innerHTML = '<div style="color:#777; font-size:12px;">Chưa có đánh giá nào cho sản phẩm này.</div>';
+    return;
+  }
+  tempReviews.forEach((r, idx) => {
+    container.innerHTML += `
+      <div style="background:#333; padding:10px; border-radius:6px; display:flex; gap:10px; align-items:center;">
+        <input type="text" class="form-control" value="${r.name}" placeholder="Tên khách" onchange="tempReviews[${idx}].name=this.value" style="flex:1;">
+        <select class="form-control" onchange="tempReviews[${idx}].rating=this.value" style="width:80px;">
+          <option value="5" ${r.rating==5?'selected':''}>5 ★</option>
+          <option value="4" ${r.rating==4?'selected':''}>4 ★</option>
+          <option value="3" ${r.rating==3?'selected':''}>3 ★</option>
+          <option value="2" ${r.rating==2?'selected':''}>2 ★</option>
+          <option value="1" ${r.rating==1?'selected':''}>1 ★</option>
+        </select>
+        <input type="text" class="form-control" value="${r.content}" placeholder="Nội dung đánh giá" onchange="tempReviews[${idx}].content=this.value" style="flex:2;">
+        <button class="btn btn-sm btn-secondary" onclick="tempReviews.splice(${idx},1);renderProductReviewsList();">Xóa</button>
+      </div>
+    `;
+  });
+}
+
+function addReviewItem() {
+  tempReviews.push({ name: 'Khách hàng ẩn danh', rating: 5, content: 'Sản phẩm tuyệt vời, dùng rất mượt!' });
+  renderProductReviewsList();
+}
+
 function openProductModal() {
   document.getElementById('prodEditId').value = '';
   document.getElementById('prodName').value = '';
@@ -553,10 +509,11 @@ function openProductModal() {
   document.getElementById('prodSold').value = '127.5K';
   document.getElementById('prodRating').value = '4.9';
   document.getElementById('prodVariants').value = '';
-  document.getElementById('videoUrlInput').value = '';
   document.getElementById('prodDesc').value = '';
   tempImages = [];
+  tempReviews = [];
   renderMediaGrid();
+  renderProductReviewsList();
   document.getElementById('productModal').style.display = 'flex';
 }
 
@@ -571,10 +528,11 @@ function editProduct(idx) {
   document.getElementById('prodSold').value = p.sold || '127.5K';
   document.getElementById('prodRating').value = p.rating || '4.9';
   document.getElementById('prodVariants').value = (p.variants || []).join(', ');
-  document.getElementById('videoUrlInput').value = p.video || '';
   document.getElementById('prodDesc').value = p.desc || '';
   tempImages = p.images ? [...p.images] : (p.img ? [p.img] : []);
+  tempReviews = p.reviews ? [...p.reviews] : [];
   renderMediaGrid();
+  renderProductReviewsList();
   document.getElementById('productModal').style.display = 'flex';
 }
 
@@ -594,7 +552,7 @@ function saveProduct() {
     variants: document.getElementById('prodVariants').value.split(',').map(s => s.trim()).filter(Boolean),
     desc: document.getElementById('prodDesc').value.trim(),
     images: tempImages,
-    video: document.getElementById('videoUrlInput').value.trim(),
+    reviews: tempReviews, // Lưu mảng đánh giá riêng của sản phẩm lên Firebase
     status: true
   };
 
@@ -603,49 +561,6 @@ function saveProduct() {
 
   syncProductsToFirebase();
   closeProductModal();
-}
-
-// Quản lý Đánh giá (Review)
-function openReviewModal() {
-  document.getElementById('revName').value = '';
-  document.getElementById('revRating').value = '5';
-  document.getElementById('revContent').value = '';
-  document.getElementById('reviewModal').style.display = 'flex';
-}
-function closeReviewModal() { document.getElementById('reviewModal').style.display = 'none'; }
-
-function saveReview() {
-  const name = document.getElementById('revName').value.trim();
-  const rating = parseInt(document.getElementById('revRating').value) || 5;
-  const content = document.getElementById('revContent').value.trim();
-  if(!name || !content) { alert('Vui lòng nhập tên khách và nội dung!'); return; }
-
-  reviews.unshift({ name, rating, content, time: new Date().toLocaleDateString('vi-VN') });
-  db.ref('hta_reviews').set(reviews).then(() => {
-    alert('Đã thêm đánh giá thành công!');
-    closeReviewModal();
-  });
-}
-
-function renderReviews() {
-  const tbody = document.getElementById('reviewTableBody');
-  tbody.innerHTML = '';
-  reviews.forEach((r, i) => {
-    tbody.innerHTML += `
-      <tr>
-        <td><b>${r.name}</b></td>
-        <td style="color:#ffb400">★ ${r.rating || 5}</td>
-        <td>${r.content}</td>
-        <td><small style="color:var(--text-muted)">${r.time || 'Mới'}</small></td>
-        <td><button class="btn btn-sm btn-secondary" onclick="deleteReview(${i})">Xóa</button></td>
-      </tr>
-    `;
-  });
-}
-
-function deleteReview(idx) {
-  reviews.splice(idx, 1);
-  db.ref('hta_reviews').set(reviews);
 }
 </script>
 </body>
