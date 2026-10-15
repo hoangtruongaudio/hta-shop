@@ -114,7 +114,6 @@ tr:hover { background: #2f2f2f; }
   </div>
 
   <div class="content">
-    <!-- TRANG TỔNG QUAN -->
     <div id="page-dashboard" class="page active">
       <div class="stats-grid">
         <div class="stat-card">
@@ -136,7 +135,6 @@ tr:hover { background: #2f2f2f; }
       </div>
     </div>
 
-    <!-- TRANG CÀI ĐẶT THÔNG TIN SHOP -->
     <div id="page-shopinfo" class="page">
       <div style="background:var(--bg-card); padding:25px; border-radius:8px; border:1px solid var(--border); max-width:600px;">
         <h3 style="margin-bottom:15px; color:var(--primary);">Cài đặt Giao diện & Logo Shop</h3>
@@ -155,7 +153,7 @@ tr:hover { background: #2f2f2f; }
         <div class="form-group">
           <label>Logo Cửa hàng (Tải ảnh từ máy)</label>
           <input type="file" id="logoFileInput" accept="image/*" class="form-control" style="margin-bottom:8px;" onchange="handleLogoUpload(event)">
-          <input type="text" id="settingLogoUrl" class="form-control" placeholder="Hoặc dán link URL Logo ở đây">
+          <input type="text" id="settingLogoUrl" class="form-control" placeholder="Hoặc dán link URL Logo">
           <div style="margin-top:10px; width:80px; height:80px; border-radius:50%; overflow:hidden; background:#333; border:1px solid var(--border);">
             <img id="logoPreviewImg" src="" style="width:100%;height:100%;object-fit:cover;">
           </div>
@@ -164,7 +162,6 @@ tr:hover { background: #2f2f2f; }
       </div>
     </div>
 
-    <!-- TRANG QUẢN LÝ ĐƠN HÀNG -->
     <div id="page-orders" class="page">
       <div class="table-container">
         <div class="table-header">
@@ -193,7 +190,6 @@ tr:hover { background: #2f2f2f; }
       </div>
     </div>
 
-    <!-- TRANG QUẢN LÝ SẢN PHẨM -->
     <div id="page-products" class="page">
       <div style="margin-bottom: 15px; display: flex; justify-content: space-between;">
         <input type="text" class="search-box" id="searchProductInput" oninput="renderProducts()" placeholder="Tìm kiếm sản phẩm...">
@@ -219,7 +215,7 @@ tr:hover { background: #2f2f2f; }
   </div>
 </div>
 
-<!-- Modal Sản phẩm (Hỗ trợ trình soạn thảo mô tả chèn ảnh/video) -->
+<!-- Modal Sản phẩm -->
 <div id="productModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:1000;">
   <div style="background:var(--bg-card); width:850px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:25px; border:1px solid var(--border);">
     <h3 id="modalProductTitle" style="margin-bottom:20px;">Cấu hình sản phẩm & Mô tả chi tiết</h3>
@@ -261,7 +257,7 @@ tr:hover { background: #2f2f2f; }
     <div class="form-group">
       <label>Ảnh sản phẩm (Thumbnail)</label>
       <input type="file" id="imageInput" multiple accept="image/*" style="display:none" onchange="handleImageUpload(event)">
-      <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imageInput').click()">+ Tải ảnh lên</button>
+      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('imageInput').click()">+ Tải ảnh lên</button>
       <div class="media-grid" id="imageGrid"></div>
     </div>
 
@@ -293,7 +289,7 @@ tr:hover { background: #2f2f2f; }
   </div>
 </div>
 
-<!-- Modal Chèn Ảnh vào Mô Tả -->
+<!-- Modal Chèn Ảnh -->
 <div id="insertImgModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000;">
   <div style="background:var(--bg-card); width:400px; border-radius:10px; padding:20px; border:1px solid var(--border);">
     <h4 style="margin-bottom:12px; color:#fff;">Chèn ảnh vào mô tả</h4>
@@ -313,14 +309,23 @@ tr:hover { background: #2f2f2f; }
   </div>
 </div>
 
-<!-- Modal Chèn Video vào Mô Tả -->
+<!-- Modal Chèn Video (Hỗ trợ Tải lên từ máy HOẶC dán link) -->
 <div id="insertVideoModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000;">
-  <div style="background:var(--bg-card); width:400px; border-radius:10px; padding:20px; border:1px solid var(--border);">
+  <div style="background:var(--bg-card); width:420px; border-radius:10px; padding:20px; border:1px solid var(--border);">
     <h4 style="margin-bottom:12px; color:#fff;">Chèn video vào mô tả</h4>
+    
     <div class="form-group">
-      <label>Dán URL đường dẫn Video (MP4)</label>
+      <label>Cách 1: Tải video trực tiếp từ máy (MP4)</label>
+      <input type="file" id="editorVideoFileInput" accept="video/mp4,video/*" class="form-control" style="font-size:12px;">
+    </div>
+
+    <div style="text-align:center; color:var(--text-muted); margin: 8px 0;">— HOẶC —</div>
+
+    <div class="form-group">
+      <label>Cách 2: Dán URL đường dẫn Video</label>
       <input type="text" id="editorVideoUrlInput" class="form-control" placeholder="https://example.com/video.mp4">
     </div>
+
     <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
       <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('insertVideoModal').style.display='none'">Hủy</button>
       <button type="button" class="btn btn-primary btn-sm" onclick="confirmInsertVideo()">Chèn Video</button>
@@ -402,15 +407,13 @@ function renderStats() {
   document.getElementById('statActiveProducts').textContent = products.filter(p => p.status !== false).length;
 }
 
-// Xử lý Logo Shop
 function handleLogoUpload(e) {
   const file = e.target.files[0];
   if(file) {
     const reader = new FileReader();
     reader.onload = (evt) => {
-      const base64 = evt.target.result;
-      document.getElementById('settingLogoUrl').value = base64;
-      document.getElementById('logoPreviewImg').src = base64;
+      document.getElementById('settingLogoUrl').value = evt.target.result;
+      document.getElementById('logoPreviewImg').src = evt.target.result;
     };
     reader.readAsDataURL(file);
   }
@@ -423,9 +426,7 @@ function saveShopSettings() {
     sold: document.getElementById('settingShopSold').value.trim(),
     logo: document.getElementById('settingLogoUrl').value.trim()
   };
-  db.ref('hta_shop').set(sData).then(() => {
-    alert('Đã lưu thông tin Cửa hàng và Logo thành công!');
-  });
+  db.ref('hta_shop').set(sData).then(() => { alert('Đã lưu thông tin Cửa hàng và Logo thành công!'); });
 }
 
 function renderOrders() {
@@ -501,9 +502,7 @@ function copyProduct(idx) {
 }
 
 function syncProductsToFirebase() {
-  db.ref('hta_products').set(products).then(() => {
-    alert("Đã đồng bộ lên Firebase thành công!");
-  });
+  db.ref('hta_products').set(products).then(() => { alert("Đã đồng bộ lên Firebase thành công!"); });
 }
 
 function handleImageUpload(e) {
@@ -522,7 +521,6 @@ function renderMediaGrid() {
   });
 }
 
-// Trình soạn thảo mô tả chi tiết
 function execCmd(cmd) { document.execCommand(cmd, false, null); }
 
 function openInsertImageModal() {
@@ -538,11 +536,7 @@ function confirmInsertImage() {
   const urlInput = document.getElementById('editorUrlInput').value.trim();
   const editor = document.getElementById('editorContent');
   editor.focus();
-  if(savedRange) {
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(savedRange);
-  }
+  if(savedRange) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); }
   if(fileInput.files && fileInput.files[0]) {
     const reader = new FileReader();
     reader.onload = (evt) => {
@@ -559,26 +553,35 @@ function confirmInsertImage() {
 function openInsertVideoModal() {
   const sel = window.getSelection();
   if (sel.getRangeAt && sel.rangeCount) savedRange = sel.getRangeAt(0);
+  document.getElementById('editorVideoFileInput').value = '';
   document.getElementById('editorVideoUrlInput').value = '';
   document.getElementById('insertVideoModal').style.display = 'flex';
 }
 
 function confirmInsertVideo() {
-  const url = document.getElementById('editorVideoUrlInput').value.trim();
-  if(!url) return;
+  const fileInput = document.getElementById('editorVideoFileInput');
+  const urlInput = document.getElementById('editorVideoUrlInput').value.trim();
   const editor = document.getElementById('editorContent');
   editor.focus();
-  if(savedRange) {
-    const sel = window.getSelection();
-    sel.removeAllRanges();
-    sel.addRange(savedRange);
+  if(savedRange) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); }
+
+  if(fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const videoHTML = `<br><video src="${evt.target.result}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
+      document.execCommand('insertHTML', false, videoHTML);
+      document.getElementById('insertVideoModal').style.display = 'none';
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  } else if(urlInput) {
+    const videoHTML = `<br><video src="${urlInput}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
+    document.execCommand('insertHTML', false, videoHTML);
+    document.getElementById('insertVideoModal').style.display = 'none';
+  } else {
+    alert('Vui lòng chọn file video hoặc nhập URL!');
   }
-  const videoHTML = `<br><video src="${url}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
-  document.execCommand('insertHTML', false, videoHTML);
-  document.getElementById('insertVideoModal').style.display = 'none';
 }
 
-// Quản lý đánh giá riêng
 function renderProductReviewsList() {
   const container = document.getElementById('productReviewsContainer');
   container.innerHTML = '';
