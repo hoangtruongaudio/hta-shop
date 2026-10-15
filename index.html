@@ -32,7 +32,7 @@ button{cursor:pointer}
 .shop{background:#fff;margin:0 0 8px;padding:13px 14px 14px;border-radius:0 0 10px 10px}
 .shopline{display:flex;align-items:center;gap:11px}
 .logo{width:62px;height:62px;border:1px solid #ddd;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#fff;flex:none}
-.logo img{width:100%;height:100%;object-fit:contain}
+.logo img{width:100%;height:100%;object-fit:cover}
 .shopname{font-size:18px;font-weight:500;flex:1}
 .follow{background:var(--pink);color:#fff;border:0;border-radius:20px;padding:10px 22px;font-weight:700}
 .shopsub{margin-left:73px;margin-top:-22px;font-size:12px}
@@ -49,13 +49,11 @@ button{cursor:pointer}
 .sort button.active{color:var(--pink);font-weight:700}
 .sep{color:#ddd}
 
-/* Bố cục sản phẩm chuẩn Ảnh TikTok Shop (Ảnh 1) */
 .list{background:#fff}
 .product{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid #f0f0f0;background:#fff;cursor:pointer}
 .pimg-wrap{width:125px;height:125px;background:#f4f4f4;border-radius:8px;overflow:hidden;position:relative;flex:none}
 .pimg-wrap img, .pimg-wrap video{width:100%;height:100%;object-fit:cover}
 
-/* Huy hiệu góc ảnh (XTRA Freeship, Bonus Hoàn tiền) */
 .img-badges{position:absolute;bottom:0;left:0;right:0;display:flex;gap:2px;padding:2px}
 .badge-xtra{background:#00b894;color:#fff;font-size:8px;font-weight:800;padding:2px 3px;border-radius:2px}
 .badge-bonus{background:#ffb400;color:#000;font-size:8px;font-weight:800;padding:2px 3px;border-radius:2px}
@@ -64,7 +62,6 @@ button{cursor:pointer}
 .pname{font-size:14px;line-height:1.3;font-weight:600;color:#222;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tag-hangviet{background:#00b894;color:#fff;font-size:9px;font-weight:bold;padding:1px 4px;border-radius:3px;margin-right:4px}
 
-/* Dải nhãn dán ưu đãi chuẩn ảnh 1 */
 .p-tags{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
 .tag-24h{background:#e3fc2d;color:#008b8b;font-size:10px;font-weight:bold;padding:1px 5px;border-radius:3px;display:inline-flex;align-items:center;gap:2px}
 .tag-udai{background:#fff0f3;color:var(--pink);font-size:10px;font-weight:bold;padding:1px 5px;border-radius:3px}
@@ -79,7 +76,6 @@ button{cursor:pointer}
 .btn-cart-icon{width:32px;height:32px;border:1px solid #ffd2db;background:#fff0f3;color:var(--pink);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .buy{background:var(--pink);color:#fff;border-radius:6px;border:0;font-size:13px;font-weight:700;padding:0 14px;height:32px}
 
-/* Popup Voucher Mái Nhà Hồng (Ảnh 2) chuẩn TikTok Shop */
 .popup-v-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;display:none;align-items:center;justify-content:center}
 .popup-v-box{width:320px;background:linear-gradient(180deg,#ff6b81 0%,#fe2c55 100%);border-radius:20px;padding:20px 16px 16px;text-align:center;color:#fff;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
 .popup-v-roof{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:280px;height:30px;background:#fff;border-radius:15px 15px 0 0;display:flex;overflow:hidden}
@@ -125,7 +121,6 @@ button{cursor:pointer}
 .review{border-top:1px solid #eee;padding:12px 0;font-size:13px}
 .avatar{display:inline-flex;width:30px;height:30px;border-radius:50%;background:#eee;align-items:center;justify-content:center;margin-right:7px}
 
-/* Thanh công cụ định vị cố định như TikTok Shop */
 .sticky{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);background:#fff;border-top:1px solid #ddd;padding:7px 9px calc(7px + env(safe-area-inset-bottom));display:flex;gap:6px;z-index:40}
 .sticky .small{width:50px;background:#fff;border:0;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#333}
 .sticky .add{width:38%;background:#fff0f3;color:var(--pink);border:1px solid #ffd7df;border-radius:4px;font-weight:700;font-size:14px}
@@ -157,11 +152,11 @@ button{cursor:pointer}
 <div class="home" id="home">
  <section class="shop">
   <div class="shopline">
-   <div class="logo"><img id="logoImg" src="https://via.placeholder.com/100/000000/FFFFFF?text=HTA" alt="logo"></div>
+   <div class="logo" id="logoImgContainer"><img src="https://via.placeholder.com/100/000000/FFFFFF?text=HTA" alt="logo"></div>
    <div class="shopname" id="shopName">HOÀNG TRƯỜNG AUDIO ›</div>
    <button class="follow">Theo dõi</button>
   </div>
-  <div class="shopsub"><span class="rating">★ 4.9</span> &nbsp; <span id="soldShop">10.4K đã bán</span></div>
+  <div class="shopsub"><span class="rating" id="shopRatingText">★ 4.9</span> &nbsp; <span id="soldShop">10.4K đã bán</span></div>
   <div class="vouchers">
    <div class="voucher"><b>Voucher vận chuyển x18</b><br>cho đơn trên 1đ <button>Nhận</button></div>
    <div class="voucher pink"><b>Giảm 30K ₫</b><br>Không mức chi tiêu tối thiểu</div>
@@ -176,7 +171,7 @@ button{cursor:pointer}
 
  <div id="tabHomeContent">
    <div class="banner">
-     <h2>HOÀNG TRƯỜNG AUDIO</h2>
+     <h2 id="bannerShopName">HOÀNG TRƯỜNG AUDIO</h2>
      <p>Âm Thanh Đỉnh Cao - Giá Cực Tốt</p>
    </div>
    <div style="padding:10px 14px;font-weight:700;font-size:16px">🔥 Sản phẩm nổi bật</div>
@@ -203,7 +198,6 @@ button{cursor:pointer}
  </div>
 </div>
 
-<!-- POPUP VOUCHER MÁI NHÀ HỒNG (Ảnh 2) -->
 <div class="popup-v-bg" id="voucherPopup">
  <div class="popup-v-box">
    <div class="popup-v-roof">
@@ -230,7 +224,7 @@ button{cursor:pointer}
  </div>
  <div class="dinfo">
   <div class="dtitle" id="detailTitle"></div>
-  <div class="stars">★★★★★ <span style="color:#777">4.9 | Đã bán 1.2K</span></div>
+  <div class="stars" id="detailStarsTop">★★★★★ <span style="color:#777">4.9 | Đã bán 1.2K</span></div>
   <div class="dprice" id="detailPrice"></div>
  </div>
  <div class="shipping">🚚 <b>Miễn phí vận chuyển</b> · Giao sớm nhất trong 3 ngày.</div>
@@ -239,7 +233,6 @@ button{cursor:pointer}
  <div class="section"><h3>Mô tả sản phẩm</h3><div id="detailDesc" style="font-size:13px;line-height:1.6;color:#444;"></div></div>
 </div>
 
-<!-- Thanh công cụ TikTok Shop -->
 <div class="sticky">
  <button class="small" onclick="chatWithShop()">💬<br>Chat</button>
  <button class="small" onclick="openCartView()">🛒<br>Giỏ</button>
@@ -247,7 +240,6 @@ button{cursor:pointer}
  <button class="buy" onclick="openOrder()">Mua ngay<br><small id="stickyPrice">0₫</small></button>
 </div>
 
-<!-- Sheet đặt hàng mua ngay -->
 <div class="sheetbg" id="sheetbg">
  <div class="sheet">
   <button class="close" onclick="closeOrder()">×</button>
@@ -267,7 +259,6 @@ button{cursor:pointer}
  </div>
 </div>
 
-<!-- Sheet xem giỏ hàng -->
 <div class="sheetbg" id="cartSheetBg">
  <div class="sheet">
   <button class="close" onclick="closeCartView()">×</button>
@@ -285,20 +276,11 @@ const firebaseConfig = {
   projectId: "hoangtruong-c6268",
   storageBucket: "hoangtruong-c6268.firebasestorage.app",
   messagingSenderId: "858441479645",
-  appId: "1:858441479645:web:bad1af63eadf0633a1f234",
-  measurementId: "G-Q0DMZ4NXBY"
+  appId: "1:858441479645:web:bad1af63eadf0633a1f234"
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.database();
-
-const defaultProducts=[
- {id:'p1', name:'Tai nghe Bluetooth AP2 không dây HIFI cảm ứng thông minh', price:'89.000₫', old:'149.000₫', sold:'127.5K', rating:'4.8', images:[], status:true, variants:['AP2 Standard', 'AP2 Pro'], desc:'Tai nghe AP2 âm thanh đỉnh cao, nhỏ gọn tiện lợi.'},
- {id:'p2', name:'Tai nghe Bluetooth AP3 ENC Pin 8H Bluetooth 5.3 HIFI', price:'129.000₫', old:'199.000₫', sold:'74.4K', rating:'4.9', images:[], status:true, variants:['AP3 White', 'AP3 Black'], desc:'Pin trâu 8H liên tục, âm thanh HIFI chân thực.'},
- {id:'p3', name:'Tai nghe Bluetooth AP4 ANC xuyên âm khử ồn', price:'189.000₫', old:'299.000₫', sold:'81.9K', rating:'4.8', images:[], status:true, variants:['AP4 ANC'], desc:'Tính năng chống ồn chủ động ANC tiên tiến.'}
-];
 
 let products = [];
 let currentProducts = [];
@@ -313,7 +295,7 @@ function listenRealtimeData() {
     if (val && Array.isArray(val)) {
       products = val.filter(p => p.status !== false);
     } else {
-      products = defaultProducts;
+      products = [];
     }
     currentProducts = [...products];
     const activeTabBtn = document.querySelector('.tabs button.active');
@@ -322,9 +304,21 @@ function listenRealtimeData() {
     else if (activeTab === 'tabProductBtn') renderList(currentProducts, 'productList');
   });
 
-  db.ref('hta_reviews').on('value', (snapshot) => {
-    const val = snapshot.val();
-    if(val) renderReviewsList(val);
+  // Lắng nghe cài đặt Shop, Logo và Tên từ Firebase Realtime Database
+  db.ref('hta_shop').on('value', (snapshot) => {
+    const s = snapshot.val();
+    if(s) {
+      if(s.name) {
+        document.getElementById('shopName').textContent = s.name + ' ›';
+        document.getElementById('bannerShopName').textContent = s.name;
+        document.title = s.name;
+      }
+      if(s.rating) document.getElementById('shopRatingText').textContent = '★ ' + s.rating;
+      if(s.sold) document.getElementById('soldShop').textContent = s.sold + ' đã bán';
+      if(s.logo) {
+        document.getElementById('logoImgContainer').innerHTML = `<img src="${s.logo}" alt="logo">`;
+      }
+    }
   });
 }
 
@@ -339,24 +333,20 @@ function closeVoucherPopup() {
 
 function chatWithShop() {
   const shopPhone = '84985500095';
-  let msg = 'Chào Hoàng Trường Audio, mình muốn tư vấn mua hàng!';
-  if (selectedProduct) {
-    msg = `Chào Shop, mình muốn tư vấn sản phẩm: ${selectedProduct.name} (${selectedVariant})`;
-  }
+  let msg = selectedProduct ? `Chào Shop, mình muốn tư vấn sản phẩm: ${selectedProduct.name} (${selectedVariant})` : 'Chào Hoàng Trường Audio, mình muốn tư vấn mua hàng!';
   window.open(`https://zalo.me/${shopPhone}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
 function addToCartDirect(id) {
   const p = products.find(item => item.id === id);
   if(p) {
-    const item = {
+    cartList.push({
       id: p.id,
       name: p.name,
       variant: p.variants?.[0] || 'Mặc định',
       price: p.price,
-      img: (p.images && p.images.length > 0) ? p.images[0] : (p.img || '')
-    };
-    cartList.push(item);
+      img: (p.images && p.images.length > 0) ? p.images[0] : ''
+    });
     localStorage.setItem('hta_cart', JSON.stringify(cartList));
     updateCartUI();
     alert('Đã thêm sản phẩm vào giỏ hàng!');
@@ -365,14 +355,13 @@ function addToCartDirect(id) {
 
 function addToCart() {
   if (!selectedProduct) return;
-  const item = {
+  cartList.push({
     id: selectedProduct.id,
     name: selectedProduct.name,
     variant: selectedVariant,
     price: selectedProduct.price,
-    img: (selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : (selectedProduct.img || '')
-  };
-  cartList.push(item);
+    img: (selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : ''
+  });
   localStorage.setItem('hta_cart', JSON.stringify(cartList));
   updateCartUI();
   alert('Đã thêm sản phẩm vào giỏ hàng!');
@@ -402,10 +391,7 @@ function openCartView() {
   document.getElementById('cartSheetBg').style.display = 'flex';
 }
 
-function closeCartView() {
-  document.getElementById('cartSheetBg').style.display = 'none';
-}
-
+function closeCartView() { document.getElementById('cartSheetBg').style.display = 'none'; }
 function removeFromCart(index) {
   cartList.splice(index, 1);
   localStorage.setItem('hta_cart', JSON.stringify(cartList));
@@ -448,11 +434,7 @@ function renderList(listData, targetId){
 
  listData.forEach((p)=>{
   let imgTag = '<div style="padding:10px;font-size:11px;color:#aaa;text-align:center">Chưa có ảnh</div>';
-  if (p.images && p.images.length > 0) {
-    imgTag = `<img src="${p.images[0]}" alt="${p.name}">`;
-  } else if (p.img) {
-    imgTag = `<img src="${p.img}">`;
-  }
+  if (p.images && p.images.length > 0) imgTag = `<img src="${p.images[0]}" alt="${p.name}">`;
 
   const el = document.createElement('div');
   el.className = 'product';
@@ -473,9 +455,8 @@ function renderList(listData, targetId){
       <div class="p-tags">
         <span class="tag-24h">🚚 Nhanh 24h free</span>
         <span class="tag-udai">🔥 Ưu đãi</span>
-        <span class="tag-udai">Giảm 20K ₫</span>
       </div>
-      <div class="stars">★★★★★ <b>${p.rating || '4.9'}</b> | Đã bán online ${p.sold || '1.2K'}</div>
+      <div class="stars">★★★★★ <b>${p.rating || '4.9'}</b> | Đã bán ${p.sold || '1.2K'}</div>
       <div class="priceRow">
         <div>
           <span class="price">${p.price}</span>
@@ -528,9 +509,11 @@ function showDetail(itemOrId) {
   document.getElementById('detailTitle').textContent = item.name;
   document.getElementById('detailPrice').textContent = item.price;
   document.getElementById('stickyPrice').textContent = item.price;
+  document.getElementById('detailStarsTop').innerHTML = `★★★★★ <span style="color:#777">${item.rating || '4.9'} | Đã bán ${item.sold || '1.2K'}</span>`;
   document.getElementById('detailDesc').innerHTML = item.desc || 'Chưa có mô tả chi tiết.';
 
   renderDetailMedia(item);
+  renderProductReviews(item.reviews); // Hiển thị đánh giá riêng của sản phẩm
 
   const varBox = document.getElementById('variants');
   varBox.innerHTML = '';
@@ -560,11 +543,8 @@ function renderDetailMedia(item) {
   thumbSlider.innerHTML = '';
   let mediaList = [];
 
-  if (item.video) mediaList.push({ type: 'video', src: item.video });
   if (item.images && item.images.length > 0) {
     item.images.forEach(img => mediaList.push({ type: 'image', src: img }));
-  } else if (item.img) {
-    mediaList.push({ type: 'image', src: item.img });
   }
 
   if (mediaList.length === 0) {
@@ -576,11 +556,7 @@ function renderDetailMedia(item) {
   thumbSlider.style.display = mediaList.length > 1 ? 'flex' : 'none';
 
   function displayMainMedia(mediaItem) {
-    if (mediaItem.type === 'video') {
-      mainView.innerHTML = `<video src="${mediaItem.src}" controls autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>`;
-    } else {
-      mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
-    }
+    mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
   }
 
   displayMainMedia(mediaList[0]);
@@ -598,17 +574,19 @@ function renderDetailMedia(item) {
   });
 }
 
-function renderReviewsList(reviewsData) {
+function renderProductReviews(reviewsData) {
   const container = document.getElementById('reviewContainer');
-  let reviews = reviewsData || [
-    { name: 'Nguyễn Văn A', rating: 5, content: 'Sản phẩm dùng rất mượt, giao hàng siêu nhanh!' }
-  ];
-  let html = `<div style="font-size:28px;font-weight:800;margin-bottom:10px;">4.9 <span style="font-size:16px;color:#ffb400">★★★★★</span></div>`;
+  let reviews = reviewsData || [];
+  if (reviews.length === 0) {
+    container.innerHTML = '<div style="color:#777; font-size:13px; padding:10px 0;">Chưa có đánh giá nào cho sản phẩm này.</div>';
+    return;
+  }
+  let html = `<div style="font-size:24px;font-weight:800;margin-bottom:10px;">${selectedProduct.rating || '4.9'} <span style="font-size:16px;color:#ffb400">★★★★★</span></div>`;
   reviews.forEach(r => {
     html += `
       <div class="review">
         <span class="avatar">${r.name ? r.name.charAt(0) : 'K'}</span><b>${r.name}</b><br>
-        <span class="stars">${'★'.repeat(r.rating || 5)}</span><br>${r.content}
+        <span class="stars">${'★'.repeat(parseInt(r.rating) || 5)}</span><br>${r.content}
       </div>
     `;
   });
@@ -633,8 +611,6 @@ function openOrder() {
   const imgBox = document.getElementById('orderImgContainer');
   if(selectedProduct.images && selectedProduct.images.length > 0) {
     imgBox.innerHTML = `<img src="${selectedProduct.images[0]}" style="width:100%;height:100%;object-fit:cover">`;
-  } else if(selectedProduct.img) {
-    imgBox.innerHTML = `<img src="${selectedProduct.img}" style="width:100%;height:100%;object-fit:cover">`;
   } else {
     imgBox.innerHTML = `<div style="text-align:center;line-height:75px;color:#aaa">HTA</div>`;
   }
@@ -642,9 +618,7 @@ function openOrder() {
   document.getElementById('sheetbg').style.display = 'flex';
 }
 
-function closeOrder() {
-  document.getElementById('sheetbg').style.display = 'none';
-}
+function closeOrder() { document.getElementById('sheetbg').style.display = 'none'; }
 
 function submitOrder() {
   const name = document.getElementById('name').value.trim();
@@ -673,14 +647,7 @@ function submitOrder() {
     time: new Date().toLocaleString('vi-VN')
   };
 
-  const msgForShopZalo = `🛍️ XÁC NHẬN ĐƠN HÀNG MỚI (HTA)\n` +
-    `📦 Mã đơn: ${orderId}\n` +
-    `👤 Khách hàng: ${name}\n` +
-    `📞 SĐT khách: ${phone}\n` +
-    `🎧 Sản phẩm: ${selectedProduct.name} (${selectedVariant})\n` +
-    `💰 Số tiền: ${selectedProduct.price}\n` +
-    `📍 Địa chỉ: ${address}\n` +
-    `⏰ Thời gian: ${new Date().toLocaleString('vi-VN')}`;
+  const msgForShopZalo = `🛍️ XÁC NHẬN ĐƠN HÀNG MỚI (HTA)\n📦 Mã đơn: ${orderId}\n👤 Khách hàng: ${name}\n📞 SĐT: ${phone}\n🎧 Sản phẩm: ${selectedProduct.name} (${selectedVariant})\n💰 Tiền: ${selectedProduct.price}\n📍 Địa chỉ: ${address}`;
 
   const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*
 📦 *Mã đơn:* \`${orderId}\`
@@ -693,23 +660,16 @@ function submitOrder() {
   fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      chat_id: TELEGRAM_CHAT_ID,
-      text: msgForAdmin,
-      parse_mode: 'Markdown'
-    })
+    body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msgForAdmin, parse_mode: 'Markdown' })
   });
 
   db.ref('hta_orders').push(newOrder).then(() => {
     alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận đơn...');
     closeOrder();
-    
     document.getElementById('name').value = '';
     document.getElementById('phone').value = '';
     document.getElementById('address').value = '';
-
-    const zaloUrl = `https://zalo.me/${SHOP_ZALO_PHONE}?text=${encodeURIComponent(msgForShopZalo)}`;
-    window.open(zaloUrl, '_blank');
+    window.open(`https://zalo.me/${SHOP_ZALO_PHONE}?text=${encodeURIComponent(msgForShopZalo)}`, '_blank');
   });
 }
 
@@ -717,10 +677,7 @@ window.onload = function() {
   listenRealtimeData();
   switchTab('home');
   updateCartUI();
-  // Tự động bật Popup Voucher sau khi mở trang
-  setTimeout(() => {
-    document.getElementById('voucherPopup').style.display = 'flex';
-  }, 400);
+  setTimeout(() => { document.getElementById('voucherPopup').style.display = 'flex'; }, 400);
 };
 </script>
 </body>
