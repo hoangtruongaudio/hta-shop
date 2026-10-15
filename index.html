@@ -25,9 +25,9 @@ button{cursor:pointer}
 .nav{height:56px;background:var(--dark);color:#fff;display:flex;align-items:center;padding:0 15px;gap:18px}
 .nav .back{font-size:30px;background:none;border:0;color:#fff}
 .nav .search{flex:1;background:#fff1;border:1px solid #ffffff44;border-radius:22px;height:38px;display:flex;align-items:center;padding:0 13px;font-size:13px;color:#eee}
-.nav .share,.nav .cart{font-size:24px}
+.nav .share,.nav .cart{font-size:24px;cursor:pointer}
 .cart{position:relative}
-.cart b{position:absolute;right:-8px;top:-8px;font-size:10px;background:var(--pink);border-radius:12px;padding:3px 5px}
+.cart b{position:absolute;right:-8px;top:-8px;font-size:10px;background:var(--pink);border-radius:12px;padding:3px 5px;color:#fff}
 .mall{height:42px;margin:0 14px;background:linear-gradient(110deg,#5a3019,#1d1009);color:#ffe9d5;border-radius:0 0 10px 10px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:13px}
 .shop{background:#fff;margin:0 0 8px;padding:13px 14px 14px;border-radius:0 0 10px 10px}
 .shopline{display:flex;align-items:center;gap:11px}
@@ -97,16 +97,19 @@ button{cursor:pointer}
 .review{border-top:1px solid #eee;padding:12px 0;font-size:13px}
 .avatar{display:inline-flex;width:30px;height:30px;border-radius:50%;background:#eee;align-items:center;justify-content:center;margin-right:7px}
 .review .stars{color:#ffb400}
+
+/* Thanh công cụ định vị cố định như TikTok Shop */
 .sticky{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);background:#fff;border-top:1px solid #ddd;padding:7px 9px calc(7px + env(safe-area-inset-bottom));display:flex;gap:6px;z-index:40}
-.sticky .small{width:45px;background:#fff;border:0;font-size:10px}
-.sticky .add{width:38%;background:#fff0f3;color:var(--pink);border:0;border-radius:4px;font-weight:700}
-.sticky .buy{flex:1;border-radius:4px}
+.sticky .small{width:50px;background:#fff;border:0;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#333}
+.sticky .add{width:38%;background:#fff0f3;color:var(--pink);border:1px solid #ffd7df;border-radius:4px;font-weight:700;font-size:14px}
+.sticky .buy{flex:1;border-radius:4px;background:var(--pink);color:#fff;border:0;font-weight:700}
+
 .sheetbg{position:fixed;inset:0;background:#0008;z-index:80;display:none;align-items:flex-end}
 .sheet{width:min(720px,100%);margin:auto;background:#fff;border-radius:15px 15px 0 0;padding:16px;max-height:90vh;overflow:auto}
 .sheet h2{font-size:18px;margin:0 0 12px}
 .close{float:right;border:0;background:#eee;border-radius:50%;width:30px;height:30px}
-.orderitem{display:flex;gap:10px;border-bottom:1px solid #eee;padding-bottom:12px}
-.othumb{width:75px;height:75px;background:#eee;border-radius:7px;overflow:hidden}
+.orderitem{display:flex;gap:10px;border-bottom:1px solid #eee;padding-bottom:12px;align-items:center}
+.othumb{width:75px;height:75px;background:#eee;border-radius:7px;overflow:hidden;flex:none}
 .field{margin-top:12px}
 .field label{display:block;font-size:12px;color:#666;margin-bottom:5px}
 .field input,.field textarea{width:100%;border:1px solid #ddd;border-radius:6px;padding:11px;outline:0}
@@ -121,7 +124,7 @@ button{cursor:pointer}
  <button class="back" onclick="backHome()">‹</button>
  <div class="search">⌕&nbsp; Tìm kiếm sản phẩm</div>
  <div class="share">↗</div>
- <div class="cart" onclick="alert('Tính năng giỏ hàng tổng quát')">🛒<b>31</b></div>
+ <div class="cart" onclick="openCartView()">🛒<b id="cartCount">0</b></div>
 </div>
 <div class="mall"><span>♙ Mall</span><span>Hàng thật 100% · Freeship ›</span></div>
 
@@ -194,13 +197,15 @@ button{cursor:pointer}
  <div class="section"><h3>Mô tả sản phẩm</h3><div id="detailDesc" style="font-size:13px;line-height:1.6;color:#444;"></div></div>
 </div>
 
+<!-- Thanh công cụ TikTok Shop -->
 <div class="sticky">
- <button class="small" onclick="alert('Đang mở Chat...')">💬<br>Chat</button>
- <button class="small" onclick="alert('Đang mở Giỏ...')">🛒<br>Giỏ</button>
- <button class="add" onclick="openOrder()">Thêm vào giỏ</button>
+ <button class="small" onclick="chatWithShop()">💬<br>Chat</button>
+ <button class="small" onclick="openCartView()">🛒<br>Giỏ</button>
+ <button class="add" onclick="addToCart()">Thêm vào giỏ</button>
  <button class="buy" onclick="openOrder()">Mua ngay<br><small id="stickyPrice">0₫</small></button>
 </div>
 
+<!-- Sheet đặt hàng mua ngay -->
 <div class="sheetbg" id="sheetbg">
  <div class="sheet">
   <button class="close" onclick="closeOrder()">×</button>
@@ -217,6 +222,16 @@ button{cursor:pointer}
   <div class="field"><label>Số điện thoại *</label><input id="phone" inputmode="tel" placeholder="Nhập số điện thoại"></div>
   <div class="field"><label>Địa chỉ nhận hàng *</label><textarea id="address" rows="3" placeholder="Số nhà, đường, phường/xã, tỉnh/thành"></textarea></div>
   <button class="confirm" onclick="submitOrder()">XÁC NHẬN ĐẶT HÀNG</button>
+ </div>
+</div>
+
+<!-- Sheet xem giỏ hàng -->
+<div class="sheetbg" id="cartSheetBg">
+ <div class="sheet">
+  <button class="close" onclick="closeCartView()">×</button>
+  <h2>Giỏ hàng của bạn</h2>
+  <div id="cartItemList" style="max-height: 300px; overflow-y: auto;"></div>
+  <button class="confirm" style="margin-top:20px;" onclick="closeCartView(); if(cartList.length>0) openOrder();">TIẾP TỤC ĐẶT HÀNG</button>
  </div>
 </div>
 
@@ -250,6 +265,7 @@ let currentProducts = [];
 let selectedProduct = null;
 let selectedVariant = '';
 let priceAsc = true;
+let cartList = JSON.parse(localStorage.getItem('hta_cart') || '[]');
 
 // Lắng nghe dữ liệu realtime từ Firebase cho toàn bộ thiết bị
 function listenRealtimeData() {
@@ -271,6 +287,76 @@ function listenRealtimeData() {
     const val = snapshot.val();
     if(val) renderReviewsList(val);
   });
+}
+
+function updateCartUI() {
+  const countEl = document.getElementById('cartCount');
+  if(countEl) countEl.textContent = cartList.length;
+}
+
+// 1. CHỨC NĂNG CHAT ZALO VỚI SHOP
+function chatWithShop() {
+  const shopPhone = '84985500095';
+  let msg = 'Chào Hoàng Trường Audio, mình muốn tư vấn mua hàng!';
+  if (selectedProduct) {
+    msg = `Chào Shop, mình muốn tư vấn sản phẩm: ${selectedProduct.name} (${selectedVariant})`;
+  }
+  window.open(`https://zalo.me/${shopPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// 2. CHỨC NĂNG THÊM VÀO GIỎ HÀNG
+function addToCart() {
+  if (!selectedProduct) {
+    alert('Vui lòng chọn một sản phẩm!');
+    return;
+  }
+  const item = {
+    id: selectedProduct.id,
+    name: selectedProduct.name,
+    variant: selectedVariant,
+    price: selectedProduct.price,
+    img: (selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : (selectedProduct.img || '')
+  };
+  cartList.push(item);
+  localStorage.setItem('hta_cart', JSON.stringify(cartList));
+  updateCartUI();
+  alert('Đã thêm sản phẩm vào giỏ hàng!');
+}
+
+// 3. XEM CHI TIẾT GIỎ HÀNG
+function openCartView() {
+  const container = document.getElementById('cartItemList');
+  if (cartList.length === 0) {
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">Giỏ hàng trống</div>';
+  } else {
+    let html = '';
+    cartList.forEach((item, index) => {
+      html += `
+        <div class="orderitem" style="margin-top:10px;">
+          <div class="othumb"><img src="${item.img || 'https://via.placeholder.com/75'}" style="width:100%;height:100%;object-fit:cover"></div>
+          <div style="flex:1">
+            <b>${item.name}</b>
+            <div style="font-size:12px;color:#666;">${item.variant}</div>
+            <div style="color:var(--pink);font-weight:bold">${item.price}</div>
+          </div>
+          <button onclick="removeFromCart(${index})" style="border:0;background:#ff000022;color:red;border-radius:4px;padding:5px 8px;">Xóa</button>
+        </div>
+      `;
+    });
+    container.innerHTML = html;
+  }
+  document.getElementById('cartSheetBg').style.display = 'flex';
+}
+
+function closeCartView() {
+  document.getElementById('cartSheetBg').style.display = 'none';
+}
+
+function removeFromCart(index) {
+  cartList.splice(index, 1);
+  localStorage.setItem('hta_cart', JSON.stringify(cartList));
+  updateCartUI();
+  openCartView();
 }
 
 function switchTab(tabName){
@@ -505,10 +591,9 @@ function submitOrder() {
     return;
   }
 
-  // Cấu hình Telegram và Cố định số Zalo nhận đơn của Shop
   const TELEGRAM_BOT_TOKEN = '8869659373:AAFJAU0YcVSISF6hriTRcB-S3PMiRFpJPS4';
   const TELEGRAM_CHAT_ID = '6961829665';
-  const SHOP_ZALO_PHONE = '84985500095'; // Cố định số Zalo của bạn (chuyển 0985500095 thành 84985500095)
+  const SHOP_ZALO_PHONE = '84985500095';
 
   const orderId = 'ORD_' + Date.now();
   const newOrder = {
@@ -523,7 +608,6 @@ function submitOrder() {
     time: new Date().toLocaleString('vi-VN')
   };
 
-  // 1. Soạn nội dung tin nhắn chốt đơn gửi tới Zalo Shop (Số 0985500095)
   const msgForShopZalo = `🛍️ XÁC NHẬN ĐƠN HÀNG MỚI (HTA)\n` +
     `📦 Mã đơn: ${orderId}\n` +
     `👤 Khách hàng: ${name}\n` +
@@ -533,7 +617,6 @@ function submitOrder() {
     `📍 Địa chỉ: ${address}\n` +
     `⏰ Thời gian: ${new Date().toLocaleString('vi-VN')}`;
 
-  // 2. Soạn tin nhắn báo động về Telegram cho Admin
   const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*
 📦 *Mã đơn:* \`${orderId}\`
 👤 *Khách hàng:* ${name}
@@ -542,7 +625,6 @@ function submitOrder() {
 💰 *Tổng tiền:* ${selectedProduct.price}
 📍 *Địa chỉ:* ${address}`;
 
-  // 3. Gửi thông báo trực tiếp về Telegram cá nhân
   fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -556,16 +638,14 @@ function submitOrder() {
   .then(data => console.log("Gửi Telegram thành công:", data))
   .catch(err => console.error("Lỗi gửi Telegram:", err));
 
-  // 4. Lưu đơn lên Firebase & Tự bật Zalo gửi tin nhắn cố định tới số của shop
   db.ref('hta_orders').push(newOrder).then(() => {
-    alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận đơn tới Shop...');
+    alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận đơn...');
     closeOrder();
     
     document.getElementById('name').value = '';
     document.getElementById('phone').value = '';
     document.getElementById('address').value = '';
 
-    // Mở Zalo chat tới số 0985500095 kèm nội dung chốt đơn sẵn
     const zaloUrl = `https://zalo.me/${SHOP_ZALO_PHONE}?text=${encodeURIComponent(msgForShopZalo)}`;
     window.open(zaloUrl, '_blank');
   });
@@ -574,6 +654,7 @@ function submitOrder() {
 window.onload = function() {
   listenRealtimeData();
   switchTab('home');
+  updateCartUI();
 };
 </script>
 </body>
