@@ -79,6 +79,11 @@ tr:hover { background: #2f2f2f; }
 .media-box { aspect-ratio: 1; background: var(--bg-input); border: 2px dashed var(--border); border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; cursor: pointer; overflow: hidden; }
 .media-box img { width: 100%; height: 100%; object-fit: cover; }
 .media-box .remove-btn { position: absolute; top: 4px; right: 4px; background: rgba(0,0,0,0.7); color: #fff; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+
+.editor-toolbar { background: #222; border: 1px solid var(--border); border-bottom: none; border-radius: 6px 6px 0 0; padding: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+.editor-toolbar button { background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+.editor-content { background: var(--bg-input); border: 1px solid var(--border); border-radius: 0 0 6px 6px; min-height: 150px; padding: 12px; color: #fff; outline: none; }
+.editor-content img, .editor-content video { max-width: 100%; border-radius: 6px; margin: 8px 0; display: block; }
 </style>
 </head>
 <body>
@@ -148,9 +153,9 @@ tr:hover { background: #2f2f2f; }
           <input type="text" id="settingShopSold" class="form-control" placeholder="219.4K">
         </div>
         <div class="form-group">
-          <label>Logo Cửa hàng (Tải ảnh hoặc dán link)</label>
+          <label>Logo Cửa hàng (Tải ảnh từ máy)</label>
           <input type="file" id="logoFileInput" accept="image/*" class="form-control" style="margin-bottom:8px;" onchange="handleLogoUpload(event)">
-          <input type="text" id="settingLogoUrl" class="form-control" placeholder="Link URL Logo">
+          <input type="text" id="settingLogoUrl" class="form-control" placeholder="Hoặc dán link URL Logo ở đây">
           <div style="margin-top:10px; width:80px; height:80px; border-radius:50%; overflow:hidden; background:#333; border:1px solid var(--border);">
             <img id="logoPreviewImg" src="" style="width:100%;height:100%;object-fit:cover;">
           </div>
@@ -214,10 +219,10 @@ tr:hover { background: #2f2f2f; }
   </div>
 </div>
 
-<!-- Modal Sản phẩm (Có chỉnh số bán, điểm đánh giá và danh sách đánh giá riêng) -->
+<!-- Modal Sản phẩm (Hỗ trợ trình soạn thảo mô tả chèn ảnh/video) -->
 <div id="productModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index:1000;">
   <div style="background:var(--bg-card); width:850px; max-height:90vh; overflow-y:auto; border-radius:12px; padding:25px; border:1px solid var(--border);">
-    <h3 id="modalProductTitle" style="margin-bottom:20px;">Cấu hình sản phẩm & Đánh giá riêng</h3>
+    <h3 id="modalProductTitle" style="margin-bottom:20px;">Cấu hình sản phẩm & Mô tả chi tiết</h3>
     
     <input type="hidden" id="prodEditId">
     
@@ -254,29 +259,71 @@ tr:hover { background: #2f2f2f; }
     </div>
 
     <div class="form-group">
-      <label>Ảnh sản phẩm</label>
+      <label>Ảnh sản phẩm (Thumbnail)</label>
       <input type="file" id="imageInput" multiple accept="image/*" style="display:none" onchange="handleImageUpload(event)">
       <button class="btn btn-secondary btn-sm" onclick="document.getElementById('imageInput').click()">+ Tải ảnh lên</button>
       <div class="media-grid" id="imageGrid"></div>
     </div>
 
     <div class="form-group">
-      <label>Mô tả chi tiết sản phẩm</label>
-      <textarea id="prodDesc" class="form-control" rows="3" placeholder="Mô tả sản phẩm..."></textarea>
+      <label>Mô tả chi tiết sản phẩm (Hỗ trợ chèn ảnh và video)</label>
+      <div class="editor-toolbar">
+        <button type="button" onclick="execCmd('bold')"><b>B</b></button>
+        <button type="button" onclick="execCmd('italic')"><i>I</i></button>
+        <button type="button" onclick="execCmd('insertUnorderedList')">• Danh sách</button>
+        <button type="button" onclick="openInsertImageModal()">+ Chèn Ảnh</button>
+        <button type="button" onclick="openInsertVideoModal()">+ Chèn Video</button>
+      </div>
+      <div id="editorContent" class="editor-content" contenteditable="true"></div>
     </div>
 
-    <!-- PHẦN QUẢN LÝ ĐÁNH GIÁ RIÊNG CHO SẢN PHẨM NÀY -->
+    <!-- PHẦN QUẢN LÝ ĐÁNH GIÁ RIÊNG CHO SẢN PHẨM -->
     <div style="border-top:1px solid var(--border); padding-top:15px; margin-top:15px;">
-      <div style="display:flex; justify-content:between; align-items:center; margin-bottom:10px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <label style="font-weight:bold; color:var(--primary); font-size:14px;">⭐ Đánh giá riêng của sản phẩm này</label>
-        <button class="btn btn-sm btn-primary" onclick="addReviewItem()">+ Thêm đánh giá</button>
+        <button type="button" class="btn btn-sm btn-primary" onclick="addReviewItem()">+ Thêm đánh giá</button>
       </div>
       <div id="productReviewsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
     </div>
 
     <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
-      <button class="btn btn-secondary" onclick="closeProductModal()">Hủy</button>
-      <button class="btn btn-primary" onclick="saveProduct()">Lưu sản phẩm</button>
+      <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Hủy</button>
+      <button type="button" class="btn btn-primary" onclick="saveProduct()">Lưu sản phẩm</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Chèn Ảnh vào Mô Tả -->
+<div id="insertImgModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000;">
+  <div style="background:var(--bg-card); width:400px; border-radius:10px; padding:20px; border:1px solid var(--border);">
+    <h4 style="margin-bottom:12px; color:#fff;">Chèn ảnh vào mô tả</h4>
+    <div class="form-group">
+      <label>Chọn file ảnh từ máy</label>
+      <input type="file" id="editorFileInput" accept="image/*" class="form-control" style="font-size:12px;">
+    </div>
+    <div style="text-align:center; color:var(--text-muted); margin: 8px 0;">— HOẶC —</div>
+    <div class="form-group">
+      <label>Dán URL đường dẫn ảnh</label>
+      <input type="text" id="editorUrlInput" class="form-control" placeholder="https://example.com/anh.jpg">
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('insertImgModal').style.display='none'">Hủy</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="confirmInsertImage()">Chèn</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Chèn Video vào Mô Tả -->
+<div id="insertVideoModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000;">
+  <div style="background:var(--bg-card); width:400px; border-radius:10px; padding:20px; border:1px solid var(--border);">
+    <h4 style="margin-bottom:12px; color:#fff;">Chèn video vào mô tả</h4>
+    <div class="form-group">
+      <label>Dán URL đường dẫn Video (MP4)</label>
+      <input type="text" id="editorVideoUrlInput" class="form-control" placeholder="https://example.com/video.mp4">
+    </div>
+    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('insertVideoModal').style.display='none'">Hủy</button>
+      <button type="button" class="btn btn-primary btn-sm" onclick="confirmInsertVideo()">Chèn Video</button>
     </div>
   </div>
 </div>
@@ -299,7 +346,8 @@ let products = [];
 let orders = [];
 let shopSettings = {};
 let tempImages = [];
-let tempReviews = []; // Lưu tạm danh sách đánh giá của sản phẩm đang sửa
+let tempReviews = [];
+let savedRange = null;
 
 function checkLogin() {
   if(document.getElementById('loginPass').value === '123456') {
@@ -354,13 +402,15 @@ function renderStats() {
   document.getElementById('statActiveProducts').textContent = products.filter(p => p.status !== false).length;
 }
 
+// Xử lý Logo Shop
 function handleLogoUpload(e) {
   const file = e.target.files[0];
   if(file) {
     const reader = new FileReader();
     reader.onload = (evt) => {
-      document.getElementById('settingLogoUrl').value = evt.target.result;
-      document.getElementById('logoPreviewImg').src = evt.target.result;
+      const base64 = evt.target.result;
+      document.getElementById('settingLogoUrl').value = base64;
+      document.getElementById('logoPreviewImg').src = base64;
     };
     reader.readAsDataURL(file);
   }
@@ -373,7 +423,9 @@ function saveShopSettings() {
     sold: document.getElementById('settingShopSold').value.trim(),
     logo: document.getElementById('settingLogoUrl').value.trim()
   };
-  db.ref('hta_shop').set(sData).then(() => { alert('Đã lưu cài đặt Shop!'); });
+  db.ref('hta_shop').set(sData).then(() => {
+    alert('Đã lưu thông tin Cửa hàng và Logo thành công!');
+  });
 }
 
 function renderOrders() {
@@ -450,7 +502,7 @@ function copyProduct(idx) {
 
 function syncProductsToFirebase() {
   db.ref('hta_products').set(products).then(() => {
-    alert("Đã đồng bộ thành công!");
+    alert("Đã đồng bộ lên Firebase thành công!");
   });
 }
 
@@ -466,11 +518,67 @@ function renderMediaGrid() {
   const grid = document.getElementById('imageGrid');
   grid.innerHTML = '';
   tempImages.forEach((img, i) => {
-    grid.innerHTML += `<div class="media-box"><img src="${img}"><button class="remove-btn" onclick="tempImages.splice(${i},1);renderMediaGrid();">×</button></div>`;
+    grid.innerHTML += `<div class="media-box"><img src="${img}"><button type="button" class="remove-btn" onclick="tempImages.splice(${i},1);renderMediaGrid();">×</button></div>`;
   });
 }
 
-// Xử lý danh sách đánh giá riêng của sản phẩm trong Modal
+// Trình soạn thảo mô tả chi tiết
+function execCmd(cmd) { document.execCommand(cmd, false, null); }
+
+function openInsertImageModal() {
+  const sel = window.getSelection();
+  if (sel.getRangeAt && sel.rangeCount) savedRange = sel.getRangeAt(0);
+  document.getElementById('editorFileInput').value = '';
+  document.getElementById('editorUrlInput').value = '';
+  document.getElementById('insertImgModal').style.display = 'flex';
+}
+
+function confirmInsertImage() {
+  const fileInput = document.getElementById('editorFileInput');
+  const urlInput = document.getElementById('editorUrlInput').value.trim();
+  const editor = document.getElementById('editorContent');
+  editor.focus();
+  if(savedRange) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedRange);
+  }
+  if(fileInput.files && fileInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      document.execCommand('insertImage', false, evt.target.result);
+      document.getElementById('insertImgModal').style.display = 'none';
+    };
+    reader.readAsDataURL(fileInput.files[0]);
+  } else if(urlInput) {
+    document.execCommand('insertImage', false, urlInput);
+    document.getElementById('insertImgModal').style.display = 'none';
+  }
+}
+
+function openInsertVideoModal() {
+  const sel = window.getSelection();
+  if (sel.getRangeAt && sel.rangeCount) savedRange = sel.getRangeAt(0);
+  document.getElementById('editorVideoUrlInput').value = '';
+  document.getElementById('insertVideoModal').style.display = 'flex';
+}
+
+function confirmInsertVideo() {
+  const url = document.getElementById('editorVideoUrlInput').value.trim();
+  if(!url) return;
+  const editor = document.getElementById('editorContent');
+  editor.focus();
+  if(savedRange) {
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(savedRange);
+  }
+  const videoHTML = `<br><video src="${url}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
+  document.execCommand('insertHTML', false, videoHTML);
+  document.getElementById('insertVideoModal').style.display = 'none';
+}
+
+// Quản lý đánh giá riêng
 function renderProductReviewsList() {
   const container = document.getElementById('productReviewsContainer');
   container.innerHTML = '';
@@ -490,7 +598,7 @@ function renderProductReviewsList() {
           <option value="1" ${r.rating==1?'selected':''}>1 ★</option>
         </select>
         <input type="text" class="form-control" value="${r.content}" placeholder="Nội dung đánh giá" onchange="tempReviews[${idx}].content=this.value" style="flex:2;">
-        <button class="btn btn-sm btn-secondary" onclick="tempReviews.splice(${idx},1);renderProductReviewsList();">Xóa</button>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="tempReviews.splice(${idx},1);renderProductReviewsList();">Xóa</button>
       </div>
     `;
   });
@@ -509,7 +617,7 @@ function openProductModal() {
   document.getElementById('prodSold').value = '127.5K';
   document.getElementById('prodRating').value = '4.9';
   document.getElementById('prodVariants').value = '';
-  document.getElementById('prodDesc').value = '';
+  document.getElementById('editorContent').innerHTML = '';
   tempImages = [];
   tempReviews = [];
   renderMediaGrid();
@@ -528,7 +636,7 @@ function editProduct(idx) {
   document.getElementById('prodSold').value = p.sold || '127.5K';
   document.getElementById('prodRating').value = p.rating || '4.9';
   document.getElementById('prodVariants').value = (p.variants || []).join(', ');
-  document.getElementById('prodDesc').value = p.desc || '';
+  document.getElementById('editorContent').innerHTML = p.desc || '';
   tempImages = p.images ? [...p.images] : (p.img ? [p.img] : []);
   tempReviews = p.reviews ? [...p.reviews] : [];
   renderMediaGrid();
@@ -550,9 +658,9 @@ function saveProduct() {
     sold: document.getElementById('prodSold').value.trim() || '127.5K',
     rating: document.getElementById('prodRating').value.trim() || '4.9',
     variants: document.getElementById('prodVariants').value.split(',').map(s => s.trim()).filter(Boolean),
-    desc: document.getElementById('prodDesc').value.trim(),
+    desc: document.getElementById('editorContent').innerHTML,
     images: tempImages,
-    reviews: tempReviews, // Lưu mảng đánh giá riêng của sản phẩm lên Firebase
+    reviews: tempReviews,
     status: true
   };
 
