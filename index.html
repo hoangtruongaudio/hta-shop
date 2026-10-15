@@ -537,14 +537,14 @@ function submitOrder() {
     `🚚 Thời gian giao hàng dự kiến: 2-3 ngày.\n` +
     `🔎 Theo dõi đơn hàng tại: https://hoangtruongaudio.github.io/hta-shop/`;
 
-  // 2. Soạn tin nhắn báo động về Telegram cho Admin
-  const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*\n` +
-    `📦 *Mã đơn:* \`${orderId}\`\n` +
-    `👤 *Khách hàng:* ${name}\n` +
-    `📞 *SĐT:* \`${phone}\`\n` +
-    `🎧 *Sản phẩm:* ${selectedProduct.name} (${selectedVariant})\n` +
-    `💰 *Tổng tiền:* ${selectedProduct.price}\n` +
-    `📍 *Địa chỉ:* ${address}`;
+  // 2. Soạn tin nhắn báo động về Telegram cho Admin (Sử dụng Template String chuẩn)
+  const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*
+📦 *Mã đơn:* \`${orderId}\`
+👤 *Khách hàng:* ${name}
+📞 *SĐT:* \`${phone}\`
+🎧 *Sản phẩm:* ${selectedProduct.name} (${selectedVariant})
+💰 *Tổng tiền:* ${selectedProduct.price}
+📍 *Địa chỉ:* ${address}`;
 
   // 3. Gửi thông báo trực tiếp về Telegram cá nhân
   fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -555,7 +555,10 @@ function submitOrder() {
       text: msgForAdmin,
       parse_mode: 'Markdown'
     })
-  });
+  })
+  .then(res => res.json())
+  .then(data => console.log("Gửi Telegram thành công:", data))
+  .catch(err => console.error("Lỗi gửi Telegram:", err));
 
   // 4. Lưu đơn lên Firebase & Tự bật Zalo gửi tin nhắn cho khách
   db.ref('hta_orders').push(newOrder).then(() => {
@@ -569,7 +572,6 @@ function submitOrder() {
     const zaloUrl = `https://zalo.me/${formattedPhone}?text=${encodeURIComponent(msgForCustomer)}`;
     window.open(zaloUrl, '_blank');
   });
-}
 
 window.onload = function() {
   listenRealtimeData();
