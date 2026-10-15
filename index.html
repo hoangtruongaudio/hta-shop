@@ -505,14 +505,10 @@ function submitOrder() {
     return;
   }
 
-  // Cấu hình Telegram đã hoàn chỉnh
+  // Cấu hình Telegram và Cố định số Zalo nhận đơn của Shop
   const TELEGRAM_BOT_TOKEN = '8869659373:AAFJAU0YcVSISF6hriTRcB-S3PMiRFpJPS4';
   const TELEGRAM_CHAT_ID = '6961829665';
-
-  let formattedPhone = phone.replace(/\D/g, '');
-  if(formattedPhone.startsWith('0')) {
-    formattedPhone = '84' + formattedPhone.slice(1);
-  }
+  const SHOP_ZALO_PHONE = '84985500095'; // Cố định số Zalo của bạn (chuyển 0985500095 thành 84985500095)
 
   const orderId = 'ORD_' + Date.now();
   const newOrder = {
@@ -527,15 +523,15 @@ function submitOrder() {
     time: new Date().toLocaleString('vi-VN')
   };
 
-  // 1. Soạn tin nhắn gửi Zalo cho Khách hàng
-  const msgForCustomer = `Chào ${name}, Hoàng Trường Audio xác nhận đơn hàng:\n` +
+  // 1. Soạn nội dung tin nhắn chốt đơn gửi tới Zalo Shop (Số 0985500095)
+  const msgForShopZalo = `🛍️ XÁC NHẬN ĐƠN HÀNG MỚI (HTA)\n` +
     `📦 Mã đơn: ${orderId}\n` +
+    `👤 Khách hàng: ${name}\n` +
+    `📞 SĐT khách: ${phone}\n` +
     `🎧 Sản phẩm: ${selectedProduct.name} (${selectedVariant})\n` +
     `💰 Số tiền: ${selectedProduct.price}\n` +
     `📍 Địa chỉ: ${address}\n` +
-    `📞 SĐT: ${phone}\n` +
-    `🚚 Thời gian giao hàng dự kiến: 2-3 ngày.\n` +
-    `🔎 Theo dõi đơn hàng tại: https://hoangtruongaudio.github.io/hta-shop/`;
+    `⏰ Thời gian: ${new Date().toLocaleString('vi-VN')}`;
 
   // 2. Soạn tin nhắn báo động về Telegram cho Admin
   const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*
@@ -560,16 +556,17 @@ function submitOrder() {
   .then(data => console.log("Gửi Telegram thành công:", data))
   .catch(err => console.error("Lỗi gửi Telegram:", err));
 
-  // 4. Lưu đơn lên Firebase & Tự bật Zalo gửi tin nhắn cho khách
+  // 4. Lưu đơn lên Firebase & Tự bật Zalo gửi tin nhắn cố định tới số của shop
   db.ref('hta_orders').push(newOrder).then(() => {
-    alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận...');
+    alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận đơn tới Shop...');
     closeOrder();
     
     document.getElementById('name').value = '';
     document.getElementById('phone').value = '';
     document.getElementById('address').value = '';
 
-    const zaloUrl = `https://zalo.me/${formattedPhone}?text=${encodeURIComponent(msgForCustomer)}`;
+    // Mở Zalo chat tới số 0985500095 kèm nội dung chốt đơn sẵn
+    const zaloUrl = `https://zalo.me/${SHOP_ZALO_PHONE}?text=${encodeURIComponent(msgForShopZalo)}`;
     window.open(zaloUrl, '_blank');
   });
 }
