@@ -537,7 +537,7 @@ function submitOrder() {
     `🚚 Thời gian giao hàng dự kiến: 2-3 ngày.\n` +
     `🔎 Theo dõi đơn hàng tại: https://hoangtruongaudio.github.io/hta-shop/`;
 
-  // 2. Soạn tin nhắn báo động về Telegram cho Admin (Sử dụng Template String chuẩn)
+  // 2. Soạn tin nhắn báo động về Telegram cho Admin
   const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*
 📦 *Mã đơn:* \`${orderId}\`
 👤 *Khách hàng:* ${name}
@@ -572,6 +572,7 @@ function submitOrder() {
     const zaloUrl = `https://zalo.me/${formattedPhone}?text=${encodeURIComponent(msgForCustomer)}`;
     window.open(zaloUrl, '_blank');
   });
+}
 
 window.onload = function() {
   listenRealtimeData();
