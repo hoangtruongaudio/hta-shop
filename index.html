@@ -101,9 +101,22 @@ button{cursor:pointer}
 .detail.show{display:block}
 .home.hide{display:none}
 
+/* GIAO DIỆN KHUNG CHIẾU MEDIA CÓ NÚT CHUYỂN TRANH */
 .gallery-container{background:#000;position:relative;width:100%}
 .main-media{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:#000;position:relative}
 .main-media img, .main-media video, .main-media iframe{width:100%;height:100%;object-fit:contain;border:none;}
+
+/* Nút chuyển tiếp Mũi tên trái/phải */
+.nav-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;background:rgba(0,0,0,0.4);color:#fff;border:none;border-radius:50%;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:0.2s}
+.nav-arrow:hover{background:rgba(254,44,85,0.8)}
+.nav-arrow.left{left:10px}
+.nav-arrow.right{right:10px}
+
+/* Thanh chấm tròn định vị chỉ mục */
+.dots-indicator{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.5);transition:0.2s}
+.dot.active{background:var(--pink);width:16px;border-radius:4px}
+
 .thumb-slider{display:flex;gap:8px;padding:10px;background:#fff;overflow-x:auto;border-bottom:1px solid #eee}
 .thumb-item{width:60px;height:60px;border-radius:6px;border:2px solid #ddd;overflow:hidden;flex:none;cursor:pointer;position:relative;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .thumb-item.active{border-color:var(--pink)}
@@ -219,7 +232,10 @@ button{cursor:pointer}
 
 <div class="detail" id="detail">
  <div class="gallery-container">
+   <button class="nav-arrow left" onclick="prevMedia()">‹</button>
    <div class="main-media" id="mainMediaView"></div>
+   <button class="nav-arrow right" onclick="nextMedia()">›</button>
+   <div class="dots-indicator" id="dotsContainer"></div>
    <div class="thumb-slider" id="thumbSlider"></div>
  </div>
  <div class="dinfo">
@@ -289,6 +305,9 @@ let selectedVariant = '';
 let priceAsc = true;
 let cartList = JSON.parse(localStorage.getItem('hta_cart') || '[]');
 
+let currentMediaList = [];
+let currentMediaIndex = 0;
+
 function listenRealtimeData() {
   db.ref('hta_products').on('value', (snapshot) => {
     const val = snapshot.val();
@@ -309,6 +328,7 @@ function listenRealtimeData() {
     if(s) {
       if(s.name) {
         document.getElementById('shopName').textContent = s.name + ' ›';
+        document.getElementById('bannerShopName').textContent = s.name;
         document.title = s.name;
       }
       if(s.rating) document.getElementById('shopRatingText').textContent = '★ ' + s.rating;
@@ -534,75 +554,97 @@ function showDetail(itemOrId) {
   window.scrollTo(0,0);
 }
 
-// Tự động rút trích Video / Iframe từ Mô tả đưa lên Slider sản phẩm
 function renderDetailMedia(item) {
   const mainView = document.getElementById('mainMediaView');
   const thumbSlider = document.getElementById('thumbSlider');
+  const dotsContainer = document.getElementById('dotsContainer');
+  
   mainView.innerHTML = '';
   thumbSlider.innerHTML = '';
-  let mediaList = [];
+  dotsContainer.innerHTML = '';
+  currentMediaList = [];
+  currentMediaIndex = 0;
 
-  // Tách iframe hoặc video từ phần mô tả desc
+  // Tách video/iframe từ phần mô tả desc
   if (item.desc) {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = item.desc;
     
-    // Tìm các thẻ iframe
     const iframes = tempDiv.querySelectorAll('iframe');
-    iframes.forEach(iframe => {
-      mediaList.push({ type: 'iframe', src: iframe.src });
-    });
+    iframes.forEach(iframe => { currentMediaList.push({ type: 'iframe', src: iframe.src }); });
 
-    // Tìm các thẻ video
     const videos = tempDiv.querySelectorAll('video');
-    videos.forEach(video => {
-      mediaList.push({ type: 'video', src: video.src });
-    });
+    videos.forEach(video => { currentMediaList.push({ type: 'video', src: video.src }); });
   }
 
-  // Thêm danh sách ảnh sản phẩm
+  // Thêm ảnh sản phẩm
   if (item.images && item.images.length > 0) {
-    item.images.forEach(img => mediaList.push({ type: 'image', src: img }));
+    item.images.forEach(img => currentMediaList.push({ type: 'image', src: img }));
   }
 
-  if (mediaList.length === 0) {
+  if (currentMediaList.length === 0) {
     mainView.innerHTML = `<div style="color:#888;">Không có hình ảnh</div>`;
     thumbSlider.style.display = 'none';
+    dotsContainer.style.display = 'none';
     return;
   }
 
-  thumbSlider.style.display = mediaList.length > 1 ? 'flex' : 'none';
+  thumbSlider.style.display = currentMediaList.length > 1 ? 'flex' : 'none';
+  dotsContainer.style.display = currentMediaList.length > 1 ? 'flex' : 'none';
 
-  function displayMainMedia(mediaItem) {
-    if (mediaItem.type === 'iframe') {
-      mainView.innerHTML = `<iframe src="${mediaItem.src}" width="100%" height="100%" style="border:none;" allow="autoplay" allowfullscreen></iframe>`;
-    } else if (mediaItem.type === 'video') {
-      mainView.innerHTML = `<video src="${mediaItem.src}" controls autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>`;
-    } else {
-      mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
-    }
-  }
+  // Render chấm định vị (Dots)
+  currentMediaList.forEach((_, idx) => {
+    const dot = document.createElement('div');
+    dot.className = `dot ${idx === 0 ? 'active' : ''}`;
+    dot.onclick = () => switchMediaToIndex(idx);
+    dotsContainer.appendChild(dot);
+  });
 
-  displayMainMedia(mediaList[0]);
-
-  mediaList.forEach((media, index) => {
+  // Render danh sách Thumbnails bên dưới
+  currentMediaList.forEach((media, index) => {
     const thumb = document.createElement('div');
     thumb.className = `thumb-item ${index === 0 ? 'active' : ''}`;
     
     if(media.type === 'iframe' || media.type === 'video') {
-      thumb.innerHTML = `▶`; // Icon video cho hình xem trước
+      thumb.innerHTML = `▶`;
     } else {
       thumb.innerHTML = `<img src="${media.src}">`;
     }
 
-    thumb.onclick = () => {
-      document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
-      thumb.classList.add('active');
-      displayMainMedia(media);
-    };
+    thumb.onclick = () => switchMediaToIndex(index);
     thumbSlider.appendChild(thumb);
   });
+
+  switchMediaToIndex(0);
 }
+
+function switchMediaToIndex(index) {
+  if(index < 0) index = currentMediaList.length - 1;
+  if(index >= currentMediaList.length) index = 0;
+  currentMediaIndex = index;
+
+  const mainView = document.getElementById('mainMediaView');
+  const mediaItem = currentMediaList[currentMediaIndex];
+
+  if (mediaItem.type === 'iframe') {
+    mainView.innerHTML = `<iframe src="${mediaItem.src}" width="100%" height="100%" style="border:none;" allow="autoplay" allowfullscreen></iframe>`;
+  } else if (mediaItem.type === 'video') {
+    mainView.innerHTML = `<video src="${mediaItem.src}" controls autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>`;
+  } else {
+    mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
+  }
+
+  // Cập nhật trạng thái Active trên Thumbnails & Dots
+  document.querySelectorAll('.thumb-item').forEach((el, idx) => {
+    el.classList.toggle('active', idx === currentMediaIndex);
+  });
+  document.querySelectorAll('.dot').forEach((el, idx) => {
+    el.classList.toggle('active', idx === currentMediaIndex);
+  });
+}
+
+function prevMedia() { switchMediaToIndex(currentMediaIndex - 1); }
+function nextMedia() { switchMediaToIndex(currentMediaIndex + 1); }
 
 function renderProductReviews(reviewsData) {
   const container = document.getElementById('reviewContainer');
