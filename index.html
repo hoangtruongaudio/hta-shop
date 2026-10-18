@@ -304,7 +304,6 @@ function listenRealtimeData() {
     else if (activeTab === 'tabProductBtn') renderList(currentProducts, 'productList');
   });
 
-  // Lắng nghe cài đặt Shop, Logo và Tên từ Firebase Realtime Database
   db.ref('hta_shop').on('value', (snapshot) => {
     const s = snapshot.val();
     if(s) {
@@ -543,6 +542,7 @@ function renderDetailMedia(item) {
   thumbSlider.innerHTML = '';
   let mediaList = [];
 
+  // Hỗ trợ hiển thị ảnh sản phẩm trong slider chi tiết
   if (item.images && item.images.length > 0) {
     item.images.forEach(img => mediaList.push({ type: 'image', src: img }));
   }
@@ -556,7 +556,11 @@ function renderDetailMedia(item) {
   thumbSlider.style.display = mediaList.length > 1 ? 'flex' : 'none';
 
   function displayMainMedia(mediaItem) {
-    mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
+    if (mediaItem.type === 'video') {
+      mainView.innerHTML = `<video src="${mediaItem.src}" controls autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>`;
+    } else {
+      mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
+    }
   }
 
   displayMainMedia(mediaList[0]);
