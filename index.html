@@ -103,9 +103,9 @@ button{cursor:pointer}
 
 .gallery-container{background:#000;position:relative;width:100%}
 .main-media{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:#000;position:relative}
-.main-media img, .main-media video{width:100%;height:100%;object-fit:contain}
+.main-media img, .main-media video, .main-media iframe{width:100%;height:100%;object-fit:contain;border:none;}
 .thumb-slider{display:flex;gap:8px;padding:10px;background:#fff;overflow-x:auto;border-bottom:1px solid #eee}
-.thumb-item{width:60px;height:60px;border-radius:6px;border:2px solid #ddd;overflow:hidden;flex:none;cursor:pointer;position:relative;background:#f0f0f0}
+.thumb-item{width:60px;height:60px;border-radius:6px;border:2px solid #ddd;overflow:hidden;flex:none;cursor:pointer;position:relative;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .thumb-item.active{border-color:var(--pink)}
 .thumb-item img, .thumb-item video{width:100%;height:100%;object-fit:cover}
 
@@ -309,7 +309,6 @@ function listenRealtimeData() {
     if(s) {
       if(s.name) {
         document.getElementById('shopName').textContent = s.name + ' ›';
-        document.getElementById('bannerShopName').textContent = s.name;
         document.title = s.name;
       }
       if(s.rating) document.getElementById('shopRatingText').textContent = '★ ' + s.rating;
@@ -512,7 +511,7 @@ function showDetail(itemOrId) {
   document.getElementById('detailDesc').innerHTML = item.desc || 'Chưa có mô tả chi tiết.';
 
   renderDetailMedia(item);
-  renderProductReviews(item.reviews); // Hiển thị đánh giá riêng của sản phẩm
+  renderProductReviews(item.reviews);
 
   const varBox = document.getElementById('variants');
   varBox.innerHTML = '';
@@ -535,6 +534,7 @@ function showDetail(itemOrId) {
   window.scrollTo(0,0);
 }
 
+// Tự động rút trích Video / Iframe từ Mô tả đưa lên Slider sản phẩm
 function renderDetailMedia(item) {
   const mainView = document.getElementById('mainMediaView');
   const thumbSlider = document.getElementById('thumbSlider');
@@ -542,7 +542,25 @@ function renderDetailMedia(item) {
   thumbSlider.innerHTML = '';
   let mediaList = [];
 
-  // Hỗ trợ hiển thị ảnh sản phẩm trong slider chi tiết
+  // Tách iframe hoặc video từ phần mô tả desc
+  if (item.desc) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = item.desc;
+    
+    // Tìm các thẻ iframe
+    const iframes = tempDiv.querySelectorAll('iframe');
+    iframes.forEach(iframe => {
+      mediaList.push({ type: 'iframe', src: iframe.src });
+    });
+
+    // Tìm các thẻ video
+    const videos = tempDiv.querySelectorAll('video');
+    videos.forEach(video => {
+      mediaList.push({ type: 'video', src: video.src });
+    });
+  }
+
+  // Thêm danh sách ảnh sản phẩm
   if (item.images && item.images.length > 0) {
     item.images.forEach(img => mediaList.push({ type: 'image', src: img }));
   }
@@ -556,7 +574,9 @@ function renderDetailMedia(item) {
   thumbSlider.style.display = mediaList.length > 1 ? 'flex' : 'none';
 
   function displayMainMedia(mediaItem) {
-    if (mediaItem.type === 'video') {
+    if (mediaItem.type === 'iframe') {
+      mainView.innerHTML = `<iframe src="${mediaItem.src}" width="100%" height="100%" style="border:none;" allow="autoplay" allowfullscreen></iframe>`;
+    } else if (mediaItem.type === 'video') {
       mainView.innerHTML = `<video src="${mediaItem.src}" controls autoplay loop style="width:100%;height:100%;object-fit:contain;"></video>`;
     } else {
       mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:contain;">`;
@@ -568,7 +588,13 @@ function renderDetailMedia(item) {
   mediaList.forEach((media, index) => {
     const thumb = document.createElement('div');
     thumb.className = `thumb-item ${index === 0 ? 'active' : ''}`;
-    thumb.innerHTML = `<img src="${media.src}">`;
+    
+    if(media.type === 'iframe' || media.type === 'video') {
+      thumb.innerHTML = `▶`; // Icon video cho hình xem trước
+    } else {
+      thumb.innerHTML = `<img src="${media.src}">`;
+    }
+
     thumb.onclick = () => {
       document.querySelectorAll('.thumb-item').forEach(el => el.classList.remove('active'));
       thumb.classList.add('active');
