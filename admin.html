@@ -7,6 +7,7 @@
 <!-- Tích hợp Firebase Web SDK v9 (Compat version) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
 
 <style>
 :root {
@@ -65,11 +66,6 @@ tr:hover { background: #2f2f2f; }
 .btn-secondary { background: #444; color: #fff; }
 .btn-sm { padding: 4px 8px; font-size: 12px; }
 .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; text-transform: uppercase; }
-.badge-new { background: rgba(9, 132, 227, 0.2); color: var(--info); }
-.badge-confirmed { background: rgba(253, 203, 110, 0.2); color: var(--warning); }
-.badge-shipping { background: rgba(162, 155, 254, 0.2); color: #a29bfe; }
-.badge-completed { background: rgba(0, 184, 148, 0.2); color: var(--success); }
-.badge-canceled { background: rgba(214, 48, 49, 0.2); color: var(--danger); }
 
 .form-group { margin-bottom: 18px; }
 .form-group label { display: block; margin-bottom: 6px; font-size: 13px; color: var(--text-muted); }
@@ -309,26 +305,22 @@ tr:hover { background: #2f2f2f; }
   </div>
 </div>
 
-<!-- Modal Chèn Video (Hỗ trợ Tải lên từ máy HOẶC dán link) -->
+<!-- Modal Chèn Video (Tự động tải lên Firebase Storage) -->
 <div id="insertVideoModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000;">
   <div style="background:var(--bg-card); width:420px; border-radius:10px; padding:20px; border:1px solid var(--border);">
     <h4 style="margin-bottom:12px; color:#fff;">Chèn video vào mô tả</h4>
-    
     <div class="form-group">
-      <label>Cách 1: Tải video trực tiếp từ máy (MP4)</label>
-      <input type="file" id="editorVideoFileInput" accept="video/mp4,video/*" class="form-control" style="font-size:12px;">
+      <label>Cách 1: Chọn video từ máy tính (Tự động tải lên Cloud)</label>
+      <input type="file" id="editorVideoFileInput" accept="video/*" class="form-control" style="font-size:12px;">
     </div>
-
     <div style="text-align:center; color:var(--text-muted); margin: 8px 0;">— HOẶC —</div>
-
     <div class="form-group">
-      <label>Cách 2: Dán URL đường dẫn Video</label>
+      <label>Cách 2: Dán URL video có sẵn</label>
       <input type="text" id="editorVideoUrlInput" class="form-control" placeholder="https://example.com/video.mp4">
     </div>
-
     <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
       <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('insertVideoModal').style.display='none'">Hủy</button>
-      <button type="button" class="btn btn-primary btn-sm" onclick="confirmInsertVideo()">Chèn Video</button>
+      <button type="button" class="btn btn-primary btn-sm" id="btnConfirmVideo" onclick="confirmInsertVideo()">Chèn Video</button>
     </div>
   </div>
 </div>
@@ -346,6 +338,7 @@ const firebaseConfig = {
 
 if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
 const db = firebase.database();
+const storage = firebase.storage();
 
 let products = [];
 let orders = [];
@@ -558,27 +551,50 @@ function openInsertVideoModal() {
   document.getElementById('insertVideoModal').style.display = 'flex';
 }
 
+// Xử lý tải video lên Firebase Storage và chèn vào Editor
 function confirmInsertVideo() {
   const fileInput = document.getElementById('editorVideoFileInput');
   const urlInput = document.getElementById('editorVideoUrlInput').value.trim();
   const editor = document.getElementById('editorContent');
+  const btn = document.getElementById('btnConfirmVideo');
+
   editor.focus();
   if(savedRange) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); }
 
   if(fileInput.files && fileInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const videoHTML = `<br><video src="${evt.target.result}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
-      document.execCommand('insertHTML', false, videoHTML);
-      document.getElementById('insertVideoModal').style.display = 'none';
-    };
-    reader.readAsDataURL(fileInput.files[0]);
+    const file = fileInput.files[0];
+    btn.disabled = true;
+    btn.textContent = 'Đang tải video lên Cloud...';
+
+    const storageRef = storage.ref('videos/' + Date.now() + '_' + file.name);
+    const uploadTask = storageRef.put(file);
+
+    uploadTask.on('state_changed', 
+      (snapshot) => {
+        let progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+        btn.textContent = `Đang tải: ${progress}%`;
+      }, 
+      (error) => {
+        alert('Lỗi khi tải video lên Cloud: ' + error.message);
+        btn.disabled = false;
+        btn.textContent = 'Chèn Video';
+      }, 
+      () => {
+        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
+          const videoHTML = `<br><video src="${downloadURL}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
+          document.execCommand('insertHTML', false, videoHTML);
+          document.getElementById('insertVideoModal').style.display = 'none';
+          btn.disabled = false;
+          btn.textContent = 'Chèn Video';
+        });
+      }
+    );
   } else if(urlInput) {
     const videoHTML = `<br><video src="${urlInput}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
     document.execCommand('insertHTML', false, videoHTML);
     document.getElementById('insertVideoModal').style.display = 'none';
   } else {
-    alert('Vui lòng chọn file video hoặc nhập URL!');
+    alert('Vui lòng chọn file video hoặc dán link URL!');
   }
 }
 
