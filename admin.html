@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TikTok Shop Seller Center - Quản lý cửa hàng</title>
-<!-- Tích hợp Firebase Web SDK v9 (Compat version) -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-storage-compat.js"></script>
@@ -79,7 +78,7 @@ tr:hover { background: #2f2f2f; }
 .editor-toolbar { background: #222; border: 1px solid var(--border); border-bottom: none; border-radius: 6px 6px 0 0; padding: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
 .editor-toolbar button { background: var(--bg-input); border: 1px solid var(--border); color: #fff; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 12px; }
 .editor-content { background: var(--bg-input); border: 1px solid var(--border); border-radius: 0 0 6px 6px; min-height: 150px; padding: 12px; color: #fff; outline: none; }
-.editor-content img, .editor-content video, .editor-content iframe { max-width: 100%; border-radius: 6px; margin: 8px 0; display: block; }
+.editor-content img, .editor-content video { max-width: 100%; border-radius: 6px; margin: 8px 0; display: block; object-fit:cover; }
 </style>
 </head>
 <body>
@@ -269,7 +268,6 @@ tr:hover { background: #2f2f2f; }
       <div id="editorContent" class="editor-content" contenteditable="true"></div>
     </div>
 
-    <!-- PHẦN QUẢN LÝ ĐÁNH GIÁ RIÊNG CHO SẢN PHẨM -->
     <div style="border-top:1px solid var(--border); padding-top:15px; margin-top:15px;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
         <label style="font-weight:bold; color:var(--primary); font-size:14px;">⭐ Đánh giá riêng của sản phẩm này</label>
@@ -556,8 +554,8 @@ function confirmInsertVideo() {
   editor.focus();
   if(savedRange) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); }
 
-  let videoHTML = '';
-  // Tự động nhận diện đường dẫn Google Drive và chuyển thành iframe nhúng
+  let videoSrc = urlInput;
+  // Tự động rút ID Google Drive và chuyển sang link direct stream trực tiếp
   if (urlInput.includes('drive.google.com') || urlInput.includes('googleusercontent.com')) {
     let driveId = '';
     const match = urlInput.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -565,14 +563,12 @@ function confirmInsertVideo() {
     else if(urlInput.includes('/d/')) driveId = urlInput.split('/d/')[1].split('/')[0];
 
     if (driveId) {
-      const embedUrl = `https://drive.google.com/file/d/${driveId}/preview`;
-      videoHTML = `<br><div style="position:relative;width:100%;height:0;padding-bottom:56.25%;margin:8px 0;"><iframe src="${embedUrl}" width="100%" height="100%" style="position:absolute;top:0;left:0;border:none;border-radius:8px;" allow="autoplay" allowfullscreen></iframe></div><br>`;
-    } else {
-      videoHTML = `<br><video src="${urlInput}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
+      videoSrc = `https://lh3.googleusercontent.com/d/${driveId}`;
     }
-  } else {
-    videoHTML = `<br><video src="${urlInput}" controls style="max-width:100%; border-radius:6px; margin:8px 0;"></video><br>`;
   }
+
+  // Tự động phát, không có nút rườm rà, lặp lại liên tục
+  const videoHTML = `<br><video src="${videoSrc}" autoplay loop muted playsinline style="max-width:100%; width:100%; border-radius:6px; margin:8px 0; object-fit:cover;"></video><br>`;
 
   document.execCommand('insertHTML', false, videoHTML);
   document.getElementById('insertVideoModal').style.display = 'none';
