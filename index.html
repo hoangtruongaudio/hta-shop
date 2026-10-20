@@ -709,23 +709,19 @@ function renderDetailMedia(item) {
   currentMediaList = [];
   currentMediaIndex = 0;
 
-  if (item.desc) {
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = item.desc;
-    
-    const videos = tempDiv.querySelectorAll('video');
-    videos.forEach(v => { currentMediaList.push({ type: 'video', src: v.src }); });
-
-    const iframes = tempDiv.querySelectorAll('iframe');
-    iframes.forEach(i => { currentMediaList.push({ type: 'iframe', src: i.src }); });
+  // LẤY VIDEO TỪ THUỘC TÍNH RIÊNG (HOẶC MẢNG MEDIA CỦA SẢN PHẨM NẾU BẠN CÓ CẤU HÌNH)
+  // Nếu sản phẩm có video riêng được cấu hình:
+  if (item.video) {
+    currentMediaList.push({ type: 'video', src: item.video });
   }
 
+  // Đưa các hình ảnh slide chính vào danh sách media
   if (item.images && item.images.length > 0) {
     item.images.forEach(img => currentMediaList.push({ type: 'image', src: img }));
   }
 
   if (currentMediaList.length === 0) {
-    mainView.innerHTML = `<div style="color:#888;">Không có hình ảnh</div>`;
+    mainView.innerHTML = `<div style="color:#888">Không có hình ảnh</div>`;
     thumbSlider.style.display = 'none';
     dotsContainer.style.display = 'none';
     return;
@@ -744,13 +740,11 @@ function renderDetailMedia(item) {
   currentMediaList.forEach((media, index) => {
     const thumb = document.createElement('div');
     thumb.className = `thumb-item ${index === 0 ? 'active' : ''}`;
-    
-    if(media.type === 'video' || media.type === 'iframe') {
+    if(media.type === 'video') {
       thumb.innerHTML = `▶`;
     } else {
       thumb.innerHTML = `<img src="${media.src}">`;
     }
-
     thumb.onclick = () => switchMediaToIndex(index);
     thumbSlider.appendChild(thumb);
   });
