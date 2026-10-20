@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#042e3c">
 <title>HOÀNG TRƯỜNG AUDIO</title>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 
 <style>
 :root{
@@ -22,7 +24,8 @@ button{cursor:pointer}
 .nav{height:56px;background:var(--dark);color:#fff;display:flex;align-items:center;padding:0 15px;gap:18px}
 .nav .back{font-size:30px;background:none;border:0;color:#fff}
 .nav .search{flex:1;background:#fff1;border:1px solid #ffffff44;border-radius:22px;height:38px;display:flex;align-items:center;padding:0 13px;font-size:13px;color:#eee}
-.nav .cart{font-size:24px;cursor:pointer;position:relative}
+.nav .share,.nav .cart{font-size:24px;cursor:pointer}
+.cart{position:relative}
 .cart b{position:absolute;right:-8px;top:-8px;font-size:10px;background:var(--pink);border-radius:12px;padding:3px 5px;color:#fff}
 .mall{height:42px;margin:0 14px;background:linear-gradient(110deg,#5a3019,#1d1009);color:#ffe9d5;border-radius:0 0 10px 10px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:13px}
 .shop{background:#fff;margin:0 0 8px;padding:13px 14px 14px;border-radius:0 0 10px 10px}
@@ -32,22 +35,39 @@ button{cursor:pointer}
 .shopname{font-size:18px;font-weight:500;flex:1}
 .follow{background:var(--pink);color:#fff;border:0;border-radius:20px;padding:10px 22px;font-weight:700}
 .shopsub{margin-left:73px;margin-top:-22px;font-size:12px}
+.rating{color:#111}
+.vouchers{display:flex;gap:10px;overflow:auto;margin-top:16px}
+.voucher{min-width:235px;border:1px solid #d5eeee;background:#eefafa;border-radius:10px;padding:10px 12px;font-size:13px}
+.voucher.pink{background:#fff4f6;border-color:#ffd7df}
+.voucher button{float:right;background:#18b7b2;color:#fff;border:0;border-radius:6px;padding:7px 17px}
 .tabs{height:61px;background:#fff;display:flex;align-items:end;border-bottom:1px solid #ddd}
 .tabs button{flex:1;height:53px;background:#fff;border:0;color:#777;font-size:17px}
 .tabs button.active{color:#111;font-weight:700;border-bottom:3px solid #111}
+.sort{height:54px;background:#fff;display:flex;align-items:center;gap:0;overflow:hidden;white-space:nowrap;border-bottom:1px solid #eee}
+.sort button{background:#fff;border:0;padding:0 15px;color:#777;font-size:15px}
+.sort button.active{color:var(--pink);font-weight:700}
+.sep{color:#ddd}
 
 .list{background:#fff}
 .product{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid #f0f0f0;background:#fff;cursor:pointer}
 .pimg-wrap{width:125px;height:125px;background:#f4f4f4;border-radius:8px;overflow:hidden;position:relative;flex:none}
-.pimg-wrap img{width:100%;height:100%;object-fit:cover}
+.pimg-wrap img, .pimg-wrap video{width:100%;height:100%;object-fit:cover}
+
+.img-badges{position:absolute;bottom:0;left:0;right:0;display:flex;gap:2px;padding:2px}
+.badge-xtra{background:#00b894;color:#fff;font-size:8px;font-weight:800;padding:2px 3px;border-radius:2px}
+.badge-bonus{background:#ffb400;color:#000;font-size:8px;font-weight:800;padding:2px 3px;border-radius:2px}
+
 .pbody{min-width:0;flex:1;display:flex;flex-direction:column}
 .pname{font-size:14px;line-height:1.3;font-weight:600;color:#222;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tag-hangviet{background:#00b894;color:#fff;font-size:9px;font-weight:bold;padding:1px 4px;border-radius:3px;margin-right:4px}
+
 .p-tags{display:flex;gap:4px;flex-wrap:wrap;margin:4px 0}
 .tag-24h{background:#e3fc2d;color:#008b8b;font-size:10px;font-weight:bold;padding:1px 5px;border-radius:3px;display:inline-flex;align-items:center;gap:2px}
 .tag-udai{background:#fff0f3;color:var(--pink);font-size:10px;font-weight:bold;padding:1px 5px;border-radius:3px}
+
 .stars{font-size:12px;color:#777;margin-top:2px}
 .stars b{color:#111;font-weight:bold}
+
 .priceRow{margin-top:auto;display:flex;align-items:end;justify-content:space-between;gap:5px}
 .price{font-size:18px;color:var(--pink);font-weight:800}
 .old{font-size:12px;color:#aaa;text-decoration:line-through;margin-left:6px;font-weight:normal}
@@ -55,9 +75,26 @@ button{cursor:pointer}
 .btn-cart-icon{width:32px;height:32px;border:1px solid #ffd2db;background:#fff0f3;color:var(--pink);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px}
 .buy{background:var(--pink);color:#fff;border-radius:6px;border:0;font-size:13px;font-weight:700;padding:0 14px;height:32px}
 
+.popup-v-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;display:none;align-items:center;justify-content:center}
+.popup-v-box{width:320px;background:linear-gradient(180deg,#ff6b81 0%,#fe2c55 100%);border-radius:20px;padding:20px 16px 16px;text-align:center;color:#fff;position:relative;box-shadow:0 10px 30px rgba(0,0,0,0.5)}
+.popup-v-roof{position:absolute;top:-20px;left:50%;transform:translateX(-50%);width:280px;height:30px;background:#fff;border-radius:15px 15px 0 0;display:flex;overflow:hidden}
+.roof-wave{flex:1;background:var(--pink);border-radius:0 0 10px 10px;margin:0 1px}
+.popup-v-title{font-size:18px;font-weight:800;margin-top:10px}
+.popup-v-sub{font-size:12px;opacity:0.9;margin-bottom:15px}
+.popup-v-list{display:flex;flex-direction:column;gap:8px;margin-bottom:15px}
+.popup-v-item{background:#fff;color:#333;border-radius:10px;padding:10px;text-align:left}
+.popup-v-item b{color:var(--pink);font-size:15px;display:block}
+.popup-v-item span{font-size:11px;color:#666}
+.btn-nhan-het{width:100%;background:#fff;color:var(--pink);border:0;border-radius:22px;height:42px;font-weight:800;font-size:15px}
+.popup-close{position:absolute;bottom:-45px;left:50%;transform:translateX(-50%);width:32px;height:32px;border:2px solid #fff;border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer}
+
 .banner{margin:10px 14px;background:linear-gradient(135deg,#fe2c55,#ff758c);color:#fff;padding:20px;border-radius:12px;text-align:center}
 .banner h2{margin:0 0 8px;font-size:20px}
 .banner p{margin:0;font-size:13px;opacity:0.9}
+.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px}
+.cat-item{background:#fff;border:1px solid #eee;border-radius:10px;padding:16px;text-align:center;box-shadow:0 2px 4px rgba(0,0,0,0.02)}
+.cat-item .icon{font-size:32px;margin-bottom:8px}
+.cat-item b{display:block;font-size:14px;color:#333}
 
 .detail{display:none;background:#f5f5f5;min-height:500px}
 .detail.show{display:block}
@@ -65,50 +102,69 @@ button{cursor:pointer}
 
 .gallery-container{background:#000;position:relative;width:100%}
 .main-media{width:100%;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;background:#000;position:relative;overflow:hidden}
-.main-media img, .main-media video{width:100%;height:100%;object-fit:cover}
-.nav-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;background:rgba(0,0,0,0.4);color:#fff;border:none;border-radius:50%;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10}
+.main-media img{width:100%;height:100%;object-fit:cover}
+.main-media video{width:100%;height:100%;object-fit:cover}
+
+.nav-arrow{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;background:rgba(0,0,0,0.4);color:#fff;border:none;border-radius:50%;font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;transition:0.2s}
+.nav-arrow:hover{background:rgba(254,44,85,0.8)}
 .nav-arrow.left{left:10px}
 .nav-arrow.right{right:10px}
+
 .dots-indicator{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:10}
-.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.5)}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.5);transition:0.2s}
 .dot.active{background:var(--pink);width:16px;border-radius:4px}
+
 .thumb-slider{display:flex;gap:8px;padding:10px;background:#fff;overflow-x:auto;border-bottom:1px solid #eee}
-.thumb-item{width:60px;height:60px;border-radius:6px;border:2px solid #ddd;overflow:hidden;flex:none;cursor:pointer;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:18px}
+.thumb-item{width:60px;height:60px;border-radius:6px;border:2px solid #ddd;overflow:hidden;flex:none;cursor:pointer;position:relative;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-size:18px;}
 .thumb-item.active{border-color:var(--pink)}
 .thumb-item img, .thumb-item video{width:100%;height:100%;object-fit:cover}
 
 .dinfo{background:#fff;padding:13px 14px}
 .dtitle{font-size:18px;line-height:1.4}
 .dprice{font-size:24px;color:var(--pink);font-weight:800;margin-top:8px;display:flex;align-items:baseline;gap:8px}
+.doldprice{font-size:14px;color:#999;text-decoration:line-through;font-weight:normal}
 .shipping{border-top:1px solid #eee;border-bottom:1px solid #eee;background:#fff;padding:12px 14px;font-size:13px}
 .section{background:#fff;margin-top:8px;padding:14px}
 .section h3{font-size:16px;margin:0 0 12px}
+.variant{display:flex;gap:8px;flex-wrap:wrap}
+.variant button{background:#fff;border:1px solid #ddd;border-radius:4px;padding:9px 13px;font-weight:bold;color:#333}
+.variant button.sel{border-color:var(--pink);color:var(--pink);background:#fff5f7}
+.review{border-top:1px solid #eee;padding:12px 0;font-size:13px}
+.avatar{display:inline-flex;width:30px;height:30px;border-radius:50%;background:#eee;align-items:center;justify-content:center;margin-right:7px}
 
 .sticky{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);background:#fff;border-top:1px solid #ddd;padding:7px 9px calc(7px + env(safe-area-inset-bottom));display:flex;gap:6px;z-index:40}
 .sticky .small{width:50px;background:#fff;border:0;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#333}
 .sticky .add{width:38%;background:#fff0f3;color:var(--pink);border:1px solid #ffd7df;border-radius:4px;font-weight:700;font-size:14px}
 .sticky .buy{flex:1;border-radius:4px;background:var(--pink);color:#fff;border:0;font-weight:700}
 
+/* CSS POPUP CHỌN PHÂN LOẠI CÓ HÌNH ẢNH (TIKTOK SHOP STYLE) */
 .variant-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:none;align-items:flex-end;justify-content:center}
-.variant-modal{width:min(720px,100%);background:#fff;border-radius:16px 16px 0 0;padding:16px;max-height:80vh;overflow-y:auto}
+.variant-modal{width:min(720px,100%);background:#fff;border-radius:16px 16px 0 0;padding:16px;max-height:80vh;overflow-y:auto;position:relative;animation:slideUp 0.25s ease-out}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
 .vmodal-header{display:flex;gap:12px;margin-bottom:16px;border-bottom:1px solid #eee;padding-bottom:14px;position:relative}
-.vmodal-img{width:85px;height:85px;border-radius:8px;overflow:hidden;flex:none;background:#f0f0f0}
+.vmodal-img{width:85px;height:85px;border-radius:8px;overflow:hidden;flex:none;background:#f0f0f0;border:1px solid #eee}
 .vmodal-img img{width:100%;height:100%;object-fit:cover}
+.vmodal-info{display:flex;flex-direction:column;justify-content:center}
 .vmodal-price{font-size:22px;color:var(--pink);font-weight:800}
+.vmodal-sub{font-size:13px;color:#666;margin-top:4px}
+.vmodal-close{position:absolute;top:0;right:0;width:28px;height:28px;border-radius:50%;background:#f0f0f0;border:0;font-size:18px;display:flex;align-items:center;justify-content:center;color:#666}
+
+.vgrid-title{font-size:14px;font-weight:bold;margin:12px 0 8px;color:#222}
 .vgrid{display:grid;grid-template-columns:repeat(3, 1fr);gap:10px;margin-bottom:15px}
-.vcard{border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;background:#fff;text-align:center;padding:6px;cursor:pointer}
+.vcard{border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;background:#fff;text-align:center;padding:6px;cursor:pointer;transition:0.2s}
 .vcard.active{border-color:var(--pink);background:#fff5f7}
 .vcard-img{width:100%;aspect-ratio:1/1;border-radius:6px;overflow:hidden;background:#f5f5f5;margin-bottom:6px}
 .vcard-img img{width:100%;height:100%;object-fit:cover}
-.vcard-name{font-size:12px;font-weight:600;color:#333}
-.qty-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #eee}
+.vcard-name{font-size:12px;font-weight:600;color:#333;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.qty-row{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid #eee;margin-top:10px}
 .qty-btn-group{display:flex;align-items:center;border:1px solid #ddd;border-radius:6px;overflow:hidden}
 .qty-btn{width:32px;height:32px;background:#f8f8f8;border:0;font-size:16px;font-weight:bold}
 .qty-val{width:40px;text-align:center;font-weight:bold;font-size:14px}
+
 .vmodal-action{display:flex;gap:10px;margin-top:15px}
-.vbtn-cart,.vbtn-buy{flex:1;height:44px;border-radius:22px;font-weight:bold;font-size:14px}
-.vbtn-cart{background:#fff0f3;color:var(--pink);border:1px solid #ffd7df}
-.vbtn-buy{background:var(--pink);color:#fff;border:0}
+.vbtn-cart{flex:1;height:44px;background:#fff0f3;color:var(--pink);border:1px solid #ffd7df;border-radius:22px;font-weight:bold;font-size:14px}
+.vbtn-buy{flex:1;height:44px;background:var(--pink);color:#fff;border:0;border-radius:22px;font-weight:bold;font-size:14px}
 
 .sheetbg{position:fixed;inset:0;background:#0008;z-index:120;display:none;align-items:flex-end}
 .sheet{width:min(720px,100%);margin:auto;background:#fff;border-radius:15px 15px 0 0;padding:16px;max-height:90vh;overflow:auto}
@@ -120,6 +176,9 @@ button{cursor:pointer}
 .field label{display:block;font-size:12px;color:#666;margin-bottom:5px}
 .field input,.field textarea{width:100%;border:1px solid #ddd;border-radius:6px;padding:11px;outline:0}
 .confirm{width:100%;height:46px;background:var(--pink);color:#fff;border:0;border-radius:5px;font-weight:800;margin-top:14px}
+
+#detailDesc video{width:100%; height:auto; border-radius:8px; margin:8px 0; object-fit:cover;}
+#detailDesc iframe{width:100%; border-radius:8px; border:none;}
 </style>
 </head>
 <body>
@@ -128,6 +187,7 @@ button{cursor:pointer}
 <div class="nav">
  <button class="back" onclick="backHome()">‹</button>
  <div class="search">⌕&nbsp; Tìm kiếm sản phẩm</div>
+ <div class="share">↗</div>
  <div class="cart" onclick="openCartView()">🛒<b id="cartCount">0</b></div>
 </div>
 <div class="mall"><span>♙ Mall</span><span>Hàng thật 100% · Freeship ›</span></div>
@@ -135,21 +195,26 @@ button{cursor:pointer}
 <div class="home" id="home">
  <section class="shop">
   <div class="shopline">
-   <div class="logo"><img src="https://raw.githubusercontent.com/hoangtruongaudio/hta-shop/main/Video/logo.jpg" alt="logo"></div>
-   <div class="shopname">HOÀNG TRƯỜNG AUDIO ›</div>
+   <div class="logo" id="logoImgContainer"><img src="https://via.placeholder.com/100/000000/FFFFFF?text=HTA" alt="logo"></div>
+   <div class="shopname" id="shopName">HOÀNG TRƯỜNG AUDIO ›</div>
    <button class="follow">Theo dõi</button>
   </div>
-  <div class="shopsub"><span class="rating">★ 4.9</span> &nbsp; <span>219.4K đã bán</span></div>
+  <div class="shopsub"><span class="rating" id="shopRatingText">★ 4.9</span> &nbsp; <span id="soldShop">10.4K đã bán</span></div>
+  <div class="vouchers">
+   <div class="voucher"><b>Voucher vận chuyển x18</b><br>cho đơn trên 1đ <button>Nhận</button></div>
+   <div class="voucher pink"><b>Giảm 30K ₫</b><br>Không mức chi tiêu tối thiểu</div>
+  </div>
  </section>
 
  <div class="tabs">
   <button id="tabHomeBtn" class="active" onclick="switchTab('home')">Trang chủ</button>
   <button id="tabProductBtn" onclick="switchTab('product')">Sản phẩm</button>
+  <button id="tabCategoryBtn" onclick="switchTab('category')">Danh mục</button>
  </div>
 
  <div id="tabHomeContent">
    <div class="banner">
-     <h2>HOÀNG TRƯỜNG AUDIO</h2>
+     <h2 id="bannerShopName">HOÀNG TRƯỜNG AUDIO</h2>
      <p>Âm Thanh Đỉnh Cao - Giá Cực Tốt</p>
    </div>
    <div style="padding:10px 14px;font-weight:700;font-size:16px">🔥 Sản phẩm nổi bật</div>
@@ -157,7 +222,41 @@ button{cursor:pointer}
  </div>
 
  <div id="tabProductContent" style="display:none">
+   <div class="sort">
+    <button id="sortRecommend" class="active" onclick="sortProducts('recommend')">Đề xuất</button><span class="sep">|</span>
+    <button id="sortBest" onclick="sortProducts('best')">Bán chạy</button><span class="sep">|</span>
+    <button id="sortNew" onclick="sortProducts('new')">Hàng mới ra mắt</button><span class="sep">|</span>
+    <button id="sortPrice" onclick="sortProducts('price')">Giá <span id="priceDir">↕</span></button>
+   </div>
    <div class="list" id="productList"></div>
+ </div>
+
+ <div id="tabCategoryContent" style="display:none">
+   <div class="category-grid">
+     <div class="cat-item" onclick="switchTab('product')"><div class="icon">🎧</div><b>Tai nghe Bluetooth</b></div>
+     <div class="cat-item" onclick="switchTab('product')"><div class="icon">🔇</div><b>Chống ồn ANC</b></div>
+     <div class="cat-item" onclick="switchTab('product')"><div class="icon">🔊</div><b>Loa & Phụ kiện</b></div>
+     <div class="cat-item" onclick="switchTab('product')"><div class="icon">🏷️</div><b>Voucher & Ưu đãi</b></div>
+   </div>
+ </div>
+</div>
+
+<div class="popup-v-bg" id="voucherPopup">
+ <div class="popup-v-box">
+   <div class="popup-v-roof">
+     <div class="roof-wave"></div><div class="roof-wave"></div><div class="roof-wave"></div><div class="roof-wave"></div>
+   </div>
+   <div class="popup-v-title">Tiết kiệm với voucher</div>
+   <div class="popup-v-sub">Ưu đãi độc quyền từ người bán</div>
+   
+   <div class="popup-v-list">
+     <div class="popup-v-item"><b>Giảm 30K ₫</b><span>Không mức chi tiêu tối thiểu • Có áp dụng điều khoản</span></div>
+     <div class="popup-v-item"><b>Giảm 25K ₫</b><span>Không mức chi tiêu tối thiểu • Có áp dụng điều khoản</span></div>
+     <div class="popup-v-item"><b>Giảm 25K ₫</b><span>Không mức chi tiêu tối thiểu • Có áp dụng điều khoản</span></div>
+   </div>
+
+   <button class="btn-nhan-het" onclick="closeVoucherPopup()">Nhận hết</button>
+   <div class="popup-close" onclick="closeVoucherPopup()">✕</div>
  </div>
 </div>
 
@@ -171,40 +270,47 @@ button{cursor:pointer}
  </div>
  <div class="dinfo">
   <div class="dtitle" id="detailTitle"></div>
+  <div class="stars" id="detailStarsTop">★★★★★ <span style="color:#777">4.9 | Đã bán 1.2K</span></div>
+  <!-- HIỂN THỊ CẢ GIÁ BÁN VÀ GIÁ GỐC GẠCH CHÂN -->
   <div class="dprice">
     <span id="detailPrice">0₫</span>
-    <span class="doldprice" id="detailOldPrice" style="text-decoration:line-through;color:#999;font-size:14px;font-weight:normal"></span>
+    <span class="doldprice" id="detailOldPrice"></span>
   </div>
  </div>
  <div class="shipping">🚚 <b>Miễn phí vận chuyển</b> · Giao sớm nhất trong 3 ngày.</div>
  <div class="section">
    <h3>Chọn phân loại</h3>
-   <div class="variant" id="variants" style="display:flex;gap:8px;flex-wrap:wrap" onclick="openVariantPopup()"></div>
+   <div class="variant" id="variants" onclick="openVariantPopup()"></div>
  </div>
- <div class="section"><h3>Mô tả sản phẩm</h3><div id="detailDesc" style="font-size:13px;line-height:1.6;color:#444"></div></div>
+ <div class="section"><h3>Đánh giá của khách hàng</h3><div id="reviewContainer"></div></div>
+ <div class="section"><h3>Mô tả sản phẩm</h3><div id="detailDesc" style="font-size:13px;line-height:1.6;color:#444;"></div></div>
 </div>
 
+<!-- POPUP CHỌN PHÂN LOẠI CÓ HÌNH ẢNH SẢN PHẨM -->
 <div class="variant-modal-bg" id="variantModalBg" onclick="if(event.target===this) closeVariantPopup()">
   <div class="variant-modal">
-    <button class="close" onclick="closeVariantPopup()">✕</button>
+    <button class="vmodal-close" onclick="closeVariantPopup()">✕</button>
     <div class="vmodal-header">
-      <div class="vmodal-img" id="popupVarImg"><img src="" alt="product"></div>
-      <div>
+      <div class="vmodal-img" id="popupVarImg"><img src="https://via.placeholder.com/85" alt="product"></div>
+      <div class="vmodal-info">
         <div class="vmodal-price" id="popupVarPrice">0₫</div>
-        <div style="font-size:11px;color:#00b894;font-weight:bold;margin-top:2px">🚚 Freeship • Giảm giá ưu đãi</div>
-        <div class="vmodal-sub" style="font-size:13px;color:#666;margin-top:4px">Đã chọn: <b id="popupSelectedLabel" style="color:#111">Mặc định</b></div>
+        <div style="font-size:11px;color:#00b894;font-weight:bold;margin-top:2px;">🚚 Freeship • Giảm giá ưu đãi</div>
+        <div class="vmodal-sub">Đã chọn: <b id="popupSelectedLabel" style="color:#111">Mặc định</b></div>
       </div>
     </div>
-    <div style="font-size:14px;font-weight:bold;margin:12px 0 8px">Phân loại sản phẩm</div>
+    
+    <div class="vgrid-title">Phân loại sản phẩm</div>
     <div class="vgrid" id="popupVariantGrid"></div>
+
     <div class="qty-row">
-      <span style="font-weight:bold;font-size:14px">Số lượng</span>
+      <span style="font-weight:bold;font-size:14px;">Số lượng</span>
       <div class="qty-btn-group">
         <button class="qty-btn" onclick="changeQuantity(-1)">-</button>
         <span class="qty-val" id="orderQuantity">1</span>
         <button class="qty-btn" onclick="changeQuantity(1)">+</button>
       </div>
     </div>
+
     <div class="vmodal-action">
       <button class="vbtn-cart" onclick="addToCartFromPopup()">Thêm vào giỏ hàng</button>
       <button class="vbtn-buy" onclick="buyNowFromPopup()">Mua ngay</button>
@@ -227,7 +333,7 @@ button{cursor:pointer}
     <div class="othumb" id="orderImgContainer"></div>
     <div>
       <b id="orderTitle">Tên sản phẩm</b>
-      <div style="font-size:12px;color:#666" id="orderVariantLabel">Phân loại: Mặc định</div>
+      <div style="font-size:12px;color:#666;" id="orderVariantLabel">Phân loại: Mặc định</div>
       <div style="color:var(--pink);font-size:20px;font-weight:800" id="orderPrice">0₫</div>
     </div>
   </div>
@@ -242,96 +348,75 @@ button{cursor:pointer}
  <div class="sheet">
   <button class="close" onclick="closeCartView()">×</button>
   <h2>Giỏ hàng của bạn</h2>
-  <div id="cartItemList" style="max-height:300px;overflow-y:auto"></div>
-  <button class="confirm" style="margin-top:20px" onclick="closeCartView();openOrder()">TIẾP TỤC ĐẶT HÀNG</button>
+  <div id="cartItemList" style="max-height: 300px; overflow-y: auto;"></div>
+  <button class="confirm" style="margin-top:20px;" onclick="closeCartView(); if(cartList.length>0) openOrder();">TIẾP TỤC ĐẶT HÀNG</button>
  </div>
 </div>
 
 <script>
-// =========================================================================
-// KHO SẢN PHẨM TRỰC TIẾP TRÊN GITHUB
-// =========================================================================
-const products = [
-  {
-    id: "p_1",
-    name: "Tai Nghe Bluetooth AirPods 3 Pin Trâu, Cảm Ứng Mượt Mà",
-    price: "189.000₫",
-    old: "299.000₫",
-    sold: "127.5K",
-    rating: "4.9",
-    // 🎥 VIDEO CHỈ HIỂN THỊ ĐỘC QUYỀN TRÊN TRANG BÌA (SLIDE ĐẦU TIÊN)
-    video: "https://raw.githubusercontent.com/hoangtruongaudio/hta-shop/main/Video/ap31.mp4",
-    variantDetails: [
-      { name: "AP2 Standard", price: "189.000₫", img: "https://raw.githubusercontent.com/hoangtruongaudio/hta-shop/main/Video/logo.jpg" },
-      { name: "AP2 Pro", price: "249.000₫", img: "https://raw.githubusercontent.com/hoangtruongaudio/hta-shop/main/Video/logo.jpg" }
-    ],
-    images: [
-      "https://raw.githubusercontent.com/hoangtruongaudio/hta-shop/main/Video/logo.jpg"
-    ],
-    // 📝 MÔ TẢ CHI TIẾT BÊN DƯỚI (CHỈ CHỨA CHỮ VÀ ẢNH, HOÀN TOÀN KHÔNG CÓ VIDEO)
-    desc: "Thiết kế sang xịn mịn, chuẩn tỉ lệ 1:1. Âm thanh sống động, bass cực căng, kết nối bluetooth mượt mà ổn định."
-  }
-];
+const firebaseConfig = {
+  apiKey: "AIzaSyCAM8aZvUM5KwzNttrnTNsqo30yhf2IbKI",
+  authDomain: "hoangtruong-c6268.firebaseapp.com",
+  databaseURL: "https://hoangtruong-c6268-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "hoangtruong-c6268",
+  storageBucket: "hoangtruong-c6268.firebasestorage.app",
+  messagingSenderId: "858441479645",
+  appId: "1:858441479645:web:bad1af63eadf0633a1f234"
+};
 
-let currentProducts = [...products];
+if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
+const db = firebase.database();
+
+let products = [];
+let currentProducts = [];
 let selectedProduct = null;
 let selectedVariant = '';
 let currentQuantity = 1;
+let priceAsc = true;
 let cartList = JSON.parse(localStorage.getItem('hta_cart') || '[]');
+
 let currentMediaList = [];
 let currentMediaIndex = 0;
 
-// =========================================================================
-// THỐNG KÊ TRUY CẬP VÀ GỬI BÁO CÁO VỀ TELEGRAM
-// =========================================================================
-const TELEGRAM_BOT_TOKEN = '8869659373:AAFJAU0YcVSISF6hriTRcB-S3PMiRFpJPS4';
-const TELEGRAM_CHAT_ID = '6961829665';
+function listenRealtimeData() {
+  db.ref('hta_products').on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (val && Array.isArray(val)) {
+      products = val.filter(p => p.status !== false);
+    } else {
+      products = [];
+    }
+    currentProducts = [...products];
+    const activeTabBtn = document.querySelector('.tabs button.active');
+    const activeTab = activeTabBtn ? activeTabBtn.id : 'tabHomeBtn';
+    if (activeTab === 'tabHomeBtn') renderList(products, 'homeProductList');
+    else if (activeTab === 'tabProductBtn') renderList(currentProducts, 'productList');
+  });
 
-function trackVisitorAndReport() {
-  const today = new Date().toISOString().split('T')[0];
-  let visits = JSON.parse(localStorage.getItem('hta_visits') || '{}');
-  
-  let sessionKey = 'visited_' + today;
-  if (!sessionStorage.getItem(sessionKey)) {
-    sessionStorage.setItem(sessionKey, 'true');
-    visits[today] = (visits[today] || 0) + 1;
-    localStorage.setItem('hta_visits', JSON.stringify(visits));
-  }
-
-  let lastReportDate = localStorage.getItem('hta_last_report');
-  if (lastReportDate !== today) {
-    let dailyVisits = visits[today] || 1;
-    let ordersToday = JSON.parse(localStorage.getItem('hta_orders_count_' + today) || '0');
-
-    let reportMsg = `📊 *BÁO CÁO HỆ THỐNG HTA-SHOP* 📅 \`${today}\`\n\n` +
-                    `👀 Lượt truy cập hôm nay: *${dailyVisits}* lượt\n` +
-                    `📦 Số đơn hàng đặt trong ngày: *${ordersToday}* đơn`;
-
-    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: reportMsg, parse_mode: 'Markdown' })
-    }).then(() => {
-      localStorage.setItem('hta_last_report', today);
-    }).catch(err => console.log(err));
-  }
+  db.ref('hta_shop').on('value', (snapshot) => {
+    const s = snapshot.val();
+    if(s) {
+      if(s.name) {
+        document.getElementById('shopName').textContent = s.name + ' ›';
+        document.getElementById('bannerShopName').textContent = s.name;
+        document.title = s.name;
+      }
+      if(s.rating) document.getElementById('shopRatingText').textContent = '★ ' + s.rating;
+      if(s.sold) document.getElementById('soldShop').textContent = s.sold + ' đã bán';
+      if(s.logo) {
+        document.getElementById('logoImgContainer').innerHTML = `<img src="${s.logo}" alt="logo">`;
+      }
+    }
+  });
 }
-
-function incrementOrderCount() {
-  const today = new Date().toISOString().split('T')[0];
-  let ordersToday = JSON.parse(localStorage.getItem('hta_orders_count_' + today) || '0') + 1;
-  localStorage.setItem('hta_orders_count_' + today, JSON.stringify(ordersToday));
-}
-
-window.onload = function() {
-  trackVisitorAndReport();
-  renderList(products, 'homeProductList');
-  updateCartUI();
-};
 
 function updateCartUI() {
   const countEl = document.getElementById('cartCount');
   if(countEl) countEl.textContent = cartList.length;
+}
+
+function closeVoucherPopup() {
+  document.getElementById('voucherPopup').style.display = 'none';
 }
 
 function chatWithShop() {
@@ -346,10 +431,10 @@ function addToCartDirect(id) {
     cartList.push({
       id: p.id,
       name: p.name,
-      variant: p.variantDetails?.[0]?.name || 'Mặc định',
+      variant: p.variants?.[0] || 'Mặc định',
       price: p.price,
       quantity: 1,
-      img: p.images?.[0] || ''
+      img: (p.images && p.images.length > 0) ? p.images[0] : ''
     });
     localStorage.setItem('hta_cart', JSON.stringify(cartList));
     updateCartUI();
@@ -360,19 +445,19 @@ function addToCartDirect(id) {
 function openCartView() {
   const container = document.getElementById('cartItemList');
   if (cartList.length === 0) {
-    container.innerHTML = '<div style="padding:20px;text-align:center;color:#888">Giỏ hàng trống</div>';
+    container.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">Giỏ hàng trống</div>';
   } else {
     let html = '';
     cartList.forEach((item, index) => {
       html += `
-        <div class="orderitem" style="margin-top:10px">
+        <div class="orderitem" style="margin-top:10px;">
           <div class="othumb"><img src="${item.img || 'https://via.placeholder.com/75'}" style="width:100%;height:100%;object-fit:cover"></div>
           <div style="flex:1">
             <b>${item.name}</b>
-            <div style="font-size:12px;color:#666">${item.variant} x${item.quantity || 1}</div>
+            <div style="font-size:12px;color:#666;">${item.variant} x${item.quantity || 1}</div>
             <div style="color:var(--pink);font-weight:bold">${item.price}</div>
           </div>
-          <button onclick="removeFromCart(${index})" style="border:0;background:#ff000022;color:red;border-radius:4px;padding:5px 8px">Xóa</button>
+          <button onclick="removeFromCart(${index})" style="border:0;background:#ff000022;color:red;border-radius:4px;padding:5px 8px;">Xóa</button>
         </div>
       `;
     });
@@ -392,8 +477,11 @@ function removeFromCart(index) {
 function switchTab(tabName){
  document.getElementById('tabHomeBtn').classList.remove('active');
  document.getElementById('tabProductBtn').classList.remove('active');
+ document.getElementById('tabCategoryBtn').classList.remove('active');
+
  document.getElementById('tabHomeContent').style.display = 'none';
  document.getElementById('tabProductContent').style.display = 'none';
+ document.getElementById('tabCategoryContent').style.display = 'none';
 
  if(tabName === 'home'){
   document.getElementById('tabHomeBtn').classList.add('active');
@@ -403,6 +491,9 @@ function switchTab(tabName){
   document.getElementById('tabProductBtn').classList.add('active');
   document.getElementById('tabProductContent').style.display = 'block';
   renderList(currentProducts, 'productList');
+ }else if(tabName === 'category'){
+  document.getElementById('tabCategoryBtn').classList.add('active');
+  document.getElementById('tabCategoryContent').style.display = 'block';
  }
 }
 
@@ -412,7 +503,7 @@ function renderList(listData, targetId){
  list.innerHTML = '';
  
  if(listData.length === 0){
-   list.innerHTML = '<div style="padding:20px;text-align:center;color:#888">Chưa có sản phẩm nào.</div>';
+   list.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">Chưa có sản phẩm nào.</div>';
    return;
  }
 
@@ -424,7 +515,13 @@ function renderList(listData, targetId){
   el.className = 'product';
   el.onclick = () => showDetail(p);
   el.innerHTML = `
-    <div class="pimg-wrap">${imgTag}</div>
+    <div class="pimg-wrap">
+      ${imgTag}
+      <div class="img-badges">
+        <span class="badge-xtra">XTRA Freeship</span>
+        <span class="badge-bonus">Bonus Hoàn tiền</span>
+      </div>
+    </div>
     <div class="pbody">
       <div class="pname">
         <span class="tag-hangviet">HÀNG VIỆT</span>
@@ -451,16 +548,42 @@ function renderList(listData, targetId){
  });
 }
 
+function sortProducts(type) {
+  document.querySelectorAll('.sort button').forEach(b => b.classList.remove('active'));
+  if(type === 'recommend') {
+    document.getElementById('sortRecommend').classList.add('active');
+    currentProducts = [...products];
+  } else if(type === 'best') {
+    document.getElementById('sortBest').classList.add('active');
+    currentProducts.sort((a,b) => (parseInt(b.sold)||0) - (parseInt(a.sold)||0));
+  } else if(type === 'new') {
+    document.getElementById('sortNew').classList.add('active');
+    currentProducts.reverse();
+  } else if(type === 'price') {
+    document.getElementById('sortPrice').classList.add('active');
+    priceAsc = !priceAsc;
+    document.getElementById('priceDir').textContent = priceAsc ? '↑' : '↓';
+    currentProducts.sort((a,b) => {
+      let pa = parseInt(a.price.replace(/\D/g,''))||0;
+      let pb = parseInt(b.price.replace(/\D/g,''))||0;
+      return priceAsc ? pa - pb : pb - pa;
+    });
+  }
+  renderList(currentProducts, 'productList');
+}
+
 function showDetail(itemOrId) {
   let item = typeof itemOrId === 'string' ? products.find(p => p.id === itemOrId) : itemOrId;
   if(!item) return;
   selectedProduct = item;
-  selectedVariant = (item.variantDetails && item.variantDetails.length > 0) ? item.variantDetails[0].name : 'Mặc định';
+  selectedVariant = (item.variants && item.variants.length > 0) ? item.variants[0] : 'Mặc định';
 
   document.getElementById('home').classList.add('hide');
   document.getElementById('detail').classList.add('show');
   
   document.getElementById('detailTitle').textContent = item.name;
+  
+  // HIỂN THỊ ĐỒNG THỜI GIÁ BÁN VÀ GIÁ GỐC GẠCH CHÂN
   document.getElementById('detailPrice').textContent = item.price;
   document.getElementById('stickyPrice').textContent = item.price;
   const oldPriceEl = document.getElementById('detailOldPrice');
@@ -471,16 +594,19 @@ function showDetail(itemOrId) {
     oldPriceEl.style.display = 'none';
   }
 
+  document.getElementById('detailStarsTop').innerHTML = `★★★★★ <span style="color:#777">${item.rating || '4.9'} | Đã bán ${item.sold || '1.2K'}</span>`;
   document.getElementById('detailDesc').innerHTML = item.desc || 'Chưa có mô tả chi tiết.';
+
   renderDetailMedia(item);
+  renderProductReviews(item.reviews);
 
   const varBox = document.getElementById('variants');
   varBox.innerHTML = '';
-  if(item.variantDetails && item.variantDetails.length > 0) {
-    item.variantDetails.forEach((v) => {
+  if(item.variants && item.variants.length > 0) {
+    item.variants.forEach((v) => {
       const btn = document.createElement('button');
-      btn.textContent = v.name;
-      if(v.name === selectedVariant) btn.className = 'sel';
+      btn.textContent = v;
+      if(v === selectedVariant) btn.className = 'sel';
       varBox.appendChild(btn);
     });
   } else {
@@ -490,6 +616,7 @@ function showDetail(itemOrId) {
   window.scrollTo(0,0);
 }
 
+/* KHỐI XỬ LÝ POPUP CHỌN PHÂN LOẠI HIỂN THỊ HÌNH ẢNH */
 function openVariantPopup() {
   if (!selectedProduct) return;
   currentQuantity = 1;
@@ -497,30 +624,40 @@ function openVariantPopup() {
   document.getElementById('popupVarPrice').textContent = selectedProduct.price;
   document.getElementById('popupSelectedLabel').textContent = selectedVariant;
 
-  const defaultImg = (selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : '';
+  const defaultImg = (selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : 'https://via.placeholder.com/85';
   document.getElementById('popupVarImg').innerHTML = `<img src="${defaultImg}">`;
 
   const grid = document.getElementById('popupVariantGrid');
   grid.innerHTML = '';
 
-  const variantsList = selectedProduct.variantDetails || [];
+  const variantsList = (selectedProduct.variants && selectedProduct.variants.length > 0) ? selectedProduct.variants : ['Mặc định'];
 
-  variantsList.forEach((v) => {
-    let imgForVar = v.img || defaultImg;
+  variantsList.forEach((vName, idx) => {
+    // Tự động gán hình ảnh tương ứng cho từng phân loại
+    let imgForVar = defaultImg;
+    if (selectedProduct.images && selectedProduct.images[idx]) {
+      imgForVar = selectedProduct.images[idx];
+    }
+
     const card = document.createElement('div');
-    card.className = `vcard ${v.name === selectedVariant ? 'active' : ''}`;
+    card.className = `vcard ${vName === selectedVariant ? 'active' : ''}`;
     card.innerHTML = `
       <div class="vcard-img"><img src="${imgForVar}"></div>
-      <div class="vcard-name">${v.name}</div>
+      <div class="vcard-name">${vName}</div>
     `;
 
     card.onclick = () => {
       document.querySelectorAll('.vcard').forEach(c => c.classList.remove('active'));
       card.classList.add('active');
-      selectedVariant = v.name;
+      selectedVariant = vName;
       document.getElementById('popupSelectedLabel').textContent = selectedVariant;
-      document.getElementById('popupVarPrice').textContent = v.price || selectedProduct.price;
       document.getElementById('popupVarImg').innerHTML = `<img src="${imgForVar}">`;
+      
+      // Đồng bộ lại nút chọn ở trang ngoài
+      const varBtns = document.querySelectorAll('#variants button');
+      varBtns.forEach(b => {
+        b.classList.toggle('sel', b.textContent === selectedVariant);
+      });
     };
 
     grid.appendChild(card);
@@ -541,7 +678,7 @@ function changeQuantity(val) {
 
 function addToCartFromPopup() {
   if (!selectedProduct) return;
-  const pImg = selectedProduct.images?.[0] || '';
+  const pImg = (selectedProduct.images && selectedProduct.images.length > 0) ? selectedProduct.images[0] : '';
   cartList.push({
     id: selectedProduct.id,
     name: selectedProduct.name,
@@ -572,12 +709,13 @@ function renderDetailMedia(item) {
   currentMediaList = [];
   currentMediaIndex = 0;
 
-  // 🎥 ĐƯA VIDEO LÊN TRANG BÌA ĐẦU TIÊN
+  // LẤY VIDEO TỪ THUỘC TÍNH RIÊNG (HOẶC MẢNG MEDIA CỦA SẢN PHẨM NẾU BẠN CÓ CẤU HÌNH)
+  // Nếu sản phẩm có video riêng được cấu hình:
   if (item.video) {
     currentMediaList.push({ type: 'video', src: item.video });
   }
 
-  // ĐƯA CÁC ẢNH SLIDE TIẾP THEO
+  // Đưa các hình ảnh slide chính vào danh sách media
   if (item.images && item.images.length > 0) {
     item.images.forEach(img => currentMediaList.push({ type: 'image', src: img }));
   }
@@ -622,10 +760,10 @@ function switchMediaToIndex(index) {
   const mainView = document.getElementById('mainMediaView');
   const mediaItem = currentMediaList[currentMediaIndex];
 
-  if (mediaItem.type === 'video') {
-    mainView.innerHTML = `<video src="${mediaItem.src}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover"></video>`;
+  if (mediaItem.type === 'video' || mediaItem.type === 'iframe') {
+    mainView.innerHTML = `<video src="${mediaItem.src}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`;
   } else {
-    mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:cover">`;
+    mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:cover;">`;
   }
 
   document.querySelectorAll('.thumb-item').forEach((el, idx) => {
@@ -638,6 +776,25 @@ function switchMediaToIndex(index) {
 
 function prevMedia() { switchMediaToIndex(currentMediaIndex - 1); }
 function nextMedia() { switchMediaToIndex(currentMediaIndex + 1); }
+
+function renderProductReviews(reviewsData) {
+  const container = document.getElementById('reviewContainer');
+  let reviews = reviewsData || [];
+  if (reviews.length === 0) {
+    container.innerHTML = '<div style="color:#777; font-size:13px; padding:10px 0;">Chưa có đánh giá nào cho sản phẩm này.</div>';
+    return;
+  }
+  let html = `<div style="font-size:24px;font-weight:800;margin-bottom:10px;">${selectedProduct.rating || '4.9'} <span style="font-size:16px;color:#ffb400">★★★★★</span></div>`;
+  reviews.forEach(r => {
+    html += `
+      <div class="review">
+        <span class="avatar">${r.name ? r.name.charAt(0) : 'K'}</span><b>${r.name}</b><br>
+        <span class="stars">${'★'.repeat(parseInt(r.rating) || 5)}</span><br>${r.content}
+      </div>
+    `;
+  });
+  container.innerHTML = html;
+}
 
 function backHome() {
   if(document.getElementById('detail').classList.contains('show')) {
@@ -657,7 +814,10 @@ function openOrder() {
   const imgBox = document.getElementById('orderImgContainer');
   if(selectedProduct.images && selectedProduct.images.length > 0) {
     imgBox.innerHTML = `<img src="${selectedProduct.images[0]}" style="width:100%;height:100%;object-fit:cover">`;
+  } else {
+    imgBox.innerHTML = `<div style="text-align:center;line-height:75px;color:#aaa">HTA</div>`;
   }
+  
   document.getElementById('sheetbg').style.display = 'flex';
 }
 
@@ -673,8 +833,26 @@ function submitOrder() {
     return;
   }
 
+  const TELEGRAM_BOT_TOKEN = '8869659373:AAFJAU0YcVSISF6hriTRcB-S3PMiRFpJPS4';
+  const TELEGRAM_CHAT_ID = '6961829665';
+  const SHOP_ZALO_PHONE = '84985500095';
+
   const orderId = 'ORD_' + Date.now();
-  const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI TỪ SHOP!*
+  const newOrder = {
+    id: orderId,
+    name: name,
+    phone: phone,
+    address: address,
+    prodName: selectedProduct.name,
+    variant: `${selectedVariant} (x${currentQuantity})`,
+    price: selectedProduct.price,
+    status: 'Mới',
+    time: new Date().toLocaleString('vi-VN')
+  };
+
+  const msgForShopZalo = `🛍️ XÁC NHẬN ĐƠN HÀNG MỚI (HTA)\n📦 Mã đơn: ${orderId}\n👤 Khách hàng: ${name}\n📞 SĐT: ${phone}\n🎧 Sản phẩm: ${selectedProduct.name} (${selectedVariant} x${currentQuantity})\n💰 Tiền: ${selectedProduct.price}\n📍 Địa chỉ: ${address}`;
+
+  const msgForAdmin = `🚨 *CÓ ĐƠN HÀNG MỚI!*
 📦 *Mã đơn:* \`${orderId}\`
 👤 *Khách hàng:* ${name}
 📞 *SĐT:* \`${phone}\`
@@ -688,18 +866,22 @@ function submitOrder() {
     body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msgForAdmin, parse_mode: 'Markdown' })
   });
 
-  incrementOrderCount();
-
-  alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận đơn...');
-  closeOrder();
-  document.getElementById('name').value = '';
-  document.getElementById('phone').value = '';
-  document.getElementById('address').value = '';
-  
-  const SHOP_ZALO_PHONE = '84985500095';
-  let msgForShopZalo = `🛍️ XÁC NHẬN ĐƠN HÀNG (HTA)\n👤 Khách: ${name}\n📞 SĐT: ${phone}\n🎧 SP: ${selectedProduct.name} (${selectedVariant} x${currentQuantity})\n📍 Địa chỉ: ${address}`;
-  window.open(`https://zalo.me/${SHOP_ZALO_PHONE}?text=${encodeURIComponent(msgForShopZalo)}`, '_blank');
+  db.ref('hta_orders').push(newOrder).then(() => {
+    alert('Đặt hàng thành công! Đang chuyển sang Zalo để gửi xác nhận đơn...');
+    closeOrder();
+    document.getElementById('name').value = '';
+    document.getElementById('phone').value = '';
+    document.getElementById('address').value = '';
+    window.open(`https://zalo.me/${SHOP_ZALO_PHONE}?text=${encodeURIComponent(msgForShopZalo)}`, '_blank');
+  });
 }
+
+window.onload = function() {
+  listenRealtimeData();
+  switchTab('home');
+  updateCartUI();
+  setTimeout(() => { document.getElementById('voucherPopup').style.display = 'flex'; }, 400);
+};
 </script>
 </body>
 </html>
