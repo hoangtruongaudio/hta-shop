@@ -137,7 +137,6 @@ button{cursor:pointer}
 .sticky .add{width:38%;background:#fff0f3;color:var(--pink);border:1px solid #ffd7df;border-radius:4px;font-weight:700;font-size:14px}
 .sticky .buy{flex:1;border-radius:4px;background:var(--pink);color:#fff;border:0;font-weight:700}
 
-/* CSS POPUP CHỌN PHÂN LOẠI CÓ HÌNH ẢNH (TIKTOK SHOP STYLE) */
 .variant-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:none;align-items:flex-end;justify-content:center}
 .variant-modal{width:min(720px,100%);background:#fff;border-radius:16px 16px 0 0;padding:16px;max-height:80vh;overflow-y:auto;position:relative;animation:slideUp 0.25s ease-out}
 @keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
@@ -177,7 +176,8 @@ button{cursor:pointer}
 .field input,.field textarea{width:100%;border:1px solid #ddd;border-radius:6px;padding:11px;outline:0}
 .confirm{width:100%;height:46px;background:var(--pink);color:#fff;border:0;border-radius:5px;font-weight:800;margin-top:14px}
 
-#detailDesc video{width:100%; height:auto; border-radius:8px; margin:8px 0; object-fit:cover;}
+/* Mô tả sản phẩm chỉ chứa ảnh hoặc văn bản, không chứa video bị lặp */
+#detailDesc img{max-width:100%; height:auto; border-radius:8px; margin:8px 0; display:block; object-fit:contain;}
 #detailDesc iframe{width:100%; border-radius:8px; border:none;}
 </style>
 </head>
@@ -271,7 +271,6 @@ button{cursor:pointer}
  <div class="dinfo">
   <div class="dtitle" id="detailTitle"></div>
   <div class="stars" id="detailStarsTop">★★★★★ <span style="color:#777">4.9 | Đã bán 1.2K</span></div>
-  <!-- HIỂN THỊ CẢ GIÁ BÁN VÀ GIÁ GỐC GẠCH CHÂN -->
   <div class="dprice">
     <span id="detailPrice">0₫</span>
     <span class="doldprice" id="detailOldPrice"></span>
@@ -286,7 +285,6 @@ button{cursor:pointer}
  <div class="section"><h3>Mô tả sản phẩm</h3><div id="detailDesc" style="font-size:13px;line-height:1.6;color:#444;"></div></div>
 </div>
 
-<!-- POPUP CHỌN PHÂN LOẠI CÓ HÌNH ẢNH SẢN PHẨM -->
 <div class="variant-modal-bg" id="variantModalBg" onclick="if(event.target===this) closeVariantPopup()">
   <div class="variant-modal">
     <button class="vmodal-close" onclick="closeVariantPopup()">✕</button>
@@ -583,7 +581,6 @@ function showDetail(itemOrId) {
   
   document.getElementById('detailTitle').textContent = item.name;
   
-  // HIỂN THỊ ĐỒNG THỜI GIÁ BÁN VÀ GIÁ GỐC GẠCH CHÂN
   document.getElementById('detailPrice').textContent = item.price;
   document.getElementById('stickyPrice').textContent = item.price;
   const oldPriceEl = document.getElementById('detailOldPrice');
@@ -616,7 +613,6 @@ function showDetail(itemOrId) {
   window.scrollTo(0,0);
 }
 
-/* KHỐI XỬ LÝ POPUP CHỌN PHÂN LOẠI HIỂN THỊ HÌNH ẢNH */
 function openVariantPopup() {
   if (!selectedProduct) return;
   currentQuantity = 1;
@@ -633,7 +629,6 @@ function openVariantPopup() {
   const variantsList = (selectedProduct.variants && selectedProduct.variants.length > 0) ? selectedProduct.variants : ['Mặc định'];
 
   variantsList.forEach((vName, idx) => {
-    // Tự động gán hình ảnh tương ứng cho từng phân loại
     let imgForVar = defaultImg;
     if (selectedProduct.images && selectedProduct.images[idx]) {
       imgForVar = selectedProduct.images[idx];
@@ -653,7 +648,6 @@ function openVariantPopup() {
       document.getElementById('popupSelectedLabel').textContent = selectedVariant;
       document.getElementById('popupVarImg').innerHTML = `<img src="${imgForVar}">`;
       
-      // Đồng bộ lại nút chọn ở trang ngoài
       const varBtns = document.querySelectorAll('#variants button');
       varBtns.forEach(b => {
         b.classList.toggle('sel', b.textContent === selectedVariant);
@@ -698,6 +692,7 @@ function buyNowFromPopup() {
   openOrder();
 }
 
+/* ĐẶT VIDEO LÊN TRANG BÌA (SLIDE ĐẦU TIÊN), CÁC ẢNH SAU HIỂN THỊ BÌNH THƯỜNG KHÔNG BỊ LẶP Ở MÔ TẢ */
 function renderDetailMedia(item) {
   const mainView = document.getElementById('mainMediaView');
   const thumbSlider = document.getElementById('thumbSlider');
@@ -709,13 +704,12 @@ function renderDetailMedia(item) {
   currentMediaList = [];
   currentMediaIndex = 0;
 
-  // LẤY VIDEO TỪ THUỘC TÍNH RIÊNG (HOẶC MẢNG MEDIA CỦA SẢN PHẨM NẾU BẠN CÓ CẤU HÌNH)
-  // Nếu sản phẩm có video riêng được cấu hình:
+  // 1. Nếu sản phẩm có thuộc tính video riêng, đưa lên trang bìa đầu tiên
   if (item.video) {
     currentMediaList.push({ type: 'video', src: item.video });
   }
 
-  // Đưa các hình ảnh slide chính vào danh sách media
+  // 2. Đưa các hình ảnh slide tiếp theo vào danh sách media
   if (item.images && item.images.length > 0) {
     item.images.forEach(img => currentMediaList.push({ type: 'image', src: img }));
   }
@@ -760,7 +754,7 @@ function switchMediaToIndex(index) {
   const mainView = document.getElementById('mainMediaView');
   const mediaItem = currentMediaList[currentMediaIndex];
 
-  if (mediaItem.type === 'video' || mediaItem.type === 'iframe') {
+  if (mediaItem.type === 'video') {
     mainView.innerHTML = `<video src="${mediaItem.src}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`;
   } else {
     mainView.innerHTML = `<img src="${mediaItem.src}" style="width:100%;height:100%;object-fit:cover;">`;
