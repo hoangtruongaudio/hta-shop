@@ -262,8 +262,9 @@ tr:hover { background: #2f2f2f; }
 
       <div class="form-group">
         <label>Danh sách Link URL Ảnh Slide chung (Mỗi link một dòng)</label>
-        <textarea id="prodImagesUrl" class="form-control" rows="3" placeholder="https://raw.githubusercontent.com/..."></textarea>
+        <textarea id="prodImagesUrl" class="form-control" rows="3" wrap="off" style="white-space: pre; overflow-x: auto;" placeholder="https://raw.githubusercontent.com/..."></textarea>
       </div>
+      
 
       <div class="form-group">
         <label>Mô tả chi tiết sản phẩm (Chỉ chứa chữ và hình ảnh, không chứa video)</label>
@@ -605,7 +606,14 @@ function saveProduct() {
   if(!name || !price) { alert('Vui lòng nhập tên và giá sản phẩm!'); return; }
 
   const simpleVariants = tempVariantList.map(v => v.name).filter(Boolean);
-  const rawImages = document.getElementById('prodImagesUrl').value.split('\n').map(s => s.trim()).filter(Boolean);
+  const rawImages = document.getElementById('prodImagesUrl').value.split('\n').map(s => {
+  let url = s.trim();
+  // Tự động đổi link github blob thành raw link để hiển thị ảnh
+  if (url.includes('github.com') && url.includes('/blob/')) {
+    url = url.replace('github.com', 'raw.githubusercontent.com').replace('/blob/', '/');
+  }
+  return url;
+}).filter(Boolean);
 
   const pData = {
     id: editIdx !== '' ? products[editIdx].id : 'p_' + Date.now(),
