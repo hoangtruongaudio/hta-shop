@@ -573,7 +573,7 @@ function editProduct(idx) {
   document.getElementById('prodSold').value = p.sold || '127.5K';
   document.getElementById('prodRating').value = p.rating || '4.9';
   document.getElementById('prodVideoUrl').value = p.video || '';
-  document.getElementById('prodImagesUrl').value = p.images ? p.images.join('\n') : (p.img || '');
+  document.getElementById('prodImagesUrl').value = p.images ? p.images.join('\n') : '';
   document.getElementById('editorContent').innerHTML = p.desc || '';
   
   if (p.variantDetails && Array.isArray(p.variantDetails)) {
@@ -602,8 +602,6 @@ function saveProduct() {
 
   const simpleVariants = tempVariantList.map(v => v.name).filter(Boolean);
   const rawImages = document.getElementById('prodImagesUrl').value.split('\n').map(s => s.trim()).filter(Boolean);
-  const variantImgs = tempVariantList.map(v => v.img).filter(Boolean);
-  const finalImages = rawImages.length > 0 ? rawImages : variantImgs;
 
   const pData = {
     id: editIdx !== '' ? products[editIdx].id : 'p_' + Date.now(),
@@ -612,11 +610,11 @@ function saveProduct() {
     old: document.getElementById('prodOldPrice').value.trim(),
     sold: document.getElementById('prodSold').value.trim() || '127.5K',
     rating: document.getElementById('prodRating').value.trim() || '4.9',
-    video: document.getElementById('prodVideoUrl').value.trim(), // LƯU LINK VIDEO RIÊNG BIỆT
+    video: document.getElementById('prodVideoUrl').value.trim(),
     variants: simpleVariants,
-    variantDetails: tempVariantList,
+    variantDetails: tempVariantList, // Lưu riêng danh sách phân loại kèm ảnh độc lập
     desc: document.getElementById('editorContent').innerHTML,
-    images: finalImages,
+    images: rawImages, // Chỉ lưu đúng các ảnh slide chung tại đây
     reviews: tempReviews,
     status: true
   };
