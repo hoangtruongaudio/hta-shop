@@ -247,6 +247,12 @@ tr:hover { background: #2f2f2f; }
         </div>
       </div>
 
+      <!-- Ô NHẬP LINK VIDEO TRANG BÌA RIÊNG BIỆT -->
+      <div class="form-group">
+        <label style="color:var(--primary); font-weight:bold;">🎥 Link Video Trang Bìa (Slide đầu tiên - Tùy chọn)</label>
+        <input type="text" id="prodVideoUrl" class="form-control" placeholder="https://raw.githubusercontent.com/.../video.mp4">
+      </div>
+
       <!-- QUẢN LÝ PHÂN LOẠI NHẸ NHÀNG BẰNG LINK URL ẢNH -->
       <div style="border:1px solid var(--border); padding:15px; border-radius:8px; margin-bottom:20px; background:#1e1e1e;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
@@ -262,13 +268,12 @@ tr:hover { background: #2f2f2f; }
       </div>
 
       <div class="form-group">
-        <label>Mô tả chi tiết sản phẩm (Hỗ trợ chèn ảnh và video)</label>
+        <label>Mô tả chi tiết sản phẩm (Chỉ chứa chữ và hình ảnh, không chứa video)</label>
         <div class="editor-toolbar">
           <button type="button" onclick="execCmd('bold')"><b>B</b></button>
           <button type="button" onclick="execCmd('italic')"><i>I</i></button>
           <button type="button" onclick="execCmd('insertUnorderedList')">• Danh sách</button>
           <button type="button" onclick="openInsertImageModal()">+ Chèn Ảnh</button>
-          <button type="button" onclick="openInsertVideoModal()">+ Chèn Video</button>
         </div>
         <div id="editorContent" class="editor-content" contenteditable="true"></div>
       </div>
@@ -301,21 +306,6 @@ tr:hover { background: #2f2f2f; }
     <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
       <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('insertImgModal').style.display='none'">Hủy</button>
       <button type="button" class="btn btn-primary btn-sm" onclick="confirmInsertImage()">Chèn</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal Chèn Video -->
-<div id="insertVideoModal" style="position:fixed; inset:0; background:rgba(0,0,0,0.85); display:none; align-items:center; justify-content:center; z-index:2000;">
-  <div style="background:var(--bg-card); width:420px; border-radius:10px; padding:20px; border:1px solid var(--border);">
-    <h4 style="margin-bottom:12px; color:#fff;">Chèn video vào mô tả</h4>
-    <div class="form-group">
-      <label>Dán URL đường dẫn Video trực tiếp (GitHub raw link)</label>
-      <input type="text" id="editorVideoUrlInput" class="form-control" placeholder="https://raw.githubusercontent.com/...">
-    </div>
-    <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:12px;">
-      <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('insertVideoModal').style.display='none'">Hủy</button>
-      <button type="button" class="btn btn-primary btn-sm" id="btnConfirmVideo" onclick="confirmInsertVideo()">Chèn Video</button>
     </div>
   </div>
 </div>
@@ -525,30 +515,6 @@ function confirmInsertImage() {
   }
 }
 
-function openInsertVideoModal() {
-  const sel = window.getSelection();
-  if (sel.getRangeAt && sel.rangeCount) savedRange = sel.getRangeAt(0);
-  document.getElementById('editorVideoUrlInput').value = '';
-  document.getElementById('insertVideoModal').style.display = 'flex';
-}
-
-function confirmInsertVideo() {
-  let urlInput = document.getElementById('editorVideoUrlInput').value.trim();
-  const editor = document.getElementById('editorContent');
-
-  if(!urlInput) {
-    alert('Vui lòng dán đường dẫn URL video!');
-    return;
-  }
-
-  editor.focus();
-  if(savedRange) { const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(savedRange); }
-
-  const videoHTML = `<br><video src="${urlInput}" autoplay loop muted playsinline style="max-width:220px; max-height:240px; border-radius:8px; margin:8px 0; object-fit:contain; background:#000;"></video><br>`;
-  document.execCommand('insertHTML', false, videoHTML);
-  document.getElementById('insertVideoModal').style.display = 'none';
-}
-
 function renderProductReviewsList() {
   const container = document.getElementById('productReviewsContainer');
   container.innerHTML = '';
@@ -586,6 +552,7 @@ function openProductModal() {
   document.getElementById('prodOldPrice').value = '';
   document.getElementById('prodSold').value = '127.5K';
   document.getElementById('prodRating').value = '4.9';
+  document.getElementById('prodVideoUrl').value = '';
   document.getElementById('prodImagesUrl').value = '';
   document.getElementById('editorContent').innerHTML = '';
   tempReviews = [];
@@ -605,6 +572,7 @@ function editProduct(idx) {
   document.getElementById('prodOldPrice').value = p.old || '';
   document.getElementById('prodSold').value = p.sold || '127.5K';
   document.getElementById('prodRating').value = p.rating || '4.9';
+  document.getElementById('prodVideoUrl').value = p.video || '';
   document.getElementById('prodImagesUrl').value = p.images ? p.images.join('\n') : (p.img || '');
   document.getElementById('editorContent').innerHTML = p.desc || '';
   
@@ -644,6 +612,7 @@ function saveProduct() {
     old: document.getElementById('prodOldPrice').value.trim(),
     sold: document.getElementById('prodSold').value.trim() || '127.5K',
     rating: document.getElementById('prodRating').value.trim() || '4.9',
+    video: document.getElementById('prodVideoUrl').value.trim(), // LƯU LINK VIDEO RIÊNG BIỆT
     variants: simpleVariants,
     variantDetails: tempVariantList,
     desc: document.getElementById('editorContent').innerHTML,
