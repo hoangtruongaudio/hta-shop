@@ -626,13 +626,19 @@ function openVariantPopup() {
   const grid = document.getElementById('popupVariantGrid');
   grid.innerHTML = '';
 
-  const variantsList = (selectedProduct.variants && selectedProduct.variants.length > 0) ? selectedProduct.variants : ['Mặc định'];
+  // Ưu tiên đọc từ danh sách variantDetails, nếu không có mới dùng mảng cũ
+  const variantsList = (selectedProduct.variantDetails && selectedProduct.variantDetails.length > 0) 
+    ? selectedProduct.variantDetails 
+    : (selectedProduct.variants || []).map(v => ({ name: v, price: selectedProduct.price, img: defaultImg }));
 
-  variantsList.forEach((vName, idx) => {
-    let imgForVar = defaultImg;
-    if (selectedProduct.images && selectedProduct.images[idx]) {
-      imgForVar = selectedProduct.images[idx];
-    }
+  if(variantsList.length === 0) {
+    variantsList.push({ name: 'Mặc định', price: selectedProduct.price, img: defaultImg });
+  }
+
+  variantsList.forEach((vItem) => {
+    let vName = typeof vItem === 'string' ? vItem : vItem.name;
+    let vPrice = (typeof vItem === 'object' && vItem.price) ? vItem.price : selectedProduct.price;
+    let imgForVar = (typeof vItem === 'object' && vItem.img) ? vItem.img : defaultImg;
 
     const card = document.createElement('div');
     card.className = `vcard ${vName === selectedVariant ? 'active' : ''}`;
@@ -646,6 +652,7 @@ function openVariantPopup() {
       card.classList.add('active');
       selectedVariant = vName;
       document.getElementById('popupSelectedLabel').textContent = selectedVariant;
+      document.getElementById('popupVarPrice').textContent = vPrice;
       document.getElementById('popupVarImg').innerHTML = `<img src="${imgForVar}">`;
       
       const varBtns = document.querySelectorAll('#variants button');
