@@ -124,7 +124,6 @@ button{cursor:pointer}
 .dprice{font-size:24px;color:var(--pink);font-weight:800;margin-top:8px;display:flex;align-items:baseline;gap:8px}
 .doldprice{font-size:14px;color:#999;text-decoration:line-through;font-weight:normal}
 
-/* STYLE CHUNG NỀN TRẮNG SÁNG CHO MIỄN PHÍ VẬN CHUYỂN & NHÃN BẢO HÀNH */
 .shipping{background:#fff;border-top:1px solid #eee;padding:12px 14px;font-size:13px;color:#222;}
 .policy-box {
   background: #fff;
@@ -150,11 +149,33 @@ button{cursor:pointer}
 
 .section{background:#fff;margin-top:8px;padding:14px}
 .section h3{font-size:16px;margin:0 0 12px}
+
+/* CSS GIAO DIỆN ĐÁNH GIÁ KIỂU TIKTOK SHOP */
+.review-header-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.review-header-title{font-size:16px;font-weight:bold;color:#111;}
+.review-more-btn{font-size:13px;color:#777;cursor:pointer;display:flex;align-items:center;gap:2px;}
+
+.review-item-tt{border-bottom:1px solid #eee;padding:14px 0;}
+.review-item-tt:last-child{border-bottom:none;}
+.review-user-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.review-user-avatar{width:32px;height:32px;border-radius:50%;background:#eee;display:flex;align-items:center;justify-content:center;font-weight:bold;color:#555;font-size:13px;overflow:hidden;}
+.review-user-avatar img{width:100%;height:100%;object-fit:cover;}
+.review-user-name{font-size:13px;font-weight:600;color:#222;}
+.review-stars-yellow{color:#ffb400;font-size:12px;margin-bottom:4px;}
+.review-meta-item{font-size:12px;color:#888;margin-bottom:2px;}
+.review-text-content{font-size:13.5px;line-height:1.45;color:#222;margin:6px 0 8px;}
+.review-image-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px;}
+.review-img-thumb{width:110px;height:110px;border-radius:8px;overflow:hidden;background:#f0f0f0;border:1px solid #eee;}
+.review-img-thumb img{width:100%;height:100%;object-fit:cover;}
+
+.review-shop-filter-box{margin-top:16px;border-top:1px solid #f0f0f0;padding-top:14px;}
+.shop-filter-title{font-size:15px;font-weight:bold;color:#111;margin-bottom:10px;}
+.shop-filter-tags{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;}
+.shop-filter-tag{background:#f5f5f5;padding:6px 12px;border-radius:16px;font-size:12px;color:#333;white-space:nowrap;display:flex;align-items:center;gap:4px;}
+
 .variant{display:flex;gap:8px;flex-wrap:wrap}
 .variant button{background:#fff;border:1px solid #ddd;border-radius:4px;padding:9px 13px;font-weight:bold;color:#333}
 .variant button.sel{border-color:var(--pink);color:var(--pink);background:#fff5f7}
-.review{border-top:1px solid #eee;padding:12px 0;font-size:13px}
-.avatar{display:inline-flex;width:30px;height:30px;border-radius:50%;background:#eee;align-items:center;justify-content:center;margin-right:7px}
 
 .sticky{position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(720px,100%);background:#fff;border-top:1px solid #ddd;padding:7px 9px calc(7px + env(safe-area-inset-bottom));display:flex;gap:6px;z-index:40}
 .sticky .small{width:50px;background:#fff;border:0;font-size:11px;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#333}
@@ -300,7 +321,6 @@ button{cursor:pointer}
   </div>
  </div>
 
- <!-- KHỐI PHÍ VẬN CHUYỂN VÀ CÁC CAM KẾT ĐỒNG KIỂM / COD NỀN TRẮNG SÁNG -->
  <div class="shipping">🚚 <b>Miễn phí vận chuyển</b> · Giao sớm nhất trong 3 ngày.</div>
  <div class="policy-box">
    <div class="policy-item"><span class="check-icon">✔</span> <span>Đảm bảo đồng kiểm khi nhận hàng</span></div>
@@ -311,7 +331,12 @@ button{cursor:pointer}
    <h3>Chọn phân loại</h3>
    <div class="variant" id="variants" onclick="openVariantPopup()"></div>
  </div>
- <div class="section"><h3>Đánh giá của khách hàng</h3><div id="reviewContainer"></div></div>
+
+ <!-- KHỐI HIỂN THỊ ĐÁNH GIÁ CHUẨN TIKTOK SHOP -->
+ <div class="section">
+   <div id="reviewContainer"></div>
+ </div>
+
  <div class="section"><h3>Mô tả sản phẩm</h3><div id="detailDesc" style="font-size:13px;line-height:1.6;color:#444;"></div></div>
 </div>
 
@@ -401,6 +426,7 @@ let selectedProduct = null;
 let selectedVariant = '';
 let currentQuantity = 1;
 let priceAsc = true;
+let showAllReviews = false;
 let cartList = JSON.parse(localStorage.getItem('hta_cart') || '[]');
 
 let currentMediaList = [];
@@ -605,6 +631,7 @@ function showDetail(itemOrId) {
   if(!item) return;
   selectedProduct = item;
   selectedVariant = (item.variants && item.variants.length > 0) ? item.variants[0] : 'Mặc định';
+  showAllReviews = false;
 
   document.getElementById('home').classList.add('hide');
   document.getElementById('detail').classList.add('show');
@@ -623,7 +650,6 @@ function showDetail(itemOrId) {
 
   document.getElementById('detailStarsTop').innerHTML = `★★★★★ <span style="color:#777">${item.rating || '4.9'} | Đã bán ${item.sold || '1.2K'}</span>`;
   
-  // TỰ ĐỘNG LỌC BỎ THẺ VIDEO NẾU TRONG MÔ TẢ CÓ LỠ BỊ LƯU VIDEO
   let cleanDesc = item.desc || 'Chưa có mô tả chi tiết.';
   cleanDesc = cleanDesc.replace(/<video[^>]*>.*?<\/video>/gi, '');
   document.getElementById('detailDesc').innerHTML = cleanDesc;
@@ -660,7 +686,6 @@ function openVariantPopup() {
   const grid = document.getElementById('popupVariantGrid');
   grid.innerHTML = '';
 
-  // ĐỌC CHÍNH XÁC VÀ ĐẦY ĐỦ ẢNH PHÂN LOẠI TỪ variantDetails
   const variantsList = (selectedProduct.variantDetails && selectedProduct.variantDetails.length > 0) 
     ? selectedProduct.variantDetails 
     : (selectedProduct.variants || []).map((v, i) => ({
@@ -748,12 +773,10 @@ function renderDetailMedia(item) {
   currentMediaList = [];
   currentMediaIndex = 0;
 
-  // 1. Đưa Video lên trang bìa slide đầu tiên
   if (item.video) {
     currentMediaList.push({ type: 'video', src: item.video });
   }
 
-  // 2. Đưa các hình ảnh slide tiếp theo
   if (item.images && item.images.length > 0) {
     item.images.forEach(img => currentMediaList.push({ type: 'image', src: img }));
   }
@@ -815,23 +838,67 @@ function switchMediaToIndex(index) {
 function prevMedia() { switchMediaToIndex(currentMediaIndex - 1); }
 function nextMedia() { switchMediaToIndex(currentMediaIndex + 1); }
 
+/* XỬ LÝ RENDER ĐÁNH GIÁ ĐẦY ĐỦ KIỂU TIKTOK SHOP */
 function renderProductReviews(reviewsData) {
   const container = document.getElementById('reviewContainer');
   let reviews = reviewsData || [];
-  if (reviews.length === 0) {
-    container.innerHTML = '<div style="color:#777; font-size:13px; padding:10px 0;">Chưa có đánh giá nào cho sản phẩm này.</div>';
-    return;
-  }
-  let html = `<div style="font-size:24px;font-weight:800;margin-bottom:10px;">${selectedProduct.rating || '4.9'} <span style="font-size:16px;color:#ffb400">★★★★★</span></div>`;
-  reviews.forEach(r => {
-    html += `
-      <div class="review">
-        <span class="avatar">${r.name ? r.name.charAt(0) : 'K'}</span><b>${r.name}</b><br>
-        <span class="stars">${'★'.repeat(parseInt(r.rating) || 5)}</span><br>${r.content}
+  const totalCount = reviews.length > 0 ? (reviews.length * 57 + 3) : 287; // Tính lượt giả lập sinh động
+
+  let html = `
+    <div class="review-header-line">
+      <div class="review-header-title">Đánh giá của khách hàng (${totalCount})</div>
+      <div class="review-more-btn" onclick="toggleMoreReviews()">
+        ${showAllReviews ? 'Thu gọn ▴' : 'Xem thêm ›'}
       </div>
-    `;
-  });
+    </div>
+    <div style="font-size:20px;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:6px;">
+      ${selectedProduct.rating || '4.9'} <span style="font-size:15px;color:#ffb400">★★★★★</span>
+    </div>
+  `;
+
+  if (reviews.length === 0) {
+    html += '<div style="color:#777; font-size:13px; padding:10px 0;">Chưa có đánh giá nào cho sản phẩm này.</div>';
+  } else {
+    const displayList = showAllReviews ? reviews : reviews.slice(0, 2);
+    displayList.forEach(r => {
+      let ratingStars = '★'.repeat(parseInt(r.rating) || 5);
+      let varText = r.variant || selectedVariant || 'Mặc định';
+      
+      html += `
+        <div class="review-item-tt">
+          <div class="review-user-row">
+            <div class="review-user-avatar">${r.name ? r.name.charAt(0) : 'K'}</div>
+            <div class="review-user-name">${r.name || 'Khách hàng ẩn danh'}</div>
+          </div>
+          <div class="review-stars-yellow">${ratingStars}</div>
+          <div class="review-meta-item">Mặt hàng: ${varText}</div>
+          <div class="review-meta-item">Độ vừa: Vừa vặn như tôi mong đợi</div>
+          <div class="review-text-content">${r.content}</div>
+          ${r.img ? `<div class="review-image-grid"><div class="review-img-thumb"><img src="${r.img}"></div></div>` : ''}
+        </div>
+      `;
+    });
+  }
+
+  // Khối bộ lọc đánh giá tổng quan cửa hàng phía dưới
+  html += `
+    <div class="review-shop-filter-box">
+      <div class="shop-filter-title">Đánh giá của khách về cửa hàng (11.6K)</div>
+      <div class="shop-filter-tags">
+        <div class="shop-filter-tag">📷 Có ảnh/video (2.3K)</div>
+        <div class="shop-filter-tag">5 ★ (9.8K)</div>
+        <div class="shop-filter-tag">4 ★ (1.2K)</div>
+        <div class="shop-filter-tag">3 ★ (289)</div>
+      </div>
+    </div>
+  `;
+
   container.innerHTML = html;
+}
+
+function toggleMoreReviews() {
+  showAllReviews = !showAllReviews;
+  renderProductReviews(selectedProduct.reviews);
 }
 
 function backHome() {
