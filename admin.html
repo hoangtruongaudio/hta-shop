@@ -247,13 +247,11 @@ tr:hover { background: #2f2f2f; }
         </div>
       </div>
 
-      <!-- Ô NHẬP LINK VIDEO TRANG BÌA RIÊNG BIỆT -->
       <div class="form-group">
         <label style="color:var(--primary); font-weight:bold;">🎥 Link Video Trang Bìa (Slide đầu tiên - Tùy chọn)</label>
         <input type="text" id="prodVideoUrl" class="form-control" placeholder="https://raw.githubusercontent.com/.../video.mp4">
       </div>
 
-      <!-- QUẢN LÝ PHÂN LOẠI NHẸ NHÀNG BẰNG LINK URL ẢNH -->
       <div style="border:1px solid var(--border); padding:15px; border-radius:8px; margin-bottom:20px; background:#1e1e1e;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <label style="font-weight:bold; color:var(--primary); font-size:14px;">🛍️ Quản lý Phân loại (Tên, Link Ảnh & Giá riêng)</label>
@@ -280,14 +278,13 @@ tr:hover { background: #2f2f2f; }
 
       <div style="border-top:1px solid var(--border); padding-top:15px; margin-top:15px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-          <label style="font-weight:bold; color:var(--primary); font-size:14px;">⭐ Đánh giá riêng của sản phẩm này</label>
+          <label style="font-weight:bold; color:var(--primary); font-size:14px;">⭐ Đánh giá riêng (Tên, Số sao, Tên phân loại, Nội dung & Link Ảnh)</label>
           <button type="button" class="btn btn-sm btn-primary" onclick="addReviewItem()">+ Thêm đánh giá</button>
         </div>
         <div id="productReviewsContainer" style="display:flex; flex-direction:column; gap:10px;"></div>
       </div>
     </div>
 
-    <!-- THANH FOOTER CỐ ĐỊNH NÚT LƯU SẢN PHẨM Ở ĐÁY -->
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Hủy</button>
       <button type="button" class="btn btn-primary" onclick="saveProduct()">Lưu sản phẩm</button>
@@ -515,6 +512,7 @@ function confirmInsertImage() {
   }
 }
 
+/* RENDER DANH SÁCH ĐÁNH GIÁ TRONG HÀM ADMIN CÓ Ô DÁN LINK ÁNH */
 function renderProductReviewsList() {
   const container = document.getElementById('productReviewsContainer');
   container.innerHTML = '';
@@ -524,24 +522,30 @@ function renderProductReviewsList() {
   }
   tempReviews.forEach((r, idx) => {
     container.innerHTML += `
-      <div style="background:#333; padding:10px; border-radius:6px; display:flex; gap:10px; align-items:center;">
-        <input type="text" class="form-control" value="${r.name}" placeholder="Tên khách" onchange="tempReviews[${idx}].name=this.value" style="flex:1;">
-        <select class="form-control" onchange="tempReviews[${idx}].rating=this.value" style="width:80px;">
-          <option value="5" ${r.rating==5?'selected':''}>5 ★</option>
-          <option value="4" ${r.rating==4?'selected':''}>4 ★</option>
-          <option value="3" ${r.rating==3?'selected':''}>3 ★</option>
-          <option value="2" ${r.rating==2?'selected':''}>2 ★</option>
-          <option value="1" ${r.rating==1?'selected':''}>1 ★</option>
-        </select>
-        <input type="text" class="form-control" value="${r.content}" placeholder="Nội dung đánh giá" onchange="tempReviews[${idx}].content=this.value" style="flex:2;">
-        <button type="button" class="btn btn-sm btn-secondary" onclick="tempReviews.splice(${idx},1);renderProductReviewsList();">Xóa</button>
+      <div style="background:#333; padding:10px; border-radius:6px; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:10px;">
+          <input type="text" class="form-control" value="${r.name || ''}" placeholder="Tên khách" onchange="tempReviews[${idx}].name=this.value" style="flex:1;">
+          <select class="form-control" onchange="tempReviews[${idx}].rating=this.value" style="width:80px;">
+            <option value="5" ${r.rating==5?'selected':''}>5 ★</option>
+            <option value="4" ${r.rating==4?'selected':''}>4 ★</option>
+            <option value="3" ${r.rating==3?'selected':''}>3 ★</option>
+            <option value="2" ${r.rating==2?'selected':''}>2 ★</option>
+            <option value="1" ${r.rating==1?'selected':''}>1 ★</option>
+          </select>
+          <input type="text" class="form-control" value="${r.variant || ''}" placeholder="Tên phân loại (VD: Nâu, XL)" onchange="tempReviews[${idx}].variant=this.value" style="flex:1;">
+        </div>
+        <input type="text" class="form-control" value="${r.content || ''}" placeholder="Nội dung đánh giá" onchange="tempReviews[${idx}].content=this.value">
+        <div style="display:flex; gap:10px; align-items:center;">
+          <input type="text" class="form-control" value="${r.img || ''}" placeholder="Dán URL link Ảnh đánh giá (Tùy chọn)" onchange="tempReviews[${idx}].img=this.value" style="flex:1;">
+          <button type="button" class="btn btn-sm btn-secondary" onclick="tempReviews.splice(${idx},1);renderProductReviewsList();">Xóa</button>
+        </div>
       </div>
     `;
   });
 }
 
 function addReviewItem() {
-  tempReviews.push({ name: 'Khách hàng ẩn danh', rating: 5, content: 'Sản phẩm tuyệt vời, dùng rất mượt!' });
+  tempReviews.push({ name: 'Ă** 🌿', rating: 5, variant: 'Mặc định', content: 'Quần kaki cao cấp sở hữu chất vải cotton dày dặn, co giãn nhẹ...', img: '' });
   renderProductReviewsList();
 }
 
@@ -612,9 +616,9 @@ function saveProduct() {
     rating: document.getElementById('prodRating').value.trim() || '4.9',
     video: document.getElementById('prodVideoUrl').value.trim(),
     variants: simpleVariants,
-    variantDetails: tempVariantList, // Lưu riêng danh sách phân loại kèm ảnh độc lập
+    variantDetails: tempVariantList,
     desc: document.getElementById('editorContent').innerHTML,
-    images: rawImages, // Chỉ lưu đúng các ảnh slide chung tại đây
+    images: rawImages,
     reviews: tempReviews,
     status: true
   };
