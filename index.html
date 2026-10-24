@@ -747,10 +747,11 @@ function chatWithShop() {
 function addToCartDirect(id) {
   const p = products.find(item => item.id === id);
   if(p) {
+    const variantName = p.variants?.[0] || 'Mặc định';
     cartList.push({
       id: p.id,
       name: p.name,
-      variant: p.variants?.[0] || 'Mặc định',
+      variant: variantName,
       price: p.price,
       quantity: 1,
       img: (p.images && p.images.length > 0) ? p.images[0] : ''
@@ -758,6 +759,24 @@ function addToCartDirect(id) {
     localStorage.setItem('hta_cart', JSON.stringify(cartList));
     updateCartUI();
     alert('Đã thêm sản phẩm vào giỏ hàng!');
+
+    // Gửi thông báo ngay về Telegram để bạn chốt đơn
+    const TELEGRAM_BOT_TOKEN = '8869659373:AAFJAU0YcVSISF6hriTRcB-S3PMiRFpJPS4';
+    const TELEGRAM_CHAT_ID = '6961829665';
+    const currentTime = new Date().toLocaleString('vi-VN');
+
+    const msgCartAlert = `🛒 *CÓ KHÁCH THÊM GIỎ HÀNG!*
+🎧 *Sản phẩm:* ${p.name}
+🏷️ *Phân loại:* ${variantName}
+💰 *Giá:* ${p.price}
+⏰ *Thời gian:* ${currentTime}
+👉 _Hãy chú ý tư vấn hoặc chốt đơn nếu khách chưa bấm thanh toán!_`;
+
+    fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: msgCartAlert, parse_mode: 'Markdown' })
+    }).catch(err => console.error("Lỗi gửi tin nhắn Telegram:", err));
   }
 }
 
