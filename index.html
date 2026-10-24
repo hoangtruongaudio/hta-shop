@@ -150,6 +150,92 @@ button{cursor:pointer}
 .section{background:#fff;margin-top:8px;padding:14px}
 .section h3{font-size:16px;margin:0 0 12px}
 
+ /* KHỐI CHÍNH SÁCH BÁN HÀNG & MUA HÀNG */
+.shop-policy-section {
+  background: #fff;
+  margin-top: 8px;
+  padding: 16px 14px;
+}
+.policy-section-title {
+  font-size: 15px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--dark);
+  text-align: center;
+  margin-bottom: 14px;
+  letter-spacing: 0.5px;
+}
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.policy-card {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.policy-card .p-icon {
+  font-size: 22px;
+  margin-bottom: 6px;
+  display: block;
+}
+.policy-card .p-text {
+  font-size: 11px;
+  color: #334155;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+/* KHỐI FOOTER THÔNG TIN LIÊN HỆ ĐỒNG BỘ NỀN TỐI */
+.footer-contact-section {
+  background: var(--dark);
+  color: #fff;
+  padding: 22px 16px 85px; /* Padding bottom để không bị che bởi thanh mua hàng cố định */
+  margin-top: 8px;
+}
+.footer-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  padding-bottom: 10px;
+}
+.footer-info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.footer-info-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: #e2e8f0;
+  line-height: 1.4;
+}
+.footer-info-item .icon {
+  font-size: 16px;
+  flex: none;
+  margin-top: 1px;
+}
+.footer-info-item b {
+  color: #fff;
+}
+.footer-info-item a {
+  color: #38bdf8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
 /* CSS GIAO DIỆN ĐÁNH GIÁ KIỂU TIKTOK SHOP */
 .review-header-line{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .review-header-title{font-size:16px;font-weight:bold;color:#111;}
@@ -339,6 +425,48 @@ button{cursor:pointer}
 
  <div class="section"><h3>Mô tả sản phẩm</h3><div id="detailDesc" style="font-size:13px;line-height:1.6;color:#444;"></div></div>
 </div>
+
+ <!-- KHỐI CHÍNH SÁCH BÁN HÀNG PHONG CÁCH TIKTOK SHOP -->
+ <div class="shop-policy-section">
+   <div class="policy-section-title">🛡️ CHÍNH SÁCH BÁN HÀNG & BẢO HÀNH</div>
+   <div class="policy-grid">
+     <div class="policy-card">
+       <span class="p-icon">💳</span>
+       <div class="p-text">Thanh toán linh hoạt & COD</div>
+     </div>
+     <div class="policy-card">
+       <span class="p-icon">🔄</span>
+       <div class="p-text">Đổi trả 1-1 trong 7 ngày</div>
+     </div>
+     <div class="policy-card">
+       <span class="p-icon">🚚</span>
+       <div class="p-text">Giao hàng toàn quốc cực nhanh</div>
+     </div>
+   </div>
+ </div>
+
+ <!-- KHỐI THÔNG TIN LIÊN HỆ FOOTER ĐỒNG BỘ GIAO DIỆN -->
+ <div class="footer-contact-section">
+   <div class="footer-title">📞 THÔNG TIN LIÊN HỆ HTA</div>
+   <div class="footer-info-list">
+     <div class="footer-info-item">
+       <span class="icon">📞</span>
+       <div><b>Điện thoại Hotline/Zalo:</b> <a href="tel:0985500095">0985 500 095</a></div>
+     </div>
+     <div class="footer-info-item">
+       <span class="icon">✉️</span>
+       <div><b>Email liên hệ:</b> hoangtruongaudio@gmail.com</div>
+     </div>
+     <div class="footer-info-item">
+       <span class="icon">📍</span>
+       <div><b>Địa chỉ Showroom:</b> Đường 32, Phường Vĩnh Tân, TP. Hồ Chí Minh</div>
+     </div>
+     <div class="footer-info-item">
+       <span class="icon">🏭</span>
+       <div><b>Xưởng & Kho hàng:</b> Kho tổng Hoàng Trường Audio</div>
+     </div>
+   </div>
+ </div>
 
 <div class="variant-modal-bg" id="variantModalBg" onclick="if(event.target===this) closeVariantPopup()">
   <div class="variant-modal">
